@@ -1,3 +1,5 @@
+@file:OptIn(kotlin.concurrent.atomics.ExperimentalAtomicApi::class)
+
 /**
  * Author & Developer: Jean Bodenberg
  * GIT: https://github.com/bodenberg/appdimens-sdps.git
@@ -24,10 +26,10 @@
  */
 package com.appdimens.dynamic.code
 
-import com.appdimens.dynamic.platform.DimenCallContext
-import com.appdimens.dynamic.platform.ScreenMetricsSnapshot
-import com.appdimens.dynamic.common.ScreenOrientation
-
+import com.appdimens.dynamic.core.AppDimensContext
+import com.appdimens.dynamic.core.ScreenConfiguration
+import com.appdimens.dynamic.core.currentScreenConfiguration
+import com.appdimens.dynamic.core.localAppDimensContext
 
 import com.appdimens.dynamic.common.DpQualifier
 import com.appdimens.dynamic.common.DpQualifierEntry
@@ -75,7 +77,7 @@ fun Number.scaledDp(): DimenScaled = this.toFloat().scaledDp()
  * A class that allows defining custom dimensions
  * based on screen qualifiers (UiModeType, Width, Height, Smallest Width).
  *
- * The value is resolved using a Context and uses the base value or a
+ * The value is resolved using a AppDimensContext and uses the base value or a
  * custom value, applying dynamic scaling at the end.
  *
  * PT
@@ -98,7 +100,6 @@ class DimenScaled private constructor(
      * EN Allow applying aspect ratio based constraint scaling.
      * PT Permite aplicar o escalonamento restrito baseado na proporção da tela (aspect ratio).
      */
-    @JvmOverloads
     fun applyAspectRatio(apply: Boolean = true): DimenScaled {
         return DimenScaled(initialBaseDp, sortedCustomEntries, ignoreMultiWindows, apply, customSensitivityK)
     }
@@ -107,7 +108,6 @@ class DimenScaled private constructor(
      * EN Allow ignoring the constraint scaling based on multi-window resizing properties.
      * PT Permite ignorar o escalonamento restrito baseado nas propriedades de redimensionamento de multi-janelas.
      */
-    @JvmOverloads
     fun ignoreMultiWindows(ignore: Boolean = true): DimenScaled {
         return DimenScaled(initialBaseDp, sortedCustomEntries, ignore, applyAspectRatio, customSensitivityK)
     }
@@ -121,7 +121,6 @@ class DimenScaled private constructor(
 
     // EN Builder methods.
 
-    @JvmOverloads
     fun screen(
         uiModeType: UiModeType,
         qualifierType: DpQualifier,
@@ -143,7 +142,6 @@ class DimenScaled private constructor(
         return DimenScaled(initialBaseDp, reorderEntries(entry), ignoreMultiWindows, applyAspectRatio, customSensitivityK)
     }
 
-    @JvmOverloads
     fun screen(
         uiModeType: UiModeType,
         qualifierType: DpQualifier,
@@ -154,7 +152,6 @@ class DimenScaled private constructor(
         inverter: Inverter? = Inverter.DEFAULT
     ): DimenScaled = screen(uiModeType, qualifierType, qualifierValue, orientation, customValue.toFloat(), finalQualifierResolver, inverter)
 
-    @JvmOverloads
     fun screen(
         type: UiModeType,
         customValue: Float,
@@ -173,7 +170,6 @@ class DimenScaled private constructor(
         return DimenScaled(initialBaseDp, reorderEntries(entry), ignoreMultiWindows, applyAspectRatio, customSensitivityK)
     }
 
-    @JvmOverloads
     fun screen(
         type: UiModeType,
         customValue: Number,
@@ -182,7 +178,6 @@ class DimenScaled private constructor(
         inverter: Inverter? = Inverter.DEFAULT
     ): DimenScaled = screen(type, customValue.toFloat(), finalQualifierResolver, orientation, inverter)
 
-    @JvmOverloads
     fun screen(
         type: DpQualifier,
         value: Int,
@@ -202,7 +197,6 @@ class DimenScaled private constructor(
         return DimenScaled(initialBaseDp, reorderEntries(entry), ignoreMultiWindows, applyAspectRatio, customSensitivityK)
     }
 
-    @JvmOverloads
     fun screen(
         type: DpQualifier,
         value: Int,
@@ -212,7 +206,6 @@ class DimenScaled private constructor(
         inverter: Inverter? = Inverter.DEFAULT
     ): DimenScaled = screen(type, value, customValue.toFloat(), finalQualifierResolver, orientation, inverter)
 
-    @JvmOverloads
     fun screen(
         orientation: Orientation = Orientation.DEFAULT,
         customValue: Float,
@@ -229,7 +222,6 @@ class DimenScaled private constructor(
         return DimenScaled(initialBaseDp, reorderEntries(entry), ignoreMultiWindows, applyAspectRatio, customSensitivityK)
     }
 
-    @JvmOverloads
     fun screen(
         orientation: Orientation = Orientation.DEFAULT,
         customValue: Number,
@@ -239,34 +231,34 @@ class DimenScaled private constructor(
 
     // EN Resolution logic.
 
-    private fun resolveDp(ctx: DimenCallContext, qualifier: DpQualifier): Float {
-        val metrics = ctx.screenMetrics
-        val currentUiModeType = ctx.currentUiMode()
-        return resolveDpInternal(ctx, qualifier, metrics, currentUiModeType)
+    private fun resolveDp(context: AppDimensContext, qualifier: DpQualifier): Float {
+        val configuration = context.configuration
+        val currentUiModeType = DimenCache.getCachedUiModeType(context)
+        return resolveDpInternal(context, qualifier, configuration, currentUiModeType)
     }
 
     /**
      * EN Resolves sdp, hdp, and wdp in one pass (single [UiModeType.fromConfiguration] and config read).
      * PT Resolve sdp, hdp e wdp numa só passagem.
      */
-    fun sdpHdpWdpPx(ctx: DimenCallContext): Triple<Float, Float, Float> {
-        val metrics = ctx.screenMetrics
-        val currentUiModeType = ctx.currentUiMode()
-        val density = ctx.screenMetrics.density
-        val sdp = resolveDpInternal(ctx, DpQualifier.SMALL_WIDTH, metrics, currentUiModeType) * density
-        val hdp = resolveDpInternal(ctx, DpQualifier.HEIGHT, metrics, currentUiModeType) * density
-        val wdp = resolveDpInternal(ctx, DpQualifier.WIDTH, metrics, currentUiModeType) * density
+    fun sdpHdpWdpPx(context: AppDimensContext): Triple<Float, Float, Float> {
+        val configuration = context.configuration
+        val currentUiModeType = DimenCache.getCachedUiModeType(context)
+        val density = context.density
+        val sdp = resolveDpInternal(context, DpQualifier.SMALL_WIDTH, configuration, currentUiModeType) * density
+        val hdp = resolveDpInternal(context, DpQualifier.HEIGHT, configuration, currentUiModeType) * density
+        val wdp = resolveDpInternal(context, DpQualifier.WIDTH, configuration, currentUiModeType) * density
         return Triple(sdp, hdp, wdp)
     }
 
     private fun resolveDpInternal(
-        ctx: DimenCallContext,
+        context: AppDimensContext,
         qualifier: DpQualifier,
-        metrics: ScreenMetricsSnapshot,
+        configuration: ScreenConfiguration,
         currentUiModeType: UiModeType
     ): Float {
-        val isLandscape = metrics.orientation == ScreenOrientation.LANDSCAPE
-        val isPortrait = metrics.orientation == ScreenOrientation.PORTRAIT
+        val isLandscape = configuration.orientation == ScreenConfiguration.ORIENTATION_LANDSCAPE
+        val isPortrait = configuration.orientation == ScreenConfiguration.ORIENTATION_PORTRAIT
 
         val foundEntry = sortedCustomEntries.firstOrNull { entry ->
             val qualifierEntry = entry.dpQualifierEntry
@@ -278,7 +270,7 @@ class DimenScaled private constructor(
             }
 
             if (qualifierEntry != null) {
-                val qualifierMatch = getQualifierValue(qualifierEntry.type, metrics) >= qualifierEntry.value.toFloat()
+                val qualifierMatch = getQualifierValue(qualifierEntry.type, configuration) >= qualifierEntry.value.toFloat()
                 if (entry.priority == 1 && uiModeMatch && qualifierMatch && orientationMatch) return@firstOrNull true
                 if (entry.priority == 3 && qualifierMatch && orientationMatch) return@firstOrNull true
                 false
@@ -293,7 +285,7 @@ class DimenScaled private constructor(
         val finalQualifier = foundEntry?.finalQualifierResolver ?: qualifier
 
         return dpToUse.toDynamicScaledDp(
-            ctx,
+            context,
             finalQualifier,
             foundEntry?.inverter ?: Inverter.DEFAULT,
             ignoreMultiWindows,
@@ -305,21 +297,21 @@ class DimenScaled private constructor(
     /**
      * EN Resolves the final value in pixels (Float).
      */
-    fun px(ctx: DimenCallContext, qualifier: DpQualifier): Float {
-        val metrics = ctx.screenMetrics
-        val currentUiModeType = ctx.currentUiMode()
-        val dpValue = resolveDpInternal(ctx, qualifier, metrics, currentUiModeType)
-        return dpValue * ctx.screenMetrics.density
+    fun px(context: AppDimensContext, qualifier: DpQualifier): Float {
+        val configuration = context.configuration
+        val currentUiModeType = DimenCache.getCachedUiModeType(context)
+        val dpValue = resolveDpInternal(context, qualifier, configuration, currentUiModeType)
+        return dpValue * context.density
     }
 
     // EN Convenience properties/methods similar to Compose version.
 
-    fun sdp(ctx: DimenCallContext): Float = px(ctx, DpQualifier.SMALL_WIDTH)
-    fun hdp(ctx: DimenCallContext): Float = px(ctx, DpQualifier.HEIGHT)
-    fun wdp(ctx: DimenCallContext): Float = px(ctx, DpQualifier.WIDTH)
+    fun sdp(context: AppDimensContext): Float = px(context, DpQualifier.SMALL_WIDTH)
+    fun hdp(context: AppDimensContext): Float = px(context, DpQualifier.HEIGHT)
+    fun wdp(context: AppDimensContext): Float = px(context, DpQualifier.WIDTH)
 
     /** EN Get the resolved value in DP (as Float). */
-    fun sdpBase(ctx: DimenCallContext): Float = resolveDp(ctx, DpQualifier.SMALL_WIDTH)
-    fun hdpBase(ctx: DimenCallContext): Float = resolveDp(ctx, DpQualifier.HEIGHT)
-    fun wdpBase(ctx: DimenCallContext): Float = resolveDp(ctx, DpQualifier.WIDTH)
+    fun sdpBase(context: AppDimensContext): Float = resolveDp(context, DpQualifier.SMALL_WIDTH)
+    fun hdpBase(context: AppDimensContext): Float = resolveDp(context, DpQualifier.HEIGHT)
+    fun wdpBase(context: AppDimensContext): Float = resolveDp(context, DpQualifier.WIDTH)
 }

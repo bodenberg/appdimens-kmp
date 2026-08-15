@@ -1,67 +1,44 @@
-# Performance notes — `DimenCache` & Scaling Engine
+# AppDimens Dynamic KMP — Cache, bypass and performance notes (library)
 
-## Fast bypass (`getOrPut`)
+This page documents the **implementation-level** performance architecture of the KMP library: the snapshot-partitioned cache, the fast bypass layer, and the platform-neutral fast lanes. For measured numbers see [PERFORMANCE.md](../PERFORMANCE.md) and [PERFORMANCE-COMPARATIVE.md](../PERFORMANCE-COMPARATIVE.md).
 
-When **aspect ratio is off** (cache key bit 63 clear, i.e. `Long` key ≥ 0 in the signed interpretation used in the fast check) and `CalcType` is one of:
+## Snapshot-partitioned cache
 
-- `PERCENT` (ordinal 7)
-- `SCALED` (ordinal 11)
-- `DENSITY` (ordinal 14)
-- `DIAGONAL` (ordinal 1)
-- `INTERPOLATED` (ordinal 5)
-- `PERIMETER` (ordinal 8)
+- **`DimenMetrics`** is the immutable per-window snapshot: `screenWidthDp`, `screenHeightDp`, `smallestScreenWidthDp`, `densityDpi`, `fontScale` (as raw bits), `orientation`, `uiMode`, `isInMultiWindowMode`.
+- Each snapshot owns a bounded `AtomicReferenceArray` partition. Entries are published as single atomic `CacheEntry` references — a resolution for window A can never read a value computed for window B.
+- **Keys** are 64-bit packed values built by `DimenCache.buildKey` from `(baseValue, landscape, ignoreMultiWindows, calcType, qualifier, inverter, applyAspectRatio, valueType, customSensitivityK)`. `CalcType` ordinals live in core so keys stay stable across modules.
+- Since **1.0.0** there is **no disk persistence** — the cache is in-memory and partitioned per window snapshot; rotation/resize/recreation can never serve a stale value. `saveToPersistence` / `loadFromByteArray` / `serializeToByteArray` are removed.
 
-`DimenCache.getOrPut` **returns `compute()` directly** and does **not** store the result in the shard table. These paths reduce to `baseValue * preComputedFactor` — a single multiplication using a value computed once per configuration change.
+## Fast bypass layer
 
-All other strategy ordinals (`AUTO`, `FLUID`, `POWER`, `LOGARITHMIC`, `FIT`, `FILL`, …) go through the normal cache path when the cache is enabled.
+For eligible `CalcType`s on the default path, `getOrPut` returns `compute()` without touching the snapshot cache — typically `baseValue × precomputedFactor` (~2 ns), which is faster than the fastest cache lookup (~5 ns):
 
-## Why
+| Path | Cost | Cache used? |
+|:---|:---:|:---:|
+| SCALED / default (most common) | ~2 ns | ❌ Bypass |
+| SCALED / custom sensitivity or non-default qualifier | varies | ✅ Cache |
+| POWER / LOG on SW+DEFAULT | ~2 ns | ❌ Bypass |
+| AUTO / FLUID / FIT / FILL | lookup + compute | ✅ Cache |
 
-For the six bypassed types, measured cost of a single multiply is lower than a full cache-slot lookup; memoization is still provided by **Compose `remember`** (and by call-site batching where used). When **aspect ratio is on**, the computation is heavier and the cache path is used.
+## Fast lanes
 
-## Pre-computed strategy scale factors (`ScreenFactors`)
+**Compose (all platforms):** `toDynamicScaledDp` / `toDynamicScaledPx` read `DimenCache.metricsScope ?: LocalDimenMetrics` when the guard passes (`inverter == DEFAULT && !ignoreMultiWindows && customSensitivityK == null && (qualifier == SMALL_WIDTH || !applyAspectRatio)`) — **one CompositionLocal read + one float multiply**, resize-aware on every platform. The fallback goes through `resolveScaledFastDp/Px` (context chain → fast window slot).
 
-`ScreenFactors.updateFactors()` runs **only on configuration changes** and pre-computes:
+**Code (non-Compose):** `Float.toDynamicScaledPx` / `toDynamicScaledDp` route the same guard to the **specialized kernels** `resolveSdpPx` / `resolveSdpaPx` / `resolveHdpPx` / `resolveWdpPx` (and Dp twins) — zero branches, volatile load + identity compare against the fast window slot + the legacy multiply order. `fastMetricsForCode` skips the ThreadLocal probe entirely.
 
-| Field | Formula |
-|---|---|
-| `scale` | `sw / 300` |
-| `arMultiplier` | `1 + (sw - 300) * (ADJUSTMENT_SCALE + SENSITIVITY_DEFAULT * logNormalizedAr)` |
-| `diagonalScale` | `sqrt(sm² + lg²) / BASE_DIAGONAL_DP` |
-| `powerScale` | `(sw / BASE_WIDTH_DP) ^ 0.75` |
-| `logScale` | `1 ± 0.4 * ln(sw * INV_BASE_RATIO)` |
-| `interpolatedScale` | `1 + (sw * INV_BASE_RATIO - 1) * 0.5` |
-| `perimeterScale` | `(sm + lg) / BASE_PERIMETER_DP` |
-| `aspectRatioMul` | `1 + SENSITIVITY_DEFAULT * logNormalizedAr` |
+**Zero allocations:** the fast lanes allocate nothing — no key encoding, no `remember` machinery, no ThreadLocal writes. `DimenMetrics` eager AR (`normalizedAspectRatio` / `logNormalizedAspectRatio` as plain `val`) removes the hidden `synchronized` probe from the SDPA path.
 
-Each `calculate*Dp` function reads the pre-computed factor from `ScreenFactors` for the **default path** (qualifier = `SMALL_WIDTH`, inverter = `DEFAULT`, `customSensitivityK = null`). Non-default paths still compute inline but avoid `Double` conversions where possible.
+## Multi-window & coherence
 
-## Cached `UiModeType`
+- `DimenCalculationPlumbing.isMultiWindowConstrained` detects split-screen; `ignoreMultiWindows` (`i` suffix) returns the raw base value when the heuristic triggers.
+- On Android a `ComponentCallbacks2` listener registered on the Application invalidates fast slots **synchronously** on any real configuration change.
+- On desktop/web/iOS/macOS `AppDimensProvider` builds the context from the **live window configuration** (`remember(configuration)`): a resize creates a new snapshot identity → fast-slot miss → rebuild. `registerConfigurationListener` is a no-op outside Android; the identity-based rebuild covers the same guarantee.
 
-`UiModeType.fromConfiguration(context, null)` — which accesses `SensorManager`, hinge sensor lookup, and `WindowMetricsCalculator` — is now cached per configuration hash in `DimenCache.getCachedUiModeType(context)`. The cache is invalidated automatically when the configuration hash changes. All `*Mode` / `*Screen` facilitators across 48 extension files read from this cache.
+## R8 notes (Android target)
 
-## Eliminated `Float→Double→Float` conversions
+- AARs are pre-shrunk/optimized at build time (`optimization { minify = true }` + `-optimizationpasses 10` + `-allowaccessmodification`, `-dontobfuscate`).
+- `consumer-rules.pro` keeps: public API `-keepnames`, `kotlin.Metadata`, cache-key enums (ordinals packed into keys), the `ResizeBound` sealed hierarchy, and the `ScreenFactors` ARM64 false-sharing padding fields. See [R8-PROGUARD.md](../R8-PROGUARD.md).
 
-- **Diagonal:** `sqrt((sm² + lg²).toDouble()).toFloat()` eliminated — uses pre-computed `diagonalScale`.
-- **Power:** `ratio.toDouble().pow(0.75).toFloat()` eliminated on default path — uses pre-computed `powerScale`. Non-default paths use `Math.pow`.
-- **Logarithmic:** raw `kotlin.math.ln()` eliminated on default path — uses pre-computed `logScale`.
+---
 
-## `buildResizeStepsPx` — zero-boxing
-
-`ResizeMath.buildResizeStepsPx` writes directly to a pre-allocated `FloatArray`, avoiding `ArrayList<Float>` boxing/unboxing overhead.
-
-## `Int` / `Float` overloads
-
-`toDynamicScaledPx`, `toDynamicScaledDp`, `sdp`, `hdp`, `wdp` (and their `a`/`i`/`ia` variants) have specialized `Int` and `Float` receiver overloads that avoid `Number.toFloat()` boxing.
-
-## Consumer R8/ProGuard rules
-
-`consumer-rules.pro` keeps the public API surface while allowing R8 to inline and remove internal helpers (padding fields, shards, etc.) via `-allowoptimization`.
-
-## Persistence
-
-`DimenCache` writes to a Preferences DataStore with namespace **`com.appdimens.dynamic.cache`**. The write flow uses **`sample(500)`** (not `debounce`) so that a first-startup burst of cache misses flushes within 500 ms of the *first* miss, instead of waiting until the burst quiets. For testing, call **`DimenCache.shutdown()`** to cancel the internal `CoroutineScope` and avoid leaked writes during teardown.
-
-## Benchmarks
-
-Do not use SCALED / PERCENT / DENSITY / DIAGONAL / INTERPOLATED / PERIMETER **without** AR to measure cache throughput — those calls intentionally bypass shard storage.
+*AppDimens Dynamic KMP 1.0.0 — library performance notes.*

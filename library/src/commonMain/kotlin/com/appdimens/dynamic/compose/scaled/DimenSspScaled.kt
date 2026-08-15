@@ -1,3 +1,5 @@
+@file:OptIn(kotlin.concurrent.atomics.ExperimentalAtomicApi::class)
+
 /**
  * Author & Developer: Jean Bodenberg
  * GIT: https://github.com/bodenberg/appdimens-sdps.git
@@ -24,15 +26,14 @@
  */
 package com.appdimens.dynamic.compose
 
-import com.appdimens.dynamic.platform.DimenCallContext
-import com.appdimens.dynamic.platform.ScreenMetricsSnapshot
-import com.appdimens.dynamic.common.ScreenOrientation
-
+import com.appdimens.dynamic.core.AppDimensContext
+import com.appdimens.dynamic.core.ScreenConfiguration
+import com.appdimens.dynamic.core.currentScreenConfiguration
+import com.appdimens.dynamic.core.localAppDimensContext
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
-import com.appdimens.dynamic.core.LocalScreenMetrics
 import androidx.compose.ui.unit.TextUnit
 import com.appdimens.dynamic.common.DpQualifier
 import com.appdimens.dynamic.common.DpQualifierEntry
@@ -261,22 +262,22 @@ class ScaledSp private constructor(
      */
     @Composable
     private fun resolve(qualifier: DpQualifier): TextUnit {
-        val metrics = LocalScreenMetrics.current
+        val configuration = currentScreenConfiguration()
 
         val currentUiModeType = getCurrentUiModeType()
 
-        val isLandscape = metrics.orientation == ScreenOrientation.LANDSCAPE
-        val isPortrait = metrics.orientation == ScreenOrientation.PORTRAIT
+        val isLandscape = configuration.orientation == ScreenConfiguration.ORIENTATION_LANDSCAPE
+        val isPortrait = configuration.orientation == ScreenConfiguration.ORIENTATION_PORTRAIT
 
-        val currentScreenWidthDp = metrics.widthDp.toFloat()
-        val currentScreenHeightDp = metrics.heightDp.toFloat()
+        val currentScreenWidthDp = configuration.screenWidthDp.toFloat()
+        val currentScreenHeightDp = configuration.screenHeightDp.toFloat()
         val aspectRatio = if (currentScreenWidthDp > 0 && currentScreenHeightDp > 0) {
             kotlin.math.max(currentScreenWidthDp, currentScreenHeightDp) / kotlin.math.min(currentScreenWidthDp, currentScreenHeightDp)
         } else 1f
 
         val entryStamp = scaledEntryRememberStamp(
             currentUiModeType.ordinal,
-            metrics,
+            configuration,
             aspectRatio,
             ignoreMultiWindows
         )
@@ -296,7 +297,7 @@ class ScaledSp private constructor(
                 }
 
                 if (qualifierEntry != null) {
-                    val qualifierMatch = getQualifierValue(qualifierEntry.type, metrics) >= qualifierEntry.value.toFloat()
+                    val qualifierMatch = getQualifierValue(qualifierEntry.type, configuration) >= qualifierEntry.value.toFloat()
                     if (entry.priority == 1 && uiModeMatch && qualifierMatch && orientationMatch) return@firstOrNull true
                     if (entry.priority == 3 && qualifierMatch && orientationMatch) return@firstOrNull true
                     return@firstOrNull false
@@ -321,22 +322,22 @@ class ScaledSp private constructor(
      */
     @Composable
     private fun resolvePx(qualifier: DpQualifier): Float {
-        val metrics = LocalScreenMetrics.current
+        val configuration = currentScreenConfiguration()
 
         val currentUiModeType = getCurrentUiModeType()
 
-        val isLandscape = metrics.orientation == ScreenOrientation.LANDSCAPE
-        val isPortrait = metrics.orientation == ScreenOrientation.PORTRAIT
+        val isLandscape = configuration.orientation == ScreenConfiguration.ORIENTATION_LANDSCAPE
+        val isPortrait = configuration.orientation == ScreenConfiguration.ORIENTATION_PORTRAIT
 
-        val currentScreenWidthDp = metrics.widthDp.toFloat()
-        val currentScreenHeightDp = metrics.heightDp.toFloat()
+        val currentScreenWidthDp = configuration.screenWidthDp.toFloat()
+        val currentScreenHeightDp = configuration.screenHeightDp.toFloat()
         val aspectRatio = if (currentScreenWidthDp > 0 && currentScreenHeightDp > 0) {
             kotlin.math.max(currentScreenWidthDp, currentScreenHeightDp) / kotlin.math.min(currentScreenWidthDp, currentScreenHeightDp)
         } else 1f
 
         val entryStampPx = scaledEntryRememberStamp(
             currentUiModeType.ordinal,
-            metrics,
+            configuration,
             aspectRatio,
             ignoreMultiWindows
         )
@@ -356,7 +357,7 @@ class ScaledSp private constructor(
                 }
 
                 if (qualifierEntry != null) {
-                    val qualifierMatch = getQualifierValue(qualifierEntry.type, metrics) >= qualifierEntry.value.toFloat()
+                    val qualifierMatch = getQualifierValue(qualifierEntry.type, configuration) >= qualifierEntry.value.toFloat()
                     if (entry.priority == 1 && uiModeMatch && qualifierMatch && orientationMatch) return@firstOrNull true
                     if (entry.priority == 3 && qualifierMatch && orientationMatch) return@firstOrNull true
                     return@firstOrNull false
@@ -381,22 +382,22 @@ class ScaledSp private constructor(
      */
     @Composable
     private fun resolveNoFontScale(qualifier: DpQualifier): TextUnit {
-        val metrics = LocalScreenMetrics.current
+        val configuration = currentScreenConfiguration()
 
         val currentUiModeType = getCurrentUiModeType()
 
-        val isLandscape = metrics.orientation == ScreenOrientation.LANDSCAPE
-        val isPortrait = metrics.orientation == ScreenOrientation.PORTRAIT
+        val isLandscape = configuration.orientation == ScreenConfiguration.ORIENTATION_LANDSCAPE
+        val isPortrait = configuration.orientation == ScreenConfiguration.ORIENTATION_PORTRAIT
 
-        val currentScreenWidthDp = metrics.widthDp.toFloat()
-        val currentScreenHeightDp = metrics.heightDp.toFloat()
+        val currentScreenWidthDp = configuration.screenWidthDp.toFloat()
+        val currentScreenHeightDp = configuration.screenHeightDp.toFloat()
         val aspectRatio = if (currentScreenWidthDp > 0 && currentScreenHeightDp > 0) {
             kotlin.math.max(currentScreenWidthDp, currentScreenHeightDp) / kotlin.math.min(currentScreenWidthDp, currentScreenHeightDp)
         } else 1f
 
         val entryStampNfs = scaledEntryRememberStamp(
             currentUiModeType.ordinal,
-            metrics,
+            configuration,
             aspectRatio,
             ignoreMultiWindows
         )
@@ -416,7 +417,7 @@ class ScaledSp private constructor(
                 }
 
                 if (qualifierEntry != null) {
-                    val qualifierMatch = getQualifierValue(qualifierEntry.type, metrics) >= qualifierEntry.value.toFloat()
+                    val qualifierMatch = getQualifierValue(qualifierEntry.type, configuration) >= qualifierEntry.value.toFloat()
                     if (entry.priority == 1 && uiModeMatch && qualifierMatch && orientationMatch) return@firstOrNull true
                     if (entry.priority == 3 && qualifierMatch && orientationMatch) return@firstOrNull true
                     return@firstOrNull false
@@ -440,22 +441,22 @@ class ScaledSp private constructor(
      */
     @Composable
     private fun resolveNoFontScalePx(qualifier: DpQualifier): Float {
-        val metrics = LocalScreenMetrics.current
+        val configuration = currentScreenConfiguration()
 
         val currentUiModeType = getCurrentUiModeType()
 
-        val isLandscape = metrics.orientation == ScreenOrientation.LANDSCAPE
-        val isPortrait = metrics.orientation == ScreenOrientation.PORTRAIT
+        val isLandscape = configuration.orientation == ScreenConfiguration.ORIENTATION_LANDSCAPE
+        val isPortrait = configuration.orientation == ScreenConfiguration.ORIENTATION_PORTRAIT
 
-        val currentScreenWidthDp = metrics.widthDp.toFloat()
-        val currentScreenHeightDp = metrics.heightDp.toFloat()
+        val currentScreenWidthDp = configuration.screenWidthDp.toFloat()
+        val currentScreenHeightDp = configuration.screenHeightDp.toFloat()
         val aspectRatio = if (currentScreenWidthDp > 0 && currentScreenHeightDp > 0) {
             kotlin.math.max(currentScreenWidthDp, currentScreenHeightDp) / kotlin.math.min(currentScreenWidthDp, currentScreenHeightDp)
         } else 1f
 
         val entryStampNfsPx = scaledEntryRememberStamp(
             currentUiModeType.ordinal,
-            metrics,
+            configuration,
             aspectRatio,
             ignoreMultiWindows
         )
@@ -475,7 +476,7 @@ class ScaledSp private constructor(
                 }
 
                 if (qualifierEntry != null) {
-                    val qualifierMatch = getQualifierValue(qualifierEntry.type, metrics) >= qualifierEntry.value.toFloat()
+                    val qualifierMatch = getQualifierValue(qualifierEntry.type, configuration) >= qualifierEntry.value.toFloat()
                     if (entry.priority == 1 && uiModeMatch && qualifierMatch && orientationMatch) return@firstOrNull true
                     if (entry.priority == 3 && qualifierMatch && orientationMatch) return@firstOrNull true
                     return@firstOrNull false

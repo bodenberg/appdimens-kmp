@@ -1,3 +1,5 @@
+@file:OptIn(kotlin.concurrent.atomics.ExperimentalAtomicApi::class)
+
 /**
  * Author & Developer: Jean Bodenberg
  * GIT: https://github.com/bodenberg/appdimens-sdps.git
@@ -24,10 +26,10 @@
  */
 package com.appdimens.dynamic.code
 
-import com.appdimens.dynamic.platform.DimenCallContext
-import com.appdimens.dynamic.platform.ScreenMetricsSnapshot
-import com.appdimens.dynamic.common.ScreenOrientation
-
+import com.appdimens.dynamic.core.AppDimensContext
+import com.appdimens.dynamic.core.ScreenConfiguration
+import com.appdimens.dynamic.core.currentScreenConfiguration
+import com.appdimens.dynamic.core.localAppDimensContext
 
 import com.appdimens.dynamic.common.DpQualifier
 import com.appdimens.dynamic.common.Orientation
@@ -46,9 +48,8 @@ private const val BASE_RATIO_STEP = 300f
  * Uses the base value by default, but when the device is in the specified [orientation],
  * it uses [rotationValue] scaled with the given [finalQualifierResolver].
  */
-@JvmOverloads
 fun Number.sdpRotate(
-    ctx: DimenCallContext,
+    context: AppDimensContext,
     rotationValue: Number,
     finalQualifierResolver: DpQualifier = DpQualifier.SMALL_WIDTH,
     orientation: Orientation = Orientation.LANDSCAPE,
@@ -56,16 +57,16 @@ fun Number.sdpRotate(
     applyAspectRatio: Boolean = false,
     customSensitivityK: Float? = null
 ): Float {
-    val metrics = ctx.screenMetrics
+    val configuration = context.configuration
     val isTargetOrientation = when (orientation) {
-        Orientation.LANDSCAPE -> metrics.orientation == ScreenOrientation.LANDSCAPE
-        Orientation.PORTRAIT -> metrics.orientation == ScreenOrientation.PORTRAIT
+        Orientation.LANDSCAPE -> configuration.orientation == ScreenConfiguration.ORIENTATION_LANDSCAPE
+        Orientation.PORTRAIT -> configuration.orientation == ScreenConfiguration.ORIENTATION_PORTRAIT
         else -> false
     }
     return if (isTargetOrientation) {
-        rotationValue.toDynamicScaledPx(ctx, finalQualifierResolver, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
+        rotationValue.toDynamicScaledPx(context, finalQualifierResolver, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
     } else {
-        this.toDynamicScaledPx(ctx, DpQualifier.SMALL_WIDTH, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
+        this.toDynamicScaledPx(context, DpQualifier.SMALL_WIDTH, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
     }
 }
 
@@ -73,9 +74,8 @@ fun Number.sdpRotate(
  * EN
  * Extension for Int with dynamic scaling based on **Screen Height (hDP)**.
  */
-@JvmOverloads
 fun Number.hdpRotate(
-    ctx: DimenCallContext,
+    context: AppDimensContext,
     rotationValue: Number,
     finalQualifierResolver: DpQualifier = DpQualifier.HEIGHT,
     orientation: Orientation = Orientation.LANDSCAPE,
@@ -83,16 +83,16 @@ fun Number.hdpRotate(
     applyAspectRatio: Boolean = false,
     customSensitivityK: Float? = null
 ): Float {
-    val metrics = ctx.screenMetrics
+    val configuration = context.configuration
     val isTargetOrientation = when (orientation) {
-        Orientation.LANDSCAPE -> metrics.orientation == ScreenOrientation.LANDSCAPE
-        Orientation.PORTRAIT -> metrics.orientation == ScreenOrientation.PORTRAIT
+        Orientation.LANDSCAPE -> configuration.orientation == ScreenConfiguration.ORIENTATION_LANDSCAPE
+        Orientation.PORTRAIT -> configuration.orientation == ScreenConfiguration.ORIENTATION_PORTRAIT
         else -> false
     }
     return if (isTargetOrientation) {
-        rotationValue.toDynamicScaledPx(ctx, finalQualifierResolver, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
+        rotationValue.toDynamicScaledPx(context, finalQualifierResolver, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
     } else {
-        this.toDynamicScaledPx(ctx, DpQualifier.HEIGHT, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
+        this.toDynamicScaledPx(context, DpQualifier.HEIGHT, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
     }
 }
 
@@ -100,9 +100,8 @@ fun Number.hdpRotate(
  * EN
  * Extension for Int with dynamic scaling based on **Screen Width (wDP)**.
  */
-@JvmOverloads
 fun Number.wdpRotate(
-    ctx: DimenCallContext,
+    context: AppDimensContext,
     rotationValue: Number,
     finalQualifierResolver: DpQualifier = DpQualifier.WIDTH,
     orientation: Orientation = Orientation.LANDSCAPE,
@@ -110,16 +109,16 @@ fun Number.wdpRotate(
     applyAspectRatio: Boolean = false,
     customSensitivityK: Float? = null
 ): Float {
-    val metrics = ctx.screenMetrics
+    val configuration = context.configuration
     val isTargetOrientation = when (orientation) {
-        Orientation.LANDSCAPE -> metrics.orientation == ScreenOrientation.LANDSCAPE
-        Orientation.PORTRAIT -> metrics.orientation == ScreenOrientation.PORTRAIT
+        Orientation.LANDSCAPE -> configuration.orientation == ScreenConfiguration.ORIENTATION_LANDSCAPE
+        Orientation.PORTRAIT -> configuration.orientation == ScreenConfiguration.ORIENTATION_PORTRAIT
         else -> false
     }
     return if (isTargetOrientation) {
-        rotationValue.toDynamicScaledPx(ctx, finalQualifierResolver, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
+        rotationValue.toDynamicScaledPx(context, finalQualifierResolver, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
     } else {
-        this.toDynamicScaledPx(ctx, DpQualifier.WIDTH, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
+        this.toDynamicScaledPx(context, DpQualifier.WIDTH, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
     }
 }
 
@@ -132,9 +131,8 @@ fun Number.wdpRotate(
  * Uses the base value by default, but when the device matches the specified [uiModeType],
  * it uses [modeValue] instead.
  */
-@JvmOverloads
 fun Number.sdpMode(
-    ctx: DimenCallContext,
+    context: AppDimensContext,
     modeValue: Number,
     uiModeType: UiModeType,
     finalQualifierResolver: DpQualifier? = null,
@@ -142,11 +140,11 @@ fun Number.sdpMode(
     applyAspectRatio: Boolean = false,
     customSensitivityK: Float? = null
 ): Float {
-    val currentUiModeType = ctx.currentUiMode() // In non-Compose we could try to find activity but usually context is enough
+    val currentUiModeType = DimenCache.getCachedUiModeType(context) // In non-Compose we could try to find activity but usually context is enough
     return if (currentUiModeType == uiModeType) {
-        modeValue.toDynamicScaledPx(ctx, finalQualifierResolver ?: DpQualifier.SMALL_WIDTH, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
+        modeValue.toDynamicScaledPx(context, finalQualifierResolver ?: DpQualifier.SMALL_WIDTH, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
     } else {
-        this.toDynamicScaledPx(ctx, DpQualifier.SMALL_WIDTH, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
+        this.toDynamicScaledPx(context, DpQualifier.SMALL_WIDTH, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
     }
 }
 
@@ -154,9 +152,8 @@ fun Number.sdpMode(
  * EN
  * Extension for Int with dynamic scaling based on **Screen Height (hDP)**.
  */
-@JvmOverloads
 fun Number.hdpMode(
-    ctx: DimenCallContext,
+    context: AppDimensContext,
     modeValue: Number,
     uiModeType: UiModeType,
     finalQualifierResolver: DpQualifier? = null,
@@ -164,11 +161,11 @@ fun Number.hdpMode(
     applyAspectRatio: Boolean = false,
     customSensitivityK: Float? = null
 ): Float {
-    val currentUiModeType = ctx.currentUiMode()
+    val currentUiModeType = DimenCache.getCachedUiModeType(context)
     return if (currentUiModeType == uiModeType) {
-        modeValue.toDynamicScaledPx(ctx, finalQualifierResolver ?: DpQualifier.HEIGHT, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
+        modeValue.toDynamicScaledPx(context, finalQualifierResolver ?: DpQualifier.HEIGHT, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
     } else {
-        this.toDynamicScaledPx(ctx, DpQualifier.HEIGHT, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
+        this.toDynamicScaledPx(context, DpQualifier.HEIGHT, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
     }
 }
 
@@ -176,9 +173,8 @@ fun Number.hdpMode(
  * EN
  * Extension for Int with dynamic scaling based on **Screen Width (wDP)**.
  */
-@JvmOverloads
 fun Number.wdpMode(
-    ctx: DimenCallContext,
+    context: AppDimensContext,
     modeValue: Number,
     uiModeType: UiModeType,
     finalQualifierResolver: DpQualifier? = null,
@@ -186,31 +182,31 @@ fun Number.wdpMode(
     applyAspectRatio: Boolean = false,
     customSensitivityK: Float? = null
 ): Float {
-    val currentUiModeType = ctx.currentUiMode()
+    val currentUiModeType = DimenCache.getCachedUiModeType(context)
     return if (currentUiModeType == uiModeType) {
-        modeValue.toDynamicScaledPx(ctx, finalQualifierResolver ?: DpQualifier.WIDTH, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
+        modeValue.toDynamicScaledPx(context, finalQualifierResolver ?: DpQualifier.WIDTH, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
     } else {
-        this.toDynamicScaledPx(ctx, DpQualifier.WIDTH, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
+        this.toDynamicScaledPx(context, DpQualifier.WIDTH, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
     }
 }
 
 
 /**
  * EN
- * Gets the actual value from the Configuration for the given DpQualifier.
+ * Gets the actual value from the ScreenConfiguration for the given DpQualifier.
  *
  * PT
- * Obtém o valor real da configuração (Configuration) para o DpQualifier dado.
+ * Obtém o valor real da configuração (ScreenConfiguration) para o DpQualifier dado.
  *
  * @param qualifier The type of qualifier (SMALL_WIDTH, HEIGHT, WIDTH).
  * @param configuration The current resource configuration.
  * @return The numeric value (in Dp) of the screen metric.
  */
-internal fun getQualifierValue(qualifier: DpQualifier, metrics: ScreenMetricsSnapshot): Float {
+internal fun getQualifierValue(qualifier: DpQualifier, configuration: ScreenConfiguration): Float {
     return when (qualifier) {
-        DpQualifier.SMALL_WIDTH -> metrics.smallestWidthDp.toFloat()
-        DpQualifier.HEIGHT -> metrics.heightDp.toFloat()
-        DpQualifier.WIDTH -> metrics.widthDp.toFloat()
+        DpQualifier.SMALL_WIDTH -> configuration.smallestScreenWidthDp.toFloat()
+        DpQualifier.HEIGHT -> configuration.screenHeightDp.toFloat()
+        DpQualifier.WIDTH -> configuration.screenWidthDp.toFloat()
     }
 }
 
@@ -218,158 +214,197 @@ internal fun getQualifierValue(qualifier: DpQualifier, metrics: ScreenMetricsSna
 // PT Extensões Android padrão para dimensionamento dinâmico rápido (baseado em Views).
 
 /**
+ * EN Ultra-fast default-path resolution shared by the plain sdp/sdpa/wdp/hdp entries.
+ *    For these four entries the guard inside [toDynamicScaledPx] only varies at runtime
+ *    by [DimenCache.isEnabled.load()] — the inverter is DEFAULT, ignoreMultiWindows is false,
+ *    customSensitivityK is null, and the qualifier satisfies the fast condition by
+ *    construction — so the other checks are skipped and each entry routes straight to
+ *    its branch-free specialized kernel (one volatile load + identity compare + the
+ *    legacy multiply order). Semantics are preserved: with the cache disabled the
+ *    exact full path runs.
+ * PT Resolução de caminho padrão ultra-rápida compartilhada pelas entradas simples
+ *    sdp/sdpa/wdp/hdp. Nessas quatro entradas a guarda de [toDynamicScaledPx] só varia
+ *    em runtime por [DimenCache.isEnabled.load()] — o inverter é DEFAULT, ignoreMultiWindows é
+ *    false, customSensitivityK é null e o qualifier satisfaz a condição fast por
+ *    construção — então as demais verificações são puladas e cada entrada roteia direto
+ *    para seu kernel especializado sem branches (uma leitura volátil + comparação de
+ *    identidade + a ordem de multiplicação legada). Semântica preservada: com cache
+ *    desabilitado, roda exatamente o caminho completo.
+ */
+
+/** SMALL_WIDTH, no AR — PX. */
+private inline fun sdpPx(context: AppDimensContext, base: Float): Float =
+    if (DimenCache.isEnabled.load()) DimenCache.resolveSdpPx(base, context)
+    else base.toDynamicScaledPx(context, DpQualifier.SMALL_WIDTH)
+
+/** SMALL_WIDTH + AR — PX. */
+private inline fun sdpaPx(context: AppDimensContext, base: Float): Float =
+    if (DimenCache.isEnabled.load()) DimenCache.resolveSdpaPx(base, context)
+    else base.toDynamicScaledPx(context, DpQualifier.SMALL_WIDTH, applyAspectRatio = true)
+
+/** HEIGHT, no AR — PX. */
+private inline fun hdpPx(context: AppDimensContext, base: Float): Float =
+    if (DimenCache.isEnabled.load()) DimenCache.resolveHdpPx(base, context)
+    else base.toDynamicScaledPx(context, DpQualifier.HEIGHT)
+
+/** WIDTH, no AR — PX. */
+private inline fun wdpPx(context: AppDimensContext, base: Float): Float =
+    if (DimenCache.isEnabled.load()) DimenCache.resolveWdpPx(base, context)
+    else base.toDynamicScaledPx(context, DpQualifier.WIDTH)
+
+/**
  * EN
  * Extension for Int with dynamic scaling based on the **Smallest Width (swDP)**.
- * Usage example: `16.sdp(ctx)`.
+ * Usage example: `16.sdp(context)`.
  *
  * PT
  * Extensão para Int com dimensionamento dinâmico baseado na **Smallest Width (swDP)**.
- * Exemplo de uso: `16.sdp(ctx)`.
+ * Exemplo de uso: `16.sdp(context)`.
  */
-fun Number.sdp(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.SMALL_WIDTH)
-fun Number.sdpa(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.SMALL_WIDTH, applyAspectRatio = true)
-fun Number.sdpi(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.SMALL_WIDTH, ignoreMultiWindows = true)
-fun Number.sdpia(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.SMALL_WIDTH, ignoreMultiWindows = true, applyAspectRatio = true)
+fun Number.sdp(context: AppDimensContext): Float = sdpPx(context, this.toFloat())
+fun Number.sdpa(context: AppDimensContext): Float = sdpaPx(context, this.toFloat())
+fun Number.sdpi(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.SMALL_WIDTH, ignoreMultiWindows = true)
+fun Number.sdpia(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.SMALL_WIDTH, ignoreMultiWindows = true, applyAspectRatio = true)
 
-fun Int.sdp(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.SMALL_WIDTH)
-fun Int.sdpa(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.SMALL_WIDTH, applyAspectRatio = true)
-fun Int.sdpi(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.SMALL_WIDTH, ignoreMultiWindows = true)
-fun Int.sdpia(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.SMALL_WIDTH, ignoreMultiWindows = true, applyAspectRatio = true)
-fun Float.sdp(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.SMALL_WIDTH)
-fun Float.sdpa(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.SMALL_WIDTH, applyAspectRatio = true)
-fun Float.sdpi(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.SMALL_WIDTH, ignoreMultiWindows = true)
-fun Float.sdpia(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.SMALL_WIDTH, ignoreMultiWindows = true, applyAspectRatio = true)
+fun Int.sdp(context: AppDimensContext): Float = sdpPx(context, this.toFloat())
+fun Int.sdpa(context: AppDimensContext): Float = sdpaPx(context, this.toFloat())
+fun Int.sdpi(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.SMALL_WIDTH, ignoreMultiWindows = true)
+fun Int.sdpia(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.SMALL_WIDTH, ignoreMultiWindows = true, applyAspectRatio = true)
+fun Float.sdp(context: AppDimensContext): Float = sdpPx(context, this)
+fun Float.sdpa(context: AppDimensContext): Float = sdpaPx(context, this)
+fun Float.sdpi(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.SMALL_WIDTH, ignoreMultiWindows = true)
+fun Float.sdpia(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.SMALL_WIDTH, ignoreMultiWindows = true, applyAspectRatio = true)
 
 /**
  * EN
  * Extension for Int with dynamic scaling based on **Smallest Width (swDP)**, but
  * in portrait orientation it acts as **Screen Height (hDP)**.
- * Usage example: `32.sdpPh(ctx)`.
+ * Usage example: `32.sdpPh(context)`.
  *
  * PT
  * Extensão para Int com dimensionamento dinâmico baseado na **Smallest Width (swDP)**, mas
  * na orientação retrato atua como **Altura da Tela (hDP)**.
- * Exemplo de uso: `32.sdpPh(ctx)`.
+ * Exemplo de uso: `32.sdpPh(context)`.
  */
-fun Number.sdpPh(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.SMALL_WIDTH, Inverter.SW_TO_PH)
-fun Number.sdpPha(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.SMALL_WIDTH, Inverter.SW_TO_PH, applyAspectRatio = true)
-fun Number.sdpPhi(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.SMALL_WIDTH, Inverter.SW_TO_PH, ignoreMultiWindows = true)
-fun Number.sdpPhia(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.SMALL_WIDTH, Inverter.SW_TO_PH, ignoreMultiWindows = true, applyAspectRatio = true)
+fun Number.sdpPh(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.SMALL_WIDTH, Inverter.SW_TO_PH)
+fun Number.sdpPha(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.SMALL_WIDTH, Inverter.SW_TO_PH, applyAspectRatio = true)
+fun Number.sdpPhi(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.SMALL_WIDTH, Inverter.SW_TO_PH, ignoreMultiWindows = true)
+fun Number.sdpPhia(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.SMALL_WIDTH, Inverter.SW_TO_PH, ignoreMultiWindows = true, applyAspectRatio = true)
 
 /**
  * EN
  * Extension for Int with dynamic scaling based on **Smallest Width (swDP)**, but
  * in landscape orientation it acts as **Screen Height (hDP)**.
- * Usage example: `32.sdpLh(ctx)`.
+ * Usage example: `32.sdpLh(context)`.
  */
-fun Number.sdpLh(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.SMALL_WIDTH, Inverter.SW_TO_LH)
-fun Number.sdpLha(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.SMALL_WIDTH, Inverter.SW_TO_LH, applyAspectRatio = true)
-fun Number.sdpLhi(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.SMALL_WIDTH, Inverter.SW_TO_LH, ignoreMultiWindows = true)
-fun Number.sdpLhia(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.SMALL_WIDTH, Inverter.SW_TO_LH, ignoreMultiWindows = true, applyAspectRatio = true)
+fun Number.sdpLh(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.SMALL_WIDTH, Inverter.SW_TO_LH)
+fun Number.sdpLha(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.SMALL_WIDTH, Inverter.SW_TO_LH, applyAspectRatio = true)
+fun Number.sdpLhi(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.SMALL_WIDTH, Inverter.SW_TO_LH, ignoreMultiWindows = true)
+fun Number.sdpLhia(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.SMALL_WIDTH, Inverter.SW_TO_LH, ignoreMultiWindows = true, applyAspectRatio = true)
 
 /**
  * EN
  * Extension for Int with dynamic scaling based on **Smallest Width (swDP)**, but
  * in portrait orientation it acts as **Screen Width (wDP)**.
- * Usage example: `32.sdpPw(ctx)`.
+ * Usage example: `32.sdpPw(context)`.
  */
-fun Number.sdpPw(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.SMALL_WIDTH, Inverter.SW_TO_PW)
-fun Number.sdpPwa(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.SMALL_WIDTH, Inverter.SW_TO_PW, applyAspectRatio = true)
-fun Number.sdpPwi(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.SMALL_WIDTH, Inverter.SW_TO_PW, ignoreMultiWindows = true)
-fun Number.sdpPwia(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.SMALL_WIDTH, Inverter.SW_TO_PW, ignoreMultiWindows = true, applyAspectRatio = true)
+fun Number.sdpPw(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.SMALL_WIDTH, Inverter.SW_TO_PW)
+fun Number.sdpPwa(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.SMALL_WIDTH, Inverter.SW_TO_PW, applyAspectRatio = true)
+fun Number.sdpPwi(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.SMALL_WIDTH, Inverter.SW_TO_PW, ignoreMultiWindows = true)
+fun Number.sdpPwia(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.SMALL_WIDTH, Inverter.SW_TO_PW, ignoreMultiWindows = true, applyAspectRatio = true)
 
 /**
  * EN
  * Extension for Int with dynamic scaling based on **Smallest Width (swDP)**, but
  * in landscape orientation it acts as **Screen Width (wDP)**.
- * Usage example: `32.sdpLw(ctx)`.
+ * Usage example: `32.sdpLw(context)`.
  */
-fun Number.sdpLw(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.SMALL_WIDTH, Inverter.SW_TO_LW)
-fun Number.sdpLwa(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.SMALL_WIDTH, Inverter.SW_TO_LW, applyAspectRatio = true)
-fun Number.sdpLwi(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.SMALL_WIDTH, Inverter.SW_TO_LW, ignoreMultiWindows = true)
-fun Number.sdpLwia(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.SMALL_WIDTH, Inverter.SW_TO_LW, ignoreMultiWindows = true, applyAspectRatio = true)
+fun Number.sdpLw(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.SMALL_WIDTH, Inverter.SW_TO_LW)
+fun Number.sdpLwa(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.SMALL_WIDTH, Inverter.SW_TO_LW, applyAspectRatio = true)
+fun Number.sdpLwi(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.SMALL_WIDTH, Inverter.SW_TO_LW, ignoreMultiWindows = true)
+fun Number.sdpLwia(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.SMALL_WIDTH, Inverter.SW_TO_LW, ignoreMultiWindows = true, applyAspectRatio = true)
 
 /**
  * EN
  * Extension for Int with dynamic scaling based on the **Screen Height (hDP)**.
- * Usage example: `32.hdp(ctx)`.
+ * Usage example: `32.hdp(context)`.
  */
-fun Number.hdp(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.HEIGHT)
-fun Number.hdpa(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.HEIGHT, applyAspectRatio = true)
-fun Number.hdpi(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.HEIGHT, ignoreMultiWindows = true)
-fun Number.hdpia(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.HEIGHT, ignoreMultiWindows = true, applyAspectRatio = true)
+fun Number.hdp(context: AppDimensContext): Float = hdpPx(context, this.toFloat())
+fun Number.hdpa(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.HEIGHT, applyAspectRatio = true)
+fun Number.hdpi(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.HEIGHT, ignoreMultiWindows = true)
+fun Number.hdpia(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.HEIGHT, ignoreMultiWindows = true, applyAspectRatio = true)
 
-fun Int.hdp(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.HEIGHT)
-fun Int.hdpa(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.HEIGHT, applyAspectRatio = true)
-fun Int.hdpi(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.HEIGHT, ignoreMultiWindows = true)
-fun Int.hdpia(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.HEIGHT, ignoreMultiWindows = true, applyAspectRatio = true)
-fun Float.hdp(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.HEIGHT)
-fun Float.hdpa(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.HEIGHT, applyAspectRatio = true)
-fun Float.hdpi(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.HEIGHT, ignoreMultiWindows = true)
-fun Float.hdpia(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.HEIGHT, ignoreMultiWindows = true, applyAspectRatio = true)
+fun Int.hdp(context: AppDimensContext): Float = hdpPx(context, this.toFloat())
+fun Int.hdpa(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.HEIGHT, applyAspectRatio = true)
+fun Int.hdpi(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.HEIGHT, ignoreMultiWindows = true)
+fun Int.hdpia(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.HEIGHT, ignoreMultiWindows = true, applyAspectRatio = true)
+fun Float.hdp(context: AppDimensContext): Float = hdpPx(context, this)
+fun Float.hdpa(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.HEIGHT, applyAspectRatio = true)
+fun Float.hdpi(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.HEIGHT, ignoreMultiWindows = true)
+fun Float.hdpia(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.HEIGHT, ignoreMultiWindows = true, applyAspectRatio = true)
 
 /**
  * EN
  * Extension for Int with dynamic scaling based on the **Screen Height (hDP)**, but
  * in landscape orientation it acts as **Screen Width (wDP)**.
- * Usage example: `32.hdpLw(ctx)`.
+ * Usage example: `32.hdpLw(context)`.
  */
-fun Number.hdpLw(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.HEIGHT, Inverter.PH_TO_LW)
-fun Number.hdpLwa(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.HEIGHT, Inverter.PH_TO_LW, applyAspectRatio = true)
-fun Number.hdpLwi(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.HEIGHT, Inverter.PH_TO_LW, ignoreMultiWindows = true)
-fun Number.hdpLwia(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.HEIGHT, Inverter.PH_TO_LW, ignoreMultiWindows = true, applyAspectRatio = true)
+fun Number.hdpLw(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.HEIGHT, Inverter.PH_TO_LW)
+fun Number.hdpLwa(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.HEIGHT, Inverter.PH_TO_LW, applyAspectRatio = true)
+fun Number.hdpLwi(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.HEIGHT, Inverter.PH_TO_LW, ignoreMultiWindows = true)
+fun Number.hdpLwia(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.HEIGHT, Inverter.PH_TO_LW, ignoreMultiWindows = true, applyAspectRatio = true)
 
 /**
  * EN
  * Extension for Int with dynamic scaling based on the **Screen Height (hDP)**, but
  * in portrait orientation it acts as **Screen Width (wDP)**.
- * Usage example: `32.hdpPw(ctx)`.
+ * Usage example: `32.hdpPw(context)`.
  */
-fun Number.hdpPw(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.HEIGHT, Inverter.LH_TO_PW)
-fun Number.hdpPwa(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.HEIGHT, Inverter.LH_TO_PW, applyAspectRatio = true)
-fun Number.hdpPwi(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.HEIGHT, Inverter.LH_TO_PW, ignoreMultiWindows = true)
-fun Number.hdpPwia(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.HEIGHT, Inverter.LH_TO_PW, ignoreMultiWindows = true, applyAspectRatio = true)
+fun Number.hdpPw(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.HEIGHT, Inverter.LH_TO_PW)
+fun Number.hdpPwa(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.HEIGHT, Inverter.LH_TO_PW, applyAspectRatio = true)
+fun Number.hdpPwi(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.HEIGHT, Inverter.LH_TO_PW, ignoreMultiWindows = true)
+fun Number.hdpPwia(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.HEIGHT, Inverter.LH_TO_PW, ignoreMultiWindows = true, applyAspectRatio = true)
 
 /**
  * EN
  * Extension for Int with dynamic scaling based on the **Screen Width (wDP)**.
- * Usage example: `100.wdp(ctx)`.
+ * Usage example: `100.wdp(context)`.
  */
-fun Number.wdp(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.WIDTH)
-fun Number.wdpa(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.WIDTH, applyAspectRatio = true)
-fun Number.wdpi(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.WIDTH, ignoreMultiWindows = true)
-fun Number.wdpia(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.WIDTH, ignoreMultiWindows = true, applyAspectRatio = true)
+fun Number.wdp(context: AppDimensContext): Float = wdpPx(context, this.toFloat())
+fun Number.wdpa(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.WIDTH, applyAspectRatio = true)
+fun Number.wdpi(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.WIDTH, ignoreMultiWindows = true)
+fun Number.wdpia(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.WIDTH, ignoreMultiWindows = true, applyAspectRatio = true)
 
-fun Int.wdp(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.WIDTH)
-fun Int.wdpa(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.WIDTH, applyAspectRatio = true)
-fun Int.wdpi(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.WIDTH, ignoreMultiWindows = true)
-fun Int.wdpia(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.WIDTH, ignoreMultiWindows = true, applyAspectRatio = true)
-fun Float.wdp(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.WIDTH)
-fun Float.wdpa(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.WIDTH, applyAspectRatio = true)
-fun Float.wdpi(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.WIDTH, ignoreMultiWindows = true)
-fun Float.wdpia(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.WIDTH, ignoreMultiWindows = true, applyAspectRatio = true)
+fun Int.wdp(context: AppDimensContext): Float = wdpPx(context, this.toFloat())
+fun Int.wdpa(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.WIDTH, applyAspectRatio = true)
+fun Int.wdpi(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.WIDTH, ignoreMultiWindows = true)
+fun Int.wdpia(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.WIDTH, ignoreMultiWindows = true, applyAspectRatio = true)
+fun Float.wdp(context: AppDimensContext): Float = wdpPx(context, this)
+fun Float.wdpa(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.WIDTH, applyAspectRatio = true)
+fun Float.wdpi(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.WIDTH, ignoreMultiWindows = true)
+fun Float.wdpia(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.WIDTH, ignoreMultiWindows = true, applyAspectRatio = true)
 
 /**
  * EN
  * Extension for Int with dynamic scaling based on the **Screen Width (wDP)**, but
  * in landscape orientation it acts as **Screen Height (hDP)**.
- * Usage example: `100.wdpLh(ctx)`.
+ * Usage example: `100.wdpLh(context)`.
  */
-fun Number.wdpLh(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.WIDTH, Inverter.PW_TO_LH)
-fun Number.wdpLha(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.WIDTH, Inverter.PW_TO_LH, applyAspectRatio = true)
-fun Number.wdpLhi(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.WIDTH, Inverter.PW_TO_LH, ignoreMultiWindows = true)
-fun Number.wdpLhia(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.WIDTH, Inverter.PW_TO_LH, ignoreMultiWindows = true, applyAspectRatio = true)
+fun Number.wdpLh(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.WIDTH, Inverter.PW_TO_LH)
+fun Number.wdpLha(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.WIDTH, Inverter.PW_TO_LH, applyAspectRatio = true)
+fun Number.wdpLhi(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.WIDTH, Inverter.PW_TO_LH, ignoreMultiWindows = true)
+fun Number.wdpLhia(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.WIDTH, Inverter.PW_TO_LH, ignoreMultiWindows = true, applyAspectRatio = true)
 
 /**
  * EN
  * Extension for Int with dynamic scaling based on the **Screen Width (wDP)**, but
  * in portrait orientation it acts as **Screen Height (hDP)**.
- * Usage example: `100.wdpPh(ctx)`.
+ * Usage example: `100.wdpPh(context)`.
  */
-fun Number.wdpPh(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.WIDTH, Inverter.LW_TO_PH)
-fun Number.wdpPha(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.WIDTH, Inverter.LW_TO_PH, applyAspectRatio = true)
-fun Number.wdpPhi(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.WIDTH, Inverter.LW_TO_PH, ignoreMultiWindows = true)
-fun Number.wdpPhia(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, DpQualifier.WIDTH, Inverter.LW_TO_PH, ignoreMultiWindows = true, applyAspectRatio = true)
+fun Number.wdpPh(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.WIDTH, Inverter.LW_TO_PH)
+fun Number.wdpPha(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.WIDTH, Inverter.LW_TO_PH, applyAspectRatio = true)
+fun Number.wdpPhi(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.WIDTH, Inverter.LW_TO_PH, ignoreMultiWindows = true)
+fun Number.wdpPhia(context: AppDimensContext): Float = this.toDynamicScaledPx(context, DpQualifier.WIDTH, Inverter.LW_TO_PH, ignoreMultiWindows = true, applyAspectRatio = true)
 
 // EN Qualifier-based conditional dynamic scaling.
 // PT Escalonamento condicional baseado em qualificador.
@@ -385,13 +420,13 @@ fun Number.wdpPhia(ctx: DimenCallContext): Float = this.toDynamicScaledPx(ctx, D
  * Usa o valor base por padrão, mas quando a métrica de tela para [qualifierType]
  * é >= [qualifierValue], usa [qualifiedValue] no lugar.
  */
-fun Number.sdpQualifier(ctx: DimenCallContext, qualifiedValue: Number, qualifierType: DpQualifier, qualifierValue: Number, finalQualifierResolver: DpQualifier? = null, ignoreMultiWindows: Boolean = false, applyAspectRatio: Boolean = false, customSensitivityK: Float? = null): Float {
-    val metrics = ctx.screenMetrics
-    val qualifierMatch = getQualifierValue(qualifierType, metrics) >= qualifierValue.toFloat()
+fun Number.sdpQualifier(context: AppDimensContext, qualifiedValue: Number, qualifierType: DpQualifier, qualifierValue: Number, finalQualifierResolver: DpQualifier? = null, ignoreMultiWindows: Boolean = false, applyAspectRatio: Boolean = false, customSensitivityK: Float? = null): Float {
+    val configuration = context.configuration
+    val qualifierMatch = getQualifierValue(qualifierType, configuration) >= qualifierValue.toFloat()
     return if (qualifierMatch) {
-        qualifiedValue.toDynamicScaledPx(ctx, finalQualifierResolver ?: DpQualifier.SMALL_WIDTH, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
+        qualifiedValue.toDynamicScaledPx(context, finalQualifierResolver ?: DpQualifier.SMALL_WIDTH, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
     } else {
-        this.toDynamicScaledPx(ctx, DpQualifier.SMALL_WIDTH, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
+        this.toDynamicScaledPx(context, DpQualifier.SMALL_WIDTH, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
     }
 }
 
@@ -406,13 +441,13 @@ fun Number.sdpQualifier(ctx: DimenCallContext, qualifiedValue: Number, qualifier
  * Usa o valor base por padrão, mas quando a métrica de tela para [qualifierType]
  * é >= [qualifierValue], usa [qualifiedValue] no lugar.
  */
-fun Number.hdpQualifier(ctx: DimenCallContext, qualifiedValue: Number, qualifierType: DpQualifier, qualifierValue: Number, finalQualifierResolver: DpQualifier? = null, ignoreMultiWindows: Boolean = false, applyAspectRatio: Boolean = false, customSensitivityK: Float? = null): Float {
-    val metrics = ctx.screenMetrics
-    val qualifierMatch = getQualifierValue(qualifierType, metrics) >= qualifierValue.toFloat()
+fun Number.hdpQualifier(context: AppDimensContext, qualifiedValue: Number, qualifierType: DpQualifier, qualifierValue: Number, finalQualifierResolver: DpQualifier? = null, ignoreMultiWindows: Boolean = false, applyAspectRatio: Boolean = false, customSensitivityK: Float? = null): Float {
+    val configuration = context.configuration
+    val qualifierMatch = getQualifierValue(qualifierType, configuration) >= qualifierValue.toFloat()
     return if (qualifierMatch) {
-        qualifiedValue.toDynamicScaledPx(ctx, finalQualifierResolver ?: DpQualifier.HEIGHT, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
+        qualifiedValue.toDynamicScaledPx(context, finalQualifierResolver ?: DpQualifier.HEIGHT, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
     } else {
-        this.toDynamicScaledPx(ctx, DpQualifier.HEIGHT, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
+        this.toDynamicScaledPx(context, DpQualifier.HEIGHT, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
     }
 }
 
@@ -427,13 +462,13 @@ fun Number.hdpQualifier(ctx: DimenCallContext, qualifiedValue: Number, qualifier
  * Usa o valor base por padrão, mas quando a métrica de tela para [qualifierType]
  * é >= [qualifierValue], usa [qualifiedValue] no lugar.
  */
-fun Number.wdpQualifier(ctx: DimenCallContext, qualifiedValue: Number, qualifierType: DpQualifier, qualifierValue: Number, finalQualifierResolver: DpQualifier? = null, ignoreMultiWindows: Boolean = false, applyAspectRatio: Boolean = false, customSensitivityK: Float? = null): Float {
-    val metrics = ctx.screenMetrics
-    val qualifierMatch = getQualifierValue(qualifierType, metrics) >= qualifierValue.toFloat()
+fun Number.wdpQualifier(context: AppDimensContext, qualifiedValue: Number, qualifierType: DpQualifier, qualifierValue: Number, finalQualifierResolver: DpQualifier? = null, ignoreMultiWindows: Boolean = false, applyAspectRatio: Boolean = false, customSensitivityK: Float? = null): Float {
+    val configuration = context.configuration
+    val qualifierMatch = getQualifierValue(qualifierType, configuration) >= qualifierValue.toFloat()
     return if (qualifierMatch) {
-        qualifiedValue.toDynamicScaledPx(ctx, finalQualifierResolver ?: DpQualifier.WIDTH, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
+        qualifiedValue.toDynamicScaledPx(context, finalQualifierResolver ?: DpQualifier.WIDTH, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
     } else {
-        this.toDynamicScaledPx(ctx, DpQualifier.WIDTH, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
+        this.toDynamicScaledPx(context, DpQualifier.WIDTH, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
     }
 }
 
@@ -451,15 +486,15 @@ fun Number.wdpQualifier(ctx: DimenCallContext, qualifiedValue: Number, qualifier
  * Usa o valor base por padrão, mas quando o dispositivo corresponde ao [uiModeType] E
  * a métrica de tela para [qualifierType] é >= [qualifierValue], usa [screenValue] no lugar.
  */
-fun Number.sdpScreen(ctx: DimenCallContext, screenValue: Number, uiModeType: UiModeType, qualifierType: DpQualifier, qualifierValue: Number, finalQualifierResolver: DpQualifier? = null, ignoreMultiWindows: Boolean = false, applyAspectRatio: Boolean = false, customSensitivityK: Float? = null): Float {
-    val metrics = ctx.screenMetrics
-    val currentUiModeType = ctx.currentUiMode()
+fun Number.sdpScreen(context: AppDimensContext, screenValue: Number, uiModeType: UiModeType, qualifierType: DpQualifier, qualifierValue: Number, finalQualifierResolver: DpQualifier? = null, ignoreMultiWindows: Boolean = false, applyAspectRatio: Boolean = false, customSensitivityK: Float? = null): Float {
+    val configuration = context.configuration
+    val currentUiModeType = DimenCache.getCachedUiModeType(context)
     val uiModeMatch = currentUiModeType == uiModeType
-    val qualifierMatch = getQualifierValue(qualifierType, metrics) >= qualifierValue.toFloat()
+    val qualifierMatch = getQualifierValue(qualifierType, configuration) >= qualifierValue.toFloat()
     return if (uiModeMatch && qualifierMatch) {
-        screenValue.toDynamicScaledPx(ctx, finalQualifierResolver ?: DpQualifier.SMALL_WIDTH, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
+        screenValue.toDynamicScaledPx(context, finalQualifierResolver ?: DpQualifier.SMALL_WIDTH, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
     } else {
-        this.toDynamicScaledPx(ctx, DpQualifier.SMALL_WIDTH, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
+        this.toDynamicScaledPx(context, DpQualifier.SMALL_WIDTH, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
     }
 }
 
@@ -474,15 +509,15 @@ fun Number.sdpScreen(ctx: DimenCallContext, screenValue: Number, uiModeType: UiM
  * Usa o valor base por padrão, mas quando o dispositivo corresponde ao [uiModeType] E
  * a métrica de tela para [qualifierType] é >= [qualifierValue], usa [screenValue] no lugar.
  */
-fun Number.hdpScreen(ctx: DimenCallContext, screenValue: Number, uiModeType: UiModeType, qualifierType: DpQualifier, qualifierValue: Number, finalQualifierResolver: DpQualifier? = null, ignoreMultiWindows: Boolean = false, applyAspectRatio: Boolean = false, customSensitivityK: Float? = null): Float {
-    val metrics = ctx.screenMetrics
-    val currentUiModeType = ctx.currentUiMode()
+fun Number.hdpScreen(context: AppDimensContext, screenValue: Number, uiModeType: UiModeType, qualifierType: DpQualifier, qualifierValue: Number, finalQualifierResolver: DpQualifier? = null, ignoreMultiWindows: Boolean = false, applyAspectRatio: Boolean = false, customSensitivityK: Float? = null): Float {
+    val configuration = context.configuration
+    val currentUiModeType = DimenCache.getCachedUiModeType(context)
     val uiModeMatch = currentUiModeType == uiModeType
-    val qualifierMatch = getQualifierValue(qualifierType, metrics) >= qualifierValue.toFloat()
+    val qualifierMatch = getQualifierValue(qualifierType, configuration) >= qualifierValue.toFloat()
     return if (uiModeMatch && qualifierMatch) {
-        screenValue.toDynamicScaledPx(ctx, finalQualifierResolver ?: DpQualifier.HEIGHT, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
+        screenValue.toDynamicScaledPx(context, finalQualifierResolver ?: DpQualifier.HEIGHT, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
     } else {
-        this.toDynamicScaledPx(ctx, DpQualifier.HEIGHT, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
+        this.toDynamicScaledPx(context, DpQualifier.HEIGHT, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
     }
 }
 
@@ -497,15 +532,15 @@ fun Number.hdpScreen(ctx: DimenCallContext, screenValue: Number, uiModeType: UiM
  * Usa o valor base por padrão, mas quando o dispositivo corresponde ao [uiModeType] E
  * a métrica de tela para [qualifierType] é >= [qualifierValue], usa [screenValue] no lugar.
  */
-fun Number.wdpScreen(ctx: DimenCallContext, screenValue: Number, uiModeType: UiModeType, qualifierType: DpQualifier, qualifierValue: Number, finalQualifierResolver: DpQualifier? = null, ignoreMultiWindows: Boolean = false, applyAspectRatio: Boolean = false, customSensitivityK: Float? = null): Float {
-    val metrics = ctx.screenMetrics
-    val currentUiModeType = ctx.currentUiMode()
+fun Number.wdpScreen(context: AppDimensContext, screenValue: Number, uiModeType: UiModeType, qualifierType: DpQualifier, qualifierValue: Number, finalQualifierResolver: DpQualifier? = null, ignoreMultiWindows: Boolean = false, applyAspectRatio: Boolean = false, customSensitivityK: Float? = null): Float {
+    val configuration = context.configuration
+    val currentUiModeType = DimenCache.getCachedUiModeType(context)
     val uiModeMatch = currentUiModeType == uiModeType
-    val qualifierMatch = getQualifierValue(qualifierType, metrics) >= qualifierValue.toFloat()
+    val qualifierMatch = getQualifierValue(qualifierType, configuration) >= qualifierValue.toFloat()
     return if (uiModeMatch && qualifierMatch) {
-        screenValue.toDynamicScaledPx(ctx, finalQualifierResolver ?: DpQualifier.WIDTH, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
+        screenValue.toDynamicScaledPx(context, finalQualifierResolver ?: DpQualifier.WIDTH, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
     } else {
-        this.toDynamicScaledPx(ctx, DpQualifier.WIDTH, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
+        this.toDynamicScaledPx(context, DpQualifier.WIDTH, ignoreMultiWindows = ignoreMultiWindows, applyAspectRatio = applyAspectRatio, customSensitivityK = customSensitivityK)
     }
 }
 
@@ -531,7 +566,7 @@ fun Number.wdpScreen(ctx: DimenCallContext, screenValue: Number, uiModeType: UiM
  *
  * **Bulk resolution:** for many keys in one pass, prefer building [LongArray] keys with
  * [DimenCache.buildKey] and [DimenCache.getBatch]. **Early init:** call [DimenSdp.warmupCache]
- * (or [DimenSsp.warmupCache]) once with your [DimenCallContext] so persistence/DataStore
+ * (or [DimenSsp.warmupCache]) once with your [AppDimensContext] so initialization
  * work does not land on the first hot-frame call.
  *
  * PT
@@ -543,7 +578,7 @@ fun Number.wdpScreen(ctx: DimenCallContext, screenValue: Number, uiModeType: UiM
  *    retorna o valor em pixels cacheado; no miss, calcula via [calculateScaledDp] e armazena.
  * 3. **Se [enableCache] for `false`**: calcula diretamente via [calculateScaledDp].
  *
- * @param context            Android [DimenCallContext] for configuration and density access.
+ * @param context            Android [AppDimensContext] for configuration and density access.
  * @param qualifier          Screen dimension qualifier: [com.appdimens.dynamic.common.DpQualifier.SMALL_WIDTH],
  *                           [com.appdimens.dynamic.common.DpQualifier.HEIGHT], or [com.appdimens.dynamic.common.DpQualifier.WIDTH].
  * @param inverter           Orientation-based dimension swap rule (default: [Inverter.DEFAULT]).
@@ -552,9 +587,8 @@ fun Number.wdpScreen(ctx: DimenCallContext, screenValue: Number, uiModeType: UiM
  * @param customSensitivityK Override for the AR sensitivity constant (null = library default).
  * @return Dynamically scaled pixel value as [Float].
  */
-@JvmOverloads
 fun Number.toDynamicScaledPx(
-    ctx: DimenCallContext,
+    context: AppDimensContext,
     qualifier: DpQualifier,
     inverter: Inverter = Inverter.DEFAULT,
     ignoreMultiWindows: Boolean = false,
@@ -562,12 +596,13 @@ fun Number.toDynamicScaledPx(
     customSensitivityK: Float? = null
 ): Float {
     val base = this.toFloat()
-    val metrics = ctx.screenMetrics
-    val density = ctx.screenMetrics.density
+    val configuration = context.configuration
+
+    val density = context.density
 
     val cacheKey = DimenCache.buildKey(
         baseValue = base,
-        isLandscape = metrics.orientation == ScreenOrientation.LANDSCAPE,
+        isLandscape = configuration.orientation == ScreenConfiguration.ORIENTATION_LANDSCAPE,
         ignoreMultiWindows = ignoreMultiWindows,
         calcType = DimenCache.CalcType.SCALED,
         qualifier = qualifier,
@@ -577,31 +612,66 @@ fun Number.toDynamicScaledPx(
         customSensitivityK = customSensitivityK
     )
 
-    return DimenCache.getOrPut(cacheKey, ctx.cachePersistence) {
-        val scaledDp = calculateScaledDp(base, metrics, qualifier, inverter, ignoreMultiWindows, applyAspectRatio, customSensitivityK, ctx)
+    return DimenCache.getOrPut(cacheKey, context) {
+        val scaledDp = calculateScaledDp(base, configuration, qualifier, inverter, ignoreMultiWindows, applyAspectRatio, customSensitivityK, context)
         scaledDp * density
     }
 }
 
-@JvmOverloads
 fun Int.toDynamicScaledPx(
-    ctx: DimenCallContext,
+    context: AppDimensContext,
     qualifier: DpQualifier,
     inverter: Inverter = Inverter.DEFAULT,
     ignoreMultiWindows: Boolean = false,
     applyAspectRatio: Boolean = false,
     customSensitivityK: Float? = null
-): Float = (this as Number).toDynamicScaledPx(ctx, qualifier, inverter, ignoreMultiWindows, applyAspectRatio, customSensitivityK)
+): Float = this.toFloat().toDynamicScaledPx(context, qualifier, inverter, ignoreMultiWindows, applyAspectRatio, customSensitivityK)
 
-@JvmOverloads
 fun Float.toDynamicScaledPx(
-    ctx: DimenCallContext,
+    context: AppDimensContext,
     qualifier: DpQualifier,
     inverter: Inverter = Inverter.DEFAULT,
     ignoreMultiWindows: Boolean = false,
     applyAspectRatio: Boolean = false,
     customSensitivityK: Float? = null
-): Float = (this as Number).toDynamicScaledPx(ctx, qualifier, inverter, ignoreMultiWindows, applyAspectRatio, customSensitivityK)
+): Float {
+    // EN Fast lane: dominant path with zero key encoding and zero ThreadLocal
+    //    writes. Bit-identical math, full per-window coherence (same metricsFor).
+    //    AR is only fast for SMALL_WIDTH (shared-kernel contract).
+    // PT Faixa rápida: caminho dominante sem codificar chave e sem escrever no
+    //    ThreadLocal. Mesma matemática, coerência por janela (mesmo metricsFor).
+    //    AR só é rápido para SMALL_WIDTH (contrato do kernel compartilhado).
+    if (DimenCache.isEnabled.load() &&
+        inverter == Inverter.DEFAULT &&
+        !ignoreMultiWindows &&
+        customSensitivityK == null &&
+        (qualifier == DpQualifier.SMALL_WIDTH || !applyAspectRatio)
+    ) {
+        return DimenCache.resolveScaledFastPx(this, context, qualifier, applyAspectRatio)
+    }
+
+    val configuration = context.configuration
+
+
+    val density = context.density
+
+    val cacheKey = DimenCache.buildKey(
+        baseValue = this,
+        isLandscape = configuration.orientation == ScreenConfiguration.ORIENTATION_LANDSCAPE,
+        ignoreMultiWindows = ignoreMultiWindows,
+        calcType = DimenCache.CalcType.SCALED,
+        qualifier = qualifier,
+        inverter = inverter,
+        applyAspectRatio = applyAspectRatio,
+        valueType = DimenCache.ValueType.PX,
+        customSensitivityK = customSensitivityK
+    )
+
+    return DimenCache.getOrPut(cacheKey, context) {
+        val scaledDp = calculateScaledDp(this, configuration, qualifier, inverter, ignoreMultiWindows, applyAspectRatio, customSensitivityK, context)
+        scaledDp * density
+    }
+}
 
 /**
  * EN
@@ -615,16 +685,16 @@ fun Float.toDynamicScaledPx(
  *    delegates to [DimenCache.calculateRawScaling] which reads pre-computed factors from
  *    [DimenCache.ScreenFactors] — a single float multiply, zero extra allocations.
  * 4. For other qualifiers or a custom sensitivity constant, reads the screen dimension from
- *    [android.content.res.Configuration] and performs the scaling formula inline.
+ *    [res.ScreenConfiguration] and performs the scaling formula inline.
  *
  * > **Performance**: Simple paths without Aspect Ratio complete in ~2 ns (single multiply).
  * > Paths with Aspect Ratio require ~41 ns on Snapdragon 888 (includes ln() fallback).
  * > Results are memoized by the [DimenCache] shared across code and compose packages.
  *
  * > **Note**: Both `code/` and `compose/` packages intentionally maintain separate copies of this
- * > function because the `code/` variant operates on [android.content.res.Configuration] directly
+ * > function because the `code/` variant operates on [res.ScreenConfiguration] directly
  * > (no Compose runtime), while `compose/` reads it from [androidx.compose.ui.platform.LocalConfiguration].
- * > The math is identical; only the Context acquisition path differs.
+ * > The math is identical; only the AppDimensContext acquisition path differs.
  *
  * PT
  * Núcleo de escalonamento puro compartilhado por [toDynamicScaledPx] e [toDynamicScaledDp].
@@ -636,15 +706,15 @@ fun Float.toDynamicScaledPx(
  * 3. Para o caminho comum (SMALL_WIDTH + DEFAULT + sem sensibilidade customizada),
  *    delega para [DimenCache.calculateRawScaling] com os fatores pré-calculados.
  * 4. Para outros qualificadores ou sensibilidade customizada, lê a dimensão da tela
- *    da [android.content.res.Configuration] e executa a fórmula de escalonamento inline.
+ *    da [res.ScreenConfiguration] e executa a fórmula de escalonamento inline.
  *
  * > **Nota**: Os pacotes `code/` e `compose/` mantêm cópias separadas intencionalmente.
- * > A versão `code/` opera sobre [android.content.res.Configuration] diretamente,
+ * > A versão `code/` opera sobre [res.ScreenConfiguration] diretamente,
  * > enquanto a versão `compose/` usa [androidx.compose.ui.platform.LocalConfiguration].
  * > A matemática é idêntica; apenas a obtenção do contexto difere.
  *
  * @param baseValue          Raw Dp value to scale (e.g. `16f` for 16 dp).
- * @param configuration      Current [android.content.res.Configuration] from the context.
+ * @param configuration      Current [res.ScreenConfiguration] from the context.
  * @param qualifier          Original screen qualifier before inversion.
  * @param inverter           Orientation-swap rule.
  * @param ignoreMultiWindows Whether to suppress scaling in multi-window mode.
@@ -654,27 +724,27 @@ fun Float.toDynamicScaledPx(
  */
 private fun calculateScaledDp(
     baseValue: Float,
-    metrics: ScreenMetricsSnapshot,
+    configuration: ScreenConfiguration,
     qualifier: DpQualifier,
     inverter: Inverter,
     ignoreMultiWindows: Boolean,
     applyAspectRatio: Boolean,
     customSensitivityK: Float?,
-    ctx: DimenCallContext? = null
+    context: AppDimensContext? = null
 ): Float {
-    val isLandscape = metrics.orientation == ScreenOrientation.LANDSCAPE
-    val isPortrait = metrics.orientation == ScreenOrientation.PORTRAIT
+    val isLandscape = configuration.orientation == ScreenConfiguration.ORIENTATION_LANDSCAPE
+    val isPortrait = configuration.orientation == ScreenConfiguration.ORIENTATION_PORTRAIT
     val actualQualifier = com.appdimens.dynamic.core.DimenCalculationPlumbing.effectiveQualifier(
         qualifier, inverter, isLandscape, isPortrait
     )
-    if (com.appdimens.dynamic.core.DimenCalculationPlumbing.isMultiWindowConstrained(metrics, ignoreMultiWindows)) {
+    if (com.appdimens.dynamic.core.DimenCalculationPlumbing.isMultiWindowConstrained(configuration, ignoreMultiWindows, context)) {
         return baseValue
     }
     val isDefaultSw = (qualifier == DpQualifier.SMALL_WIDTH) && (inverter == Inverter.DEFAULT)
     if (isDefaultSw && customSensitivityK == null) {
         return DimenCache.calculateRawScaling(baseValue, applyAspectRatio, null)
     }
-    val screenDimension = com.appdimens.dynamic.core.DimenCalculationPlumbing.readScreenDp(metrics, actualQualifier)
+    val screenDimension = com.appdimens.dynamic.core.DimenCalculationPlumbing.readScreenDp(configuration, actualQualifier)
     val scale = screenDimension * DimenCache.INV_BASE_RATIO
     return if (applyAspectRatio) {
         val diff = screenDimension - 300f
@@ -703,7 +773,7 @@ private fun calculateScaledDp(
  *
  * Mesma semântica de cache, validação e bypass de [toDynamicScaledPx].
  *
- * @param context            Android [DimenCallContext] for configuration access.
+ * @param context            Android [AppDimensContext] for configuration access.
  * @param qualifier          Screen dimension qualifier.
  * @param inverter           Orientation-based dimension swap rule (default: [Inverter.DEFAULT]).
  * @param ignoreMultiWindows If `true`, returns the base Dp value unscaled when in split-screen.
@@ -711,9 +781,8 @@ private fun calculateScaledDp(
  * @param customSensitivityK Override for the AR sensitivity constant (null = library default).
  * @return Dynamically scaled Dp value as [Float].
  */
-@JvmOverloads
 fun Number.toDynamicScaledDp(
-    ctx: DimenCallContext,
+    context: AppDimensContext,
     qualifier: DpQualifier,
     inverter: Inverter = Inverter.DEFAULT,
     ignoreMultiWindows: Boolean = false,
@@ -721,11 +790,11 @@ fun Number.toDynamicScaledDp(
     customSensitivityK: Float? = null
 ): Float {
     val base = this.toFloat()
-    val metrics = ctx.screenMetrics
+    val configuration = context.configuration
 
     val cacheKey = DimenCache.buildKey(
         baseValue = base,
-        isLandscape = metrics.orientation == ScreenOrientation.LANDSCAPE,
+        isLandscape = configuration.orientation == ScreenConfiguration.ORIENTATION_LANDSCAPE,
         ignoreMultiWindows = ignoreMultiWindows,
         calcType = DimenCache.CalcType.SCALED,
         qualifier = qualifier,
@@ -735,27 +804,58 @@ fun Number.toDynamicScaledDp(
         customSensitivityK = customSensitivityK
     )
 
-    return DimenCache.getOrPut(cacheKey, ctx.cachePersistence) {
-        calculateScaledDp(base, metrics, qualifier, inverter, ignoreMultiWindows, applyAspectRatio, customSensitivityK, ctx)
+    return DimenCache.getOrPut(cacheKey, context) {
+        calculateScaledDp(base, configuration, qualifier, inverter, ignoreMultiWindows, applyAspectRatio, customSensitivityK, context)
     }
 }
 
-@JvmOverloads
 fun Int.toDynamicScaledDp(
-    ctx: DimenCallContext,
+    context: AppDimensContext,
     qualifier: DpQualifier,
     inverter: Inverter = Inverter.DEFAULT,
     ignoreMultiWindows: Boolean = false,
     applyAspectRatio: Boolean = false,
     customSensitivityK: Float? = null
-): Float = (this as Number).toDynamicScaledDp(ctx, qualifier, inverter, ignoreMultiWindows, applyAspectRatio, customSensitivityK)
+): Float = this.toFloat().toDynamicScaledDp(context, qualifier, inverter, ignoreMultiWindows, applyAspectRatio, customSensitivityK)
 
-@JvmOverloads
 fun Float.toDynamicScaledDp(
-    ctx: DimenCallContext,
+    context: AppDimensContext,
     qualifier: DpQualifier,
     inverter: Inverter = Inverter.DEFAULT,
     ignoreMultiWindows: Boolean = false,
     applyAspectRatio: Boolean = false,
     customSensitivityK: Float? = null
-): Float = (this as Number).toDynamicScaledDp(ctx, qualifier, inverter, ignoreMultiWindows, applyAspectRatio, customSensitivityK)
+): Float {
+    // EN Fast lane: dominant path with zero key encoding and zero ThreadLocal
+    //    writes. Bit-identical math, full per-window coherence (same metricsFor).
+    //    AR is only fast for SMALL_WIDTH (shared-kernel contract).
+    // PT Faixa rápida: caminho dominante sem codificar chave e sem escrever no
+    //    ThreadLocal. Mesma matemática, coerência por janela (mesmo metricsFor).
+    //    AR só é rápido para SMALL_WIDTH (contrato do kernel compartilhado).
+    if (DimenCache.isEnabled.load() &&
+        inverter == Inverter.DEFAULT &&
+        !ignoreMultiWindows &&
+        customSensitivityK == null &&
+        (qualifier == DpQualifier.SMALL_WIDTH || !applyAspectRatio)
+    ) {
+        return DimenCache.resolveScaledFastDp(this, context, qualifier, applyAspectRatio)
+    }
+
+    val configuration = context.configuration
+
+    val cacheKey = DimenCache.buildKey(
+        baseValue = this,
+        isLandscape = configuration.orientation == ScreenConfiguration.ORIENTATION_LANDSCAPE,
+        ignoreMultiWindows = ignoreMultiWindows,
+        calcType = DimenCache.CalcType.SCALED,
+        qualifier = qualifier,
+        inverter = inverter,
+        applyAspectRatio = applyAspectRatio,
+        valueType = DimenCache.ValueType.DP,
+        customSensitivityK = customSensitivityK
+    )
+
+    return DimenCache.getOrPut(cacheKey, context) {
+        calculateScaledDp(this, configuration, qualifier, inverter, ignoreMultiWindows, applyAspectRatio, customSensitivityK, context)
+    }
+}

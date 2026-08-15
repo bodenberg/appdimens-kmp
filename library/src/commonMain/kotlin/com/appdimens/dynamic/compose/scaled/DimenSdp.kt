@@ -1,3 +1,5 @@
+@file:OptIn(kotlin.concurrent.atomics.ExperimentalAtomicApi::class)
+
 /**
  * Author & Developer: Jean Bodenberg
  * GIT: https://github.com/bodenberg/appdimens-sdps.git
@@ -24,18 +26,19 @@
  */
 package com.appdimens.dynamic.compose
 
-import com.appdimens.dynamic.platform.DimenCallContext
-import com.appdimens.dynamic.platform.ScreenMetricsSnapshot
-import com.appdimens.dynamic.common.ScreenOrientation
-
+import com.appdimens.dynamic.core.AppDimensContext
+import com.appdimens.dynamic.core.ScreenConfiguration
+import com.appdimens.dynamic.core.currentScreenConfiguration
+import com.appdimens.dynamic.core.localAppDimensContext
 
 import androidx.compose.runtime.Composable
-import com.appdimens.dynamic.core.LocalScreenMetrics
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.appdimens.dynamic.core.DimenCache
+import com.appdimens.dynamic.core.DimenMetrics
+import com.appdimens.dynamic.core.LocalDimenMetrics
 import com.appdimens.dynamic.core.rememberDimenDp
 import com.appdimens.dynamic.core.rememberDimenPxFromDp
 import com.appdimens.dynamic.core.DimenCalculationPlumbing
@@ -46,17 +49,17 @@ import com.appdimens.dynamic.core.pxRememberStamp
 
 /**
  * EN
- * Gets the actual value from the Configuration for the given DpQualifier.
+ * Gets the actual value from the ScreenConfiguration for the given DpQualifier.
  *
  * PT
- * Obtém o valor real da configuração (Configuration) para o DpQualifier dado.
+ * Obtém o valor real da configuração (ScreenConfiguration) para o DpQualifier dado.
  *
  * @param qualifier The type of qualifier (SMALL_WIDTH, HEIGHT, WIDTH).
  * @param configuration The current resource configuration.
  * @return The numeric value (in Dp) of the screen metric.
  */
-internal fun getQualifierValue(qualifier: DpQualifier, metrics: ScreenMetricsSnapshot): Float {
-    return DimenCalculationPlumbing.readScreenDp(metrics, qualifier)
+internal fun getQualifierValue(qualifier: DpQualifier, configuration: ScreenConfiguration): Float {
+    return DimenCalculationPlumbing.readScreenDp(configuration, qualifier)
 }
 
 
@@ -446,12 +449,42 @@ val Number.wdpPxiaPh: Float get() = this.toDynamicScaledPx(DpQualifier.WIDTH, In
  */
 @Composable
 fun Number.toDynamicScaledDp(qualifier: DpQualifier, inverter: Inverter = Inverter.DEFAULT, ignoreMultiWindows: Boolean = false, applyAspectRatio: Boolean = false, customSensitivityK: Float? = null): Dp {
-    val metrics = LocalScreenMetrics.current
-    val ctx = com.appdimens.dynamic.core.staticDimenCallContext(metrics)
+    // EN Fast lane (Compose): the dominant path bypasses key encoding and the
+    //    remember/getOrPut machinery entirely — a single float multiply over the
+    //    coherent per-window metrics (bit-identical to the legacy math).
+    //    AR is only fast for SMALL_WIDTH (shared-kernel contract).
+    //    Prefers the coherent metrics already provided by AppDimensProvider
+    //    ([metricsScope] thread-local wins when nested inside a strategy compute;
+    //    otherwise the live [LocalDimenMetrics] snapshot) — one CompositionLocal
+    //    read + one multiply, resize-aware on every platform. Falls back to the
+    //    context chain (fast window slot) when no provider is present.
+    // PT Faixa rápida (Compose): o caminho dominante ignora a codificação de
+    //    chave e o mecanismo remember/getOrPut — uma única multiplicação float
+    //    sobre as métricas coerentes por janela (idêntico à matemática legada).
+    //    Prefere as métricas coerentes já fornecidas pelo AppDimensProvider
+    //    ([metricsScope] thread-local vence quando aninhado em compute de
+    //    estratégia; senão o snapshot vivo [LocalDimenMetrics]) — uma leitura de
+    //    CompositionLocal + uma multiplicação, ciente de resize em toda
+    //    plataforma. Cai para a cadeia de contexto (fast window slot) sem provider.
+    if (DimenCache.isEnabled.load() &&
+        inverter == Inverter.DEFAULT &&
+        !ignoreMultiWindows &&
+        customSensitivityK == null &&
+        (qualifier == DpQualifier.SMALL_WIDTH || !applyAspectRatio)
+    ) {
+        val m: DimenMetrics? = DimenCache.metricsScope ?: LocalDimenMetrics.current
+        if (m != null) {
+            return Dp(DimenCache.resolveScaledFastDpFromMetrics(this.toFloat(), m, qualifier, applyAspectRatio))
+        }
+        return Dp(DimenCache.resolveScaledFastDp(this.toFloat(), localAppDimensContext(), qualifier, applyAspectRatio))
+    }
+
+    val configuration = currentScreenConfiguration()
+    val androidContext = localAppDimensContext()
 
     val cacheKey = DimenCache.buildKey(
         baseValue = this.toFloat(),
-        isLandscape = metrics.orientation == ScreenOrientation.LANDSCAPE,
+        isLandscape = configuration.orientation == ScreenConfiguration.ORIENTATION_LANDSCAPE,
         ignoreMultiWindows = ignoreMultiWindows,
         calcType = DimenCache.CalcType.SCALED,
         qualifier = qualifier,
@@ -460,10 +493,10 @@ fun Number.toDynamicScaledDp(qualifier: DpQualifier, inverter: Inverter = Invert
         valueType = DimenCache.ValueType.DP,
         customSensitivityK = customSensitivityK
     )
-    val layoutStamp = layoutRememberStamp(metrics, ctx)
+    val layoutStamp = layoutRememberStamp(configuration)
 
     return rememberScaledDp(
-        cacheKey, layoutStamp, ctx, this.toFloat(), metrics,
+        cacheKey, layoutStamp, androidContext, this.toFloat(), configuration,
         qualifier, inverter, ignoreMultiWindows, applyAspectRatio, customSensitivityK
     )
 }
@@ -480,7 +513,7 @@ fun Number.toDynamicScaledDp(qualifier: DpQualifier, inverter: Inverter = Invert
  *    delegates to [DimenCache.calculateRawScaling] which reads the pre-computed factors
  *    from [DimenCache.ScreenFactors] — one float multiply, zero extra allocations.
  * 4. For other qualifiers or custom sensitivity, reads the screen dimension from
- *    [Configuration] and performs the scaling formula inline.
+ *    [ScreenConfiguration] and performs the scaling formula inline.
  *
  * > **Performance**: Simple paths without Aspect Ratio complete in ~2 ns (single multiply).
  * > Paths with Aspect Ratio require ~41 ns on Snapdragon 888 (includes ln() fallback).
@@ -496,10 +529,10 @@ fun Number.toDynamicScaledDp(qualifier: DpQualifier, inverter: Inverter = Invert
  * 3. Para o caminho comum (SMALL_WIDTH + DEFAULT + sem sensibilidade customizada),
  *    delega para [DimenCache.calculateRawScaling] com os fatores pré-calculados.
  * 4. Para outros qualificadores ou sensibilidade customizada, lê a dimensão da tela
- *    do [Configuration] e executa a fórmula de escalonamento inline.
+ *    do [ScreenConfiguration] e executa a fórmula de escalonamento inline.
  *
  * @param baseValue          Raw Dp value to scale (e.g. `16f` for 16 dp).
- * @param configuration      Current [Configuration] snapshot from [LocalConfiguration.current].
+ * @param configuration      Current [ScreenConfiguration] snapshot from [currentScreenConfiguration()].
  * @param qualifier          Original screen qualifier before inversion.
  * @param inverter           Orientation-swap rule.
  * @param ignoreMultiWindows Whether to suppress scaling in multi-window mode.
@@ -509,26 +542,26 @@ fun Number.toDynamicScaledDp(qualifier: DpQualifier, inverter: Inverter = Invert
  */
 internal fun calculateScaledDpCompose(
     baseValue: Float,
-    metrics: ScreenMetricsSnapshot,
+    configuration: ScreenConfiguration,
     qualifier: DpQualifier,
     inverter: Inverter,
     ignoreMultiWindows: Boolean,
     applyAspectRatio: Boolean,
     customSensitivityK: Float?,
-    context: DimenCallContext? = null
+    context: AppDimensContext? = null
 ): Float {
-    val isLandscape = metrics.orientation == ScreenOrientation.LANDSCAPE
-    val isPortrait = metrics.orientation == ScreenOrientation.PORTRAIT
+    val isLandscape = configuration.orientation == ScreenConfiguration.ORIENTATION_LANDSCAPE
+    val isPortrait = configuration.orientation == ScreenConfiguration.ORIENTATION_PORTRAIT
     val actualQualifier = DimenCalculationPlumbing.effectiveQualifier(qualifier, inverter, isLandscape, isPortrait)
 
-    if (DimenCalculationPlumbing.isMultiWindowConstrained(metrics, ignoreMultiWindows)) {
+    if (DimenCalculationPlumbing.isMultiWindowConstrained(configuration, ignoreMultiWindows, context)) {
         return baseValue
     }
     val isDefaultSw = (qualifier == DpQualifier.SMALL_WIDTH) && (inverter == Inverter.DEFAULT)
     if (isDefaultSw && customSensitivityK == null) {
         return DimenCache.calculateRawScaling(baseValue, applyAspectRatio, null)
     }
-    val screenDim = DimenCalculationPlumbing.readScreenDp(metrics, actualQualifier)
+    val screenDim = DimenCalculationPlumbing.readScreenDp(configuration, actualQualifier)
     val scale = screenDim * DimenCache.INV_BASE_RATIO
     return if (applyAspectRatio) {
         val diff = screenDim - 300f
@@ -543,33 +576,37 @@ internal fun calculateScaledDpCompose(
 internal fun rememberScaledDp(
     cacheKey: Long,
     layoutStamp: Long,
-    ctx: DimenCallContext,
+    androidContext: AppDimensContext?,
     baseValue: Float,
-    metrics: ScreenMetricsSnapshot,
+    configuration: ScreenConfiguration,
     qualifier: DpQualifier,
     inverter: Inverter,
     ignoreMultiWindows: Boolean,
     applyAspectRatio: Boolean,
     customSensitivityK: Float?,
-): Dp = rememberDimenDp(cacheKey, layoutStamp, ctx) {
-    calculateScaledDpCompose(baseValue, metrics, qualifier, inverter, ignoreMultiWindows, applyAspectRatio, customSensitivityK, ctx)
+    match: Boolean = true,
+    passthrough: Dp = Dp.Unspecified,
+): Dp = rememberDimenDp(cacheKey, layoutStamp, androidContext, match = match, passthrough = passthrough) {
+    calculateScaledDpCompose(baseValue, configuration, qualifier, inverter, ignoreMultiWindows, applyAspectRatio, customSensitivityK, androidContext)
 }
 
 @Composable
 internal fun rememberScaledPxFromDp(
     cacheKey: Long,
     pxStamp: Long,
-    ctx: DimenCallContext,
+    androidContext: AppDimensContext?,
     density: Density,
     baseValue: Float,
-    metrics: ScreenMetricsSnapshot,
+    configuration: ScreenConfiguration,
     qualifier: DpQualifier,
     inverter: Inverter,
     ignoreMultiWindows: Boolean,
     applyAspectRatio: Boolean,
     customSensitivityK: Float?,
-): Float = rememberDimenPxFromDp(cacheKey, pxStamp, ctx, density) {
-    calculateScaledDpCompose(baseValue, metrics, qualifier, inverter, ignoreMultiWindows, applyAspectRatio, customSensitivityK, ctx)
+    match: Boolean = true,
+    passthrough: Float = Float.NaN,
+): Float = rememberDimenPxFromDp(cacheKey, pxStamp, androidContext, density, match = match, passthrough = passthrough) {
+    calculateScaledDpCompose(baseValue, configuration, qualifier, inverter, ignoreMultiWindows, applyAspectRatio, customSensitivityK, androidContext)
 }
 
 /**
@@ -595,13 +632,33 @@ internal fun rememberScaledPxFromDp(
  */
 @Composable
 fun Number.toDynamicScaledPx(qualifier: DpQualifier, inverter: Inverter = Inverter.DEFAULT, ignoreMultiWindows: Boolean = false, applyAspectRatio: Boolean = false, customSensitivityK: Float? = null): Float {
-    val metrics = LocalScreenMetrics.current
-    val ctx = com.appdimens.dynamic.core.staticDimenCallContext(metrics)
+    // EN Fast lane (Compose): dominant pixel path — one multiply set over the
+    //    coherent per-window metrics, no key encoding, no remember machinery.
+    //    AR is only fast for SMALL_WIDTH (shared-kernel contract).
+    //    Same provider-metrics preference as [toDynamicScaledDp].
+    // PT Faixa rápida (Compose): caminho em pixels dominante — um conjunto de
+    //    multiplicações sobre as métricas coerentes, sem codificar chave.
+    //    Mesma preferência de métricas do provider que [toDynamicScaledDp].
+    if (DimenCache.isEnabled.load() &&
+        inverter == Inverter.DEFAULT &&
+        !ignoreMultiWindows &&
+        customSensitivityK == null &&
+        (qualifier == DpQualifier.SMALL_WIDTH || !applyAspectRatio)
+    ) {
+        val m: DimenMetrics? = DimenCache.metricsScope ?: LocalDimenMetrics.current
+        if (m != null) {
+            return DimenCache.resolveScaledFastPxFromMetrics(this.toFloat(), m, qualifier, applyAspectRatio)
+        }
+        return DimenCache.resolveScaledFastPx(this.toFloat(), localAppDimensContext(), qualifier, applyAspectRatio)
+    }
+
+    val configuration = currentScreenConfiguration()
+    val androidContext = localAppDimensContext()
     val density = LocalDensity.current
 
     val cacheKey = DimenCache.buildKey(
         baseValue = this.toFloat(),
-        isLandscape = metrics.orientation == ScreenOrientation.LANDSCAPE,
+        isLandscape = configuration.orientation == ScreenConfiguration.ORIENTATION_LANDSCAPE,
         ignoreMultiWindows = ignoreMultiWindows,
         calcType = DimenCache.CalcType.SCALED,
         qualifier = qualifier,
@@ -610,10 +667,10 @@ fun Number.toDynamicScaledPx(qualifier: DpQualifier, inverter: Inverter = Invert
         valueType = DimenCache.ValueType.PX,
         customSensitivityK = customSensitivityK
     )
-    val pxStamp = pxRememberStamp(layoutRememberStamp(metrics, ctx), density)
+    val pxStamp = pxRememberStamp(layoutRememberStamp(configuration), density)
 
     return rememberScaledPxFromDp(
-        cacheKey, pxStamp, ctx, density, this.toFloat(), metrics,
+        cacheKey, pxStamp, androidContext, density, this.toFloat(), configuration,
         qualifier, inverter, ignoreMultiWindows, applyAspectRatio, customSensitivityK
     )
 }

@@ -1,3 +1,5 @@
+@file:OptIn(kotlin.concurrent.atomics.ExperimentalAtomicApi::class)
+
 /**
  * Author & Developer: Jean Bodenberg
  * GIT: https://github.com/bodenberg/appdimens-sdps.git
@@ -24,10 +26,10 @@
  */
 package com.appdimens.dynamic.code
 
-import com.appdimens.dynamic.platform.DimenCallContext
-import com.appdimens.dynamic.platform.ScreenMetricsSnapshot
-import com.appdimens.dynamic.common.ScreenOrientation
-
+import com.appdimens.dynamic.core.AppDimensContext
+import com.appdimens.dynamic.core.ScreenConfiguration
+import com.appdimens.dynamic.core.currentScreenConfiguration
+import com.appdimens.dynamic.core.localAppDimensContext
 
 import com.appdimens.dynamic.common.DpQualifier
 import com.appdimens.dynamic.common.DpQualifierEntry
@@ -83,7 +85,7 @@ fun Number.scaledSp(): ScaledSp = ScaledSp(this)
  * A class that allows defining custom Sp text dimensions
  * based on screen qualifiers (UiModeType, Width, Height, Smallest Width).
  *
- * The value is resolved using a Context and uses the base value or a custom value,
+ * The value is resolved using a AppDimensContext and uses the base value or a custom value,
  * applying dynamic scaling.
  *
  * PT
@@ -105,7 +107,6 @@ class ScaledSp private constructor(
      * EN Allow ignoring the constraint scaling based on multi-window resizing properties.
      * PT Permite ignorar o dimensionamento para os layouts de múltiplas janelas (divisão de tela).
      */
-    @JvmOverloads
     fun ignoreMultiWindows(ignore: Boolean = true): ScaledSp {
         return ScaledSp(initialBaseValue, defaultFontScale, sortedCustomEntries, ignore, applyAspectRatio, customSensitivityK)
     }
@@ -114,7 +115,6 @@ class ScaledSp private constructor(
      * EN Allow applying aspect ratio based constraint scaling.
      * PT Permite aplicar o redimensionamento baseado na proporção da tela.
      */
-    @JvmOverloads
     fun aspectRatio(enable: Boolean = true, sensitivityK: Float? = null): ScaledSp {
         return ScaledSp(initialBaseValue, defaultFontScale, sortedCustomEntries, ignoreMultiWindows, enable, sensitivityK)
     }
@@ -140,7 +140,6 @@ class ScaledSp private constructor(
      * EN Priority 1: Most specific qualifier — combines [UiModeType] and Dp qualifier (sw, h, w).
      * PT Prioridade 1: qualificador mais específico — combina [UiModeType] e qualificador Dp (sw, h, w).
      */
-    @JvmOverloads
     fun screen(
         uiModeType: UiModeType,
         qualifierType: DpQualifier,
@@ -168,7 +167,6 @@ class ScaledSp private constructor(
      * EN Priority 2: [UiModeType] only (e.g. TELEVISION, WATCH).
      * PT Prioridade 2: apenas [UiModeType] (ex.: TELEVISION, WATCH).
      */
-    @JvmOverloads
     fun screen(
         type: UiModeType,
         customValue: Number,
@@ -193,7 +191,6 @@ class ScaledSp private constructor(
      * EN Priority 3: Dp qualifier (sw, h, w) without [UiModeType] restriction.
      * PT Prioridade 3: qualificador Dp (sw, h, w) sem restrição de [UiModeType].
      */
-    @JvmOverloads
     fun screen(
         type: DpQualifier,
         value: Int,
@@ -219,7 +216,6 @@ class ScaledSp private constructor(
      * EN Priority 4: orientation only.
      * PT Prioridade 4: apenas orientação.
      */
-    @JvmOverloads
     fun screen(
         orientation: Orientation = Orientation.DEFAULT,
         customValue: Number,
@@ -245,23 +241,23 @@ class ScaledSp private constructor(
      * EN Resolves [qualifier] to px using the first matching [CustomSpEntry], optionally overriding font scale.
      * PT Resolve [qualifier] em px usando a primeira [CustomSpEntry] correspondente, com override opcional da escala de fonte.
      */
-    private fun resolvePx(ctx: DimenCallContext, qualifier: DpQualifier, fontScaleOverride: Boolean? = null): Float {
-        val metrics = ctx.screenMetrics
-        val currentUiModeType = ctx.currentUiMode()
-        return resolvePxInternal(ctx, qualifier, metrics, currentUiModeType, fontScaleOverride)
+    private fun resolvePx(context: AppDimensContext, qualifier: DpQualifier, fontScaleOverride: Boolean? = null): Float {
+        val configuration = context.configuration
+        val currentUiModeType = DimenCache.getCachedUiModeType(context)
+        return resolvePxInternal(context, qualifier, configuration, currentUiModeType, fontScaleOverride)
     }
 
     /**
      * EN Resolves ssp, hsp, and wsp in one pass (single [UiModeType.fromConfiguration] read).
      * PT Resolve ssp, hsp e wsp numa só passagem.
      */
-    fun sspHspWspPx(ctx: DimenCallContext): Triple<Float, Float, Float> {
-        val metrics = ctx.screenMetrics
-        val currentUiModeType = ctx.currentUiMode()
+    fun sspHspWspPx(context: AppDimensContext): Triple<Float, Float, Float> {
+        val configuration = context.configuration
+        val currentUiModeType = DimenCache.getCachedUiModeType(context)
         return Triple(
-            resolvePxInternal(ctx, DpQualifier.SMALL_WIDTH, metrics, currentUiModeType, null),
-            resolvePxInternal(ctx, DpQualifier.HEIGHT, metrics, currentUiModeType, null),
-            resolvePxInternal(ctx, DpQualifier.WIDTH, metrics, currentUiModeType, null)
+            resolvePxInternal(context, DpQualifier.SMALL_WIDTH, configuration, currentUiModeType, null),
+            resolvePxInternal(context, DpQualifier.HEIGHT, configuration, currentUiModeType, null),
+            resolvePxInternal(context, DpQualifier.WIDTH, configuration, currentUiModeType, null)
         )
     }
 
@@ -269,13 +265,13 @@ class ScaledSp private constructor(
      * EN Resolves sei, hei, and wei in one pass (fixed Sp / no font-scale path).
      * PT Resolve sei, hei e wei numa só passagem (Sp fixo / sem escala de fonte).
      */
-    fun seiHeiWeiPx(ctx: DimenCallContext): Triple<Float, Float, Float> {
-        val metrics = ctx.screenMetrics
-        val currentUiModeType = ctx.currentUiMode()
+    fun seiHeiWeiPx(context: AppDimensContext): Triple<Float, Float, Float> {
+        val configuration = context.configuration
+        val currentUiModeType = DimenCache.getCachedUiModeType(context)
         return Triple(
-            resolvePxInternal(ctx, DpQualifier.SMALL_WIDTH, metrics, currentUiModeType, false),
-            resolvePxInternal(ctx, DpQualifier.HEIGHT, metrics, currentUiModeType, false),
-            resolvePxInternal(ctx, DpQualifier.WIDTH, metrics, currentUiModeType, false)
+            resolvePxInternal(context, DpQualifier.SMALL_WIDTH, configuration, currentUiModeType, false),
+            resolvePxInternal(context, DpQualifier.HEIGHT, configuration, currentUiModeType, false),
+            resolvePxInternal(context, DpQualifier.WIDTH, configuration, currentUiModeType, false)
         )
     }
 
@@ -284,14 +280,14 @@ class ScaledSp private constructor(
      * PT Implementação compartilhada para [resolvePx], [sspHspWspPx] e [seiHeiWeiPx].
      */
     private fun resolvePxInternal(
-        ctx: DimenCallContext,
+        context: AppDimensContext,
         qualifier: DpQualifier,
-        metrics: ScreenMetricsSnapshot,
+        configuration: ScreenConfiguration,
         currentUiModeType: UiModeType,
         fontScaleOverride: Boolean?
     ): Float {
-        val isLandscape = metrics.orientation == ScreenOrientation.LANDSCAPE
-        val isPortrait = metrics.orientation == ScreenOrientation.PORTRAIT
+        val isLandscape = configuration.orientation == ScreenConfiguration.ORIENTATION_LANDSCAPE
+        val isPortrait = configuration.orientation == ScreenConfiguration.ORIENTATION_PORTRAIT
 
         val foundEntry = sortedCustomEntries.firstOrNull { entry ->
             val qualifierEntry = entry.dpQualifierEntry
@@ -303,7 +299,7 @@ class ScaledSp private constructor(
             }
 
             if (qualifierEntry != null) {
-                val qualifierMatch = getQualifierValue(qualifierEntry.type, metrics) >= qualifierEntry.value.toFloat()
+                val qualifierMatch = getQualifierValue(qualifierEntry.type, configuration) >= qualifierEntry.value.toFloat()
                 if (entry.priority == 1 && uiModeMatch && qualifierMatch && orientationMatch) return@firstOrNull true
                 if (entry.priority == 3 && qualifierMatch && orientationMatch) return@firstOrNull true
                 false
@@ -319,7 +315,7 @@ class ScaledSp private constructor(
         val finalFontScale = fontScaleOverride ?: foundEntry?.fontScale ?: defaultFontScale
 
         return valueToUse.toDynamicScaledSpPx(
-            ctx,
+            context,
             finalQualifier,
             finalFontScale,
             foundEntry?.inverter ?: Inverter.DEFAULT,
@@ -330,12 +326,12 @@ class ScaledSp private constructor(
     }
 
     /** EN Resolve final value in pixels (WITH font scale). */
-    fun ssp(ctx: DimenCallContext): Float = resolvePx(ctx, DpQualifier.SMALL_WIDTH)
-    fun hsp(ctx: DimenCallContext): Float = resolvePx(ctx, DpQualifier.HEIGHT)
-    fun wsp(ctx: DimenCallContext): Float = resolvePx(ctx, DpQualifier.WIDTH)
+    fun ssp(context: AppDimensContext): Float = resolvePx(context, DpQualifier.SMALL_WIDTH)
+    fun hsp(context: AppDimensContext): Float = resolvePx(context, DpQualifier.HEIGHT)
+    fun wsp(context: AppDimensContext): Float = resolvePx(context, DpQualifier.WIDTH)
 
     /** EN Resolve final value in pixels (WITHOUT font scale). */
-    fun sei(ctx: DimenCallContext): Float = resolvePx(ctx, DpQualifier.SMALL_WIDTH, fontScaleOverride = false)
-    fun hei(ctx: DimenCallContext): Float = resolvePx(ctx, DpQualifier.HEIGHT, fontScaleOverride = false)
-    fun wei(ctx: DimenCallContext): Float = resolvePx(ctx, DpQualifier.WIDTH, fontScaleOverride = false)
+    fun sei(context: AppDimensContext): Float = resolvePx(context, DpQualifier.SMALL_WIDTH, fontScaleOverride = false)
+    fun hei(context: AppDimensContext): Float = resolvePx(context, DpQualifier.HEIGHT, fontScaleOverride = false)
+    fun wei(context: AppDimensContext): Float = resolvePx(context, DpQualifier.WIDTH, fontScaleOverride = false)
 }

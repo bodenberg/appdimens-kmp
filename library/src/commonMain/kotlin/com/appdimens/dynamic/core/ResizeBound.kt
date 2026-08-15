@@ -1,11 +1,17 @@
+@file:OptIn(kotlin.concurrent.atomics.ExperimentalAtomicApi::class)
+
 /**
  * EN Bounds for auto-resize (TextView auto-size–style): fixed dp/sp or literal % of screen axis.
  * PT Limites para auto-resize: dp/sp fixos ou % literal de um eixo da tela.
  */
 package com.appdimens.dynamic.core
 
+import com.appdimens.dynamic.core.AppDimensContext
+import com.appdimens.dynamic.core.ScreenConfiguration
+import com.appdimens.dynamic.core.currentScreenConfiguration
+import com.appdimens.dynamic.core.localAppDimensContext
+
 import com.appdimens.dynamic.common.DpQualifier
-import com.appdimens.dynamic.platform.ScreenMetricsSnapshot
 
 /**
  * EN Screen metric used to resolve [Percent] bounds (matches sdp / wdp / hdp axes).
@@ -17,7 +23,7 @@ typealias ResizeAxisQualifier = DpQualifier
  *
  * - [FixedDp]: logical dp already chosen by the caller (e.g. `16.sdp` → pass `16f` or `dp.value`).
  * - [FixedSp]: sp value; converts to px with [fontScale] (like `COMPLEX_UNIT_SP`).
- * - [Percent]: `value` is 0–100 of [axis] using [ScreenMetricsSnapshot] (same idea as `spaceW` / `spaceSw` / `spaceH`).
+ * - [Percent]: `value` is 0–100 of [axis] using [ScreenConfiguration] (same idea as `spaceW` / `spaceSw` / `spaceH`).
  */
 sealed class ResizeBound {
     data class FixedDp(val dp: Float) : ResizeBound()
@@ -28,15 +34,15 @@ sealed class ResizeBound {
 fun resizeFixedDp(dp: Float): ResizeBound = ResizeBound.FixedDp(dp)
 fun resizeFixedSp(sp: Float): ResizeBound = ResizeBound.FixedSp(sp)
 
-/** EN % of smallest width dp. PT % do menor lado (sw). */
+/** EN % of [ScreenConfiguration.smallestScreenWidthDp]. PT % do menor lado (sw). */
 fun resizePercentSw(percent: Float): ResizeBound =
     ResizeBound.Percent(percent, DpQualifier.SMALL_WIDTH)
 
-/** EN % of screen width dp. */
+/** EN % of [ScreenConfiguration.screenWidthDp]. */
 fun resizePercentW(percent: Float): ResizeBound =
     ResizeBound.Percent(percent, DpQualifier.WIDTH)
 
-/** EN % of screen height dp. */
+/** EN % of [ScreenConfiguration.screenHeightDp]. */
 fun resizePercentH(percent: Float): ResizeBound =
     ResizeBound.Percent(percent, DpQualifier.HEIGHT)
 
@@ -44,7 +50,7 @@ fun resizePercentH(percent: Float): ResizeBound =
  * EN Converts [bound] to **px** for layout/measure (density + font scale for sp).
  */
 fun ResizeBound.resolveToPx(
-    metrics: ScreenMetricsSnapshot,
+    configuration: ScreenConfiguration,
     density: Float,
     fontScale: Float,
 ): Float {
@@ -54,7 +60,7 @@ fun ResizeBound.resolveToPx(
         is ResizeBound.FixedDp -> dp.coerceAtLeast(0f) * density
         is ResizeBound.FixedSp -> sp.coerceAtLeast(0f) * density * fs
         is ResizeBound.Percent -> {
-            val axisDp = DimenCalculationPlumbing.readScreenDp(metrics, axis)
+            val axisDp = DimenCalculationPlumbing.readScreenDp(configuration, axis)
             (value.coerceIn(0f, 100f) / 100f) * axisDp * density
         }
     }

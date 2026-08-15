@@ -1,39 +1,110 @@
 /**
  * Shared Compose remember + [DimenCache] wiring (no scaling formulas).
+ *
+ * KMP: the Android `Context` parameter became an optional [AppDimensContext].
  */
 package com.appdimens.dynamic.core
-
-import com.appdimens.dynamic.platform.DimenCallContext
-import com.appdimens.dynamic.platform.ScreenMetricsSnapshot
-import com.appdimens.dynamic.common.ScreenOrientation
-
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 
+/**
+ * EN Remembers a scaled [Dp]. When [match] is false, returns [passthrough] without
+ * touching [DimenCache] — used by `*Plain` APIs so [remember] is always called
+ * (stable Compose slots) while the miss branch stays a true no-op.
+ *
+ * PT Lembra um [Dp] escalado. Com [match] falso devolve [passthrough] sem cache.
+ */
 @Composable
-internal fun rememberDimenDp(
+fun rememberDimenDp(
     cacheKey: Long,
     layoutStamp: Long,
-    ctx: DimenCallContext,
+    appContext: AppDimensContext?,
+    match: Boolean = true,
+    passthrough: Dp = Dp.Unspecified,
     compute: () -> Float,
-): Dp = remember(cacheKey, layoutStamp) {
-    DimenCache.getOrPut(cacheKey, ctx.cachePersistence, compute).dp
+): Dp {
+    val metrics = LocalDimenMetrics.current
+    return if (match) {
+        remember(cacheKey, layoutStamp, metrics) {
+            resolveCachedFloat(cacheKey, metrics, appContext, compute).dp
+        }
+    } else {
+        remember(match, cacheKey, layoutStamp, passthrough) { passthrough }
+    }
 }
 
+/**
+ * EN Remembers scaled Dp→Px. When [match] is false, returns [passthrough] unchanged.
+ * PT Lembra Dp→Px; com [match] falso devolve [passthrough].
+ */
 @Composable
-internal fun rememberDimenPxFromDp(
+fun rememberDimenPxFromDp(
     cacheKey: Long,
     pxStamp: Long,
-    ctx: DimenCallContext,
+    appContext: AppDimensContext?,
     density: Density,
+    match: Boolean = true,
+    passthrough: Float = Float.NaN,
     compute: () -> Float,
-): Float = remember(cacheKey, pxStamp) {
-    DimenCache.getOrPut(cacheKey, ctx.cachePersistence) {
-        val scaledDp = compute()
-        density.run { scaledDp.dp.toPx() }
+): Float {
+    val metrics = LocalDimenMetrics.current
+    return if (match) {
+        remember(cacheKey, pxStamp, metrics) {
+            val scaledDp = resolveCachedFloat(cacheKey, metrics, appContext, compute)
+            density.run { scaledDp.dp.toPx() }
+        }
+    } else {
+        remember(match, cacheKey, pxStamp, passthrough) { passthrough }
     }
+}
+
+/**
+ * EN Remembers a scaled [TextUnit] (Sp path). Passthrough when [match] is false.
+ * PT Lembra um [TextUnit]; passthrough quando [match] é falso.
+ */
+@Composable
+fun rememberDimenSp(
+    cacheKey: Long,
+    spStamp: Long,
+    match: Boolean = true,
+    passthrough: TextUnit = TextUnit.Unspecified,
+    compute: () -> TextUnit,
+): TextUnit = if (match) {
+    val metrics = LocalDimenMetrics.current
+    remember(cacheKey, spStamp, metrics) { compute() }
+} else {
+    remember(match, cacheKey, spStamp, passthrough) { passthrough }
+}
+
+/**
+ * EN Remembers Sp→Px. Passthrough when [match] is false.
+ * PT Lembra Sp→Px; passthrough quando [match] é falso.
+ */
+@Composable
+fun rememberDimenSpPx(
+    cacheKey: Long,
+    sspPxStamp: Long,
+    match: Boolean = true,
+    passthrough: Float = Float.NaN,
+    compute: () -> Float,
+): Float = if (match) {
+    val metrics = LocalDimenMetrics.current
+    remember(cacheKey, sspPxStamp, metrics) { compute() }
+} else {
+    remember(match, cacheKey, sspPxStamp, passthrough) { passthrough }
+}
+
+private fun resolveCachedFloat(
+    cacheKey: Long,
+    metrics: DimenMetrics?,
+    appContext: AppDimensContext?,
+    compute: () -> Float,
+): Float = when {
+    metrics != null -> DimenCache.getOrPut(cacheKey, metrics, compute)
+    else -> DimenCache.getOrPut(cacheKey, appContext, compute)
 }

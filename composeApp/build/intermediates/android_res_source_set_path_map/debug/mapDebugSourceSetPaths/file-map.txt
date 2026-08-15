@@ -1,9 +1,0 @@
-com.appdimens.dynamic.sample.cmp.composeApp-pngs-0 /home/bodenberg/Documentos/GitHub/appdimens-dynamic-kmp/composeApp/build/generated/res/pngs/debug
-com.appdimens.dynamic.sample.cmp.composeApp-updated_navigation_xml-1 /home/bodenberg/Documentos/GitHub/appdimens-dynamic-kmp/composeApp/build/generated/updated_navigation_xml/debug
-com.appdimens.dynamic.sample.cmp.composeApp-packageDebugResources-2 /home/bodenberg/Documentos/GitHub/appdimens-dynamic-kmp/composeApp/build/intermediates/incremental/debug/packageDebugResources/merged.dir
-com.appdimens.dynamic.sample.cmp.composeApp-packageDebugResources-3 /home/bodenberg/Documentos/GitHub/appdimens-dynamic-kmp/composeApp/build/intermediates/incremental/debug/packageDebugResources/stripped.dir
-com.appdimens.dynamic.sample.cmp.composeApp-debug-4 /home/bodenberg/Documentos/GitHub/appdimens-dynamic-kmp/composeApp/build/intermediates/merged_res/debug/mergeDebugResources
-com.appdimens.dynamic.sample.cmp.composeApp-androidDebug-5 /home/bodenberg/Documentos/GitHub/appdimens-dynamic-kmp/composeApp/src/androidDebug/res
-com.appdimens.dynamic.sample.cmp.composeApp-androidMain-6 /home/bodenberg/Documentos/GitHub/appdimens-dynamic-kmp/composeApp/src/androidMain/res
-com.appdimens.dynamic.sample.cmp.composeApp-debug-7 /home/bodenberg/Documentos/GitHub/appdimens-dynamic-kmp/composeApp/src/debug/res
-com.appdimens.dynamic.sample.cmp.composeApp-main-8 /home/bodenberg/Documentos/GitHub/appdimens-dynamic-kmp/composeApp/src/main/res

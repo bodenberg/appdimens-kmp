@@ -1,8 +1,15 @@
+@file:OptIn(kotlin.concurrent.atomics.ExperimentalAtomicApi::class)
+
 /**
  * EN Step table + binary search for auto-resize (largest size that still “fits”).
  * PT Tabela de passos + busca binária para auto-resize.
  */
 package com.appdimens.dynamic.core
+
+import com.appdimens.dynamic.core.AppDimensContext
+import com.appdimens.dynamic.core.ScreenConfiguration
+import com.appdimens.dynamic.core.currentScreenConfiguration
+import com.appdimens.dynamic.core.localAppDimensContext
 
 import kotlin.math.max
 import kotlin.math.min

@@ -1,0 +1,55 @@
+# Interpolated strategy (`compose.interpolated` / `code.interpolated`)
+
+**Artifact:** `io.github.bodenberg:appdimens-dynamic-interpolated:1.0.0` (`:library-interpolated`)
+See [MODULES.md](MODULES.md) · [README installation](../README.md#installation-v100)
+
+**Same API surface as scaled** with prefixes `isdp` / `ihdp` / `iwdp` / `issp` / … — see [COMPOSE-API-CONVENTIONS.md §3](COMPOSE-API-CONVENTIONS.md#3-strategy-prefix-map-mirror-of-scaled).
+
+## What it is
+
+**Interpolated** takes the **arithmetic mean** between the **fixed** base token (dp) and the **fully linear** value at the 300 dp reference: `base + (linear − base) × 0.5`. It is a compromise between “always the same dp” and “fully proportional to the axis”.
+
+## Calculation used
+
+Mathematically:
+
+- `linear = base × dim × (1/300)` on the effective axis.
+- `out = base + (linear − base) × 0.5f` (equivalently `out = base × (1 + (dim/300 − 1) × 0.5)` when using SW).
+
+**Implementation note:** For **smallest-width** + **default inverter**, the blended factor is derived from the immutable per-window snapshot (`DimenCache.currentMetrics`) at resolution time — no process-global pre-computation (`out = base × scale`). Other qualifiers still compute `linear` from `readScreenDp` and blend inline.
+
+- With **`a`**: multiply by the pre-computed aspect-ratio factor (`DimenCache.currentAspectRatioMul`); custom sensitivity uses `1 + k × logNormalizedAr`.
+
+Implementation: `calculateInterpolatedDpCompose` in `DimenInterpolatedDp.kt`.
+
+## How to use
+
+```kotlin
+import com.appdimens.dynamic.compose.interpolated.isdp
+
+Modifier.padding(14.isdp)
+```
+
+Prefixes: `isdp`, `ihdp`, `iwdp` (+ Sp, px, variants).
+
+**Code:** `com.appdimens.dynamic.code.interpolated`.
+
+## Why use it
+
+Softens pure linear scaling on tablets without going as aggressive as **logarithmic** or **power** everywhere.
+
+## When to use it
+
+- When **scaled** pulls too hard but fixed dp tokens look **too small** on tablet.
+- Fine-tuning **hierarchy** between two reference sizes.
+
+## Advantages and trade-offs
+
+- **Pros:** one simple formula; easy to explain (“halfway”).
+- **Cons:** the 0.5 blend is fixed in the library — no knob; for other blends use conditional builders or another strategy.
+
+## Recommended usage strategy
+
+Try **interpolated** on components where **scaled** and **percent** did not work; validate on a small phone and a 600+ sw tablet so the midpoint is acceptable.
+
+[Back to index](README.md)

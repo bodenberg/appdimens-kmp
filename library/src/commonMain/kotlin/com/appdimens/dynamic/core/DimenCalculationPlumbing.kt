@@ -1,11 +1,14 @@
 /**
  * Strategy-agnostic screen plumbing: inverter resolution, multi-window detection, dp reads.
+ * Each strategy module applies its own formula on top of this.
+ *
+ * KMP: platform-neutral — operates on [ScreenConfiguration] snapshots; multi-window
+ * detection is delegated to [AppDimensContext] (Android resolves the hosting Activity).
  */
 package com.appdimens.dynamic.core
 
 import com.appdimens.dynamic.common.DpQualifier
 import com.appdimens.dynamic.common.Inverter
-import com.appdimens.dynamic.platform.ScreenMetricsSnapshot
 import kotlin.math.ln
 
 object DimenCalculationPlumbing {
@@ -32,38 +35,57 @@ object DimenCalculationPlumbing {
     }
 
     /**
-     * When [ignoreMultiWindows] is true, scaling is suppressed in multi-window (split-screen, etc.).
-     * [ScreenMetricsSnapshot.isInMultiWindow] is set by the platform (e.g. Android Activity);
-     * when false, a dp-based heuristic approximates split-screen.
+     * Returns `true` when the app is in a multi-window mode (split-screen, freeform, PiP)
+     * **and** the caller opted into suppressing scaling via [ignoreMultiWindows].
+     *
+     * Primary detection is delegated to [AppDimensContext.isInMultiWindowMode]
+     * (on Android: `Activity.isInMultiWindowMode`, available since API 24, which matches
+     * the library's minSdk). When no context is supplied, a heuristic based on
+     * [ScreenConfiguration] dimensions is used as a best-effort fallback.
      */
     fun isMultiWindowConstrained(
-        metrics: ScreenMetricsSnapshot,
+        configuration: ScreenConfiguration,
         ignoreMultiWindows: Boolean,
+        context: AppDimensContext? = null,
     ): Boolean {
         if (!ignoreMultiWindows) return false
-        if (metrics.isInMultiWindow) return true
-        val swDp = metrics.smallestWidthDp.toFloat()
+        val multiWindow = context?.isInMultiWindowMode
+        if (multiWindow != null) return multiWindow
+        val swDp = configuration.smallestScreenWidthDp.toFloat()
         if (swDp <= 0f) return false
-        val cwDp = metrics.widthDp.toFloat()
+        val cwDp = configuration.screenWidthDp.toFloat()
         return (swDp - cwDp) >= (swDp * 0.1f)
     }
 
-    fun readScreenDp(metrics: ScreenMetricsSnapshot, actualQualifier: DpQualifier): Float =
+    /** Returns the real window mode when the context knows it, without retaining it. */
+    fun isInMultiWindowMode(context: AppDimensContext?): Boolean =
+        context?.isInMultiWindowMode == true
+
+    /**
+     * Kept as a source-compatible test hook. There is no longer a Context→Activity cache:
+     * a weak key paired with the same Activity as value would retain the key indirectly.
+     */
+    internal fun clearActivityCacheForTest() = Unit
+
+    fun readScreenDp(configuration: ScreenConfiguration, actualQualifier: DpQualifier): Float =
         when (actualQualifier) {
-            DpQualifier.HEIGHT -> metrics.heightDp.toFloat()
-            DpQualifier.WIDTH -> metrics.widthDp.toFloat()
-            DpQualifier.SMALL_WIDTH -> metrics.smallestWidthDp.toFloat()
+            DpQualifier.HEIGHT -> configuration.screenHeightDp.toFloat()
+            DpQualifier.WIDTH -> configuration.screenWidthDp.toFloat()
+            DpQualifier.SMALL_WIDTH -> configuration.smallestScreenWidthDp.toFloat()
         }
 
-    fun smallestSideDp(metrics: ScreenMetricsSnapshot): Float =
-        minOf(metrics.widthDp.toFloat(), metrics.heightDp.toFloat())
+    fun smallestSideDp(configuration: ScreenConfiguration): Float =
+        minOf(configuration.screenWidthDp.toFloat(), configuration.screenHeightDp.toFloat())
 
-    fun largestSideDp(metrics: ScreenMetricsSnapshot): Float =
-        maxOf(metrics.widthDp.toFloat(), metrics.heightDp.toFloat())
+    fun largestSideDp(configuration: ScreenConfiguration): Float =
+        maxOf(configuration.screenWidthDp.toFloat(), configuration.screenHeightDp.toFloat())
 
-    fun aspectRatioMultiplier(metrics: ScreenMetricsSnapshot, sensitivity: Float): Float {
-        val sm = smallestSideDp(metrics)
-        val lg = largestSideDp(metrics)
+    /**
+     * Multiplicative factor for optional aspect-ratio correction (perceptual / power-style paths).
+     */
+    fun aspectRatioMultiplier(configuration: ScreenConfiguration, sensitivity: Float): Float {
+        val sm = smallestSideDp(configuration)
+        val lg = largestSideDp(configuration)
         if (sm <= 0f) return 1f
         val ar = lg / sm
         if (!ar.isFinite()) return 1f

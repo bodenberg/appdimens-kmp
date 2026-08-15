@@ -1,39 +1,12 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
+// Top-level build file for AppDimens KMP.
 plugins {
-    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.android.kmp.library) apply false
     alias(libs.plugins.kotlin.multiplatform) apply false
     alias(libs.plugins.kotlin.compose) apply false
-    alias(libs.plugins.android.library) apply false
-    alias(libs.plugins.android.kotlin.multiplatform.library) apply false
     alias(libs.plugins.compose.multiplatform) apply false
-    alias(libs.plugins.kotlinx.atomicfu) apply false
-    alias(libs.plugins.kotlin.ksp) apply false
 }
 
-tasks.register<Delete>("clean") {
-    delete(rootProject.layout.buildDirectory)
-}
-
-fun cleanAfterRelease(task: Task) {
-    task.doLast {
-        println("🚀 Release concluído para: ${task.name}")
-        // Buscamos especificamente o subprojeto "app"
-        val appProject = childProjects["app"]
-        appProject?.let { proj ->
-            val buildDir = proj.layout.buildDirectory.asFile.get()
-            println("🧹 Limpando módulo :app em ${buildDir.path}")
-            buildDir.listFiles()?.forEach { file ->
-                if (file.name != "outputs") {
-                    file.deleteRecursively()
-                }
-            }
-        }
-        println("✨ Limpeza do módulo :app concluída.")
-    }
-}
-
-tasks.matching {
-    it.name == ":app:assembleRelease" || it.name == ":app:bundleRelease"
-}.configureEach {
-    cleanAfterRelease(this)
-}
+// NOTE: no manual root `clean` task here — the Kotlin wasm Node.js root plugin
+// registers its own root-level `clean`, and a manual one would collide
+// (duplicate task). The root `clean` is provided by that plugin when any wasm
+// module is configured; module-level cleans are always available via `:module:clean`.

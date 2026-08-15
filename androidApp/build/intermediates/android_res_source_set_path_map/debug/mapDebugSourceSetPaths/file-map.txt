@@ -1,7 +1,0 @@
-com.appdimens.dynamic.sample.cmp.androidApp-pngs-0 /home/bodenberg/Documentos/GitHub/appdimens-dynamic-kmp/androidApp/build/generated/res/pngs/debug
-com.appdimens.dynamic.sample.cmp.androidApp-updated_navigation_xml-1 /home/bodenberg/Documentos/GitHub/appdimens-dynamic-kmp/androidApp/build/generated/updated_navigation_xml/debug
-com.appdimens.dynamic.sample.cmp.androidApp-packageDebugResources-2 /home/bodenberg/Documentos/GitHub/appdimens-dynamic-kmp/androidApp/build/intermediates/incremental/debug/packageDebugResources/merged.dir
-com.appdimens.dynamic.sample.cmp.androidApp-packageDebugResources-3 /home/bodenberg/Documentos/GitHub/appdimens-dynamic-kmp/androidApp/build/intermediates/incremental/debug/packageDebugResources/stripped.dir
-com.appdimens.dynamic.sample.cmp.androidApp-debug-4 /home/bodenberg/Documentos/GitHub/appdimens-dynamic-kmp/androidApp/build/intermediates/merged_res/debug/mergeDebugResources
-com.appdimens.dynamic.sample.cmp.androidApp-debug-5 /home/bodenberg/Documentos/GitHub/appdimens-dynamic-kmp/androidApp/src/debug/res
-com.appdimens.dynamic.sample.cmp.androidApp-main-6 /home/bodenberg/Documentos/GitHub/appdimens-dynamic-kmp/androidApp/src/main/res

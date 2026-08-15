@@ -1,3 +1,5 @@
+@file:OptIn(kotlin.concurrent.atomics.ExperimentalAtomicApi::class)
+
 /**
  * Author & Developer: Jean Bodenberg
  * GIT: https://github.com/bodenberg/appdimens-sdps.git
@@ -24,13 +26,12 @@
  */
 package com.appdimens.dynamic.compose
 
-import com.appdimens.dynamic.platform.DimenCallContext
-import com.appdimens.dynamic.platform.ScreenMetricsSnapshot
-import com.appdimens.dynamic.common.ScreenOrientation
-
+import com.appdimens.dynamic.core.AppDimensContext
+import com.appdimens.dynamic.core.ScreenConfiguration
+import com.appdimens.dynamic.core.currentScreenConfiguration
+import com.appdimens.dynamic.core.localAppDimensContext
 
 import androidx.compose.runtime.Composable
-import com.appdimens.dynamic.core.LocalScreenMetrics
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.TextUnit
@@ -41,10 +42,12 @@ import com.appdimens.dynamic.common.Inverter
 import com.appdimens.dynamic.common.Orientation
 import com.appdimens.dynamic.common.UiModeType
 import com.appdimens.dynamic.core.DimenCache
+import com.appdimens.dynamic.core.rememberDimenSp
+import com.appdimens.dynamic.core.rememberDimenSpPx
 import com.appdimens.dynamic.core.DimenCalculationPlumbing
 import com.appdimens.dynamic.core.LocalUiModeType
 import com.appdimens.dynamic.core.layoutRememberStamp
-import com.appdimens.dynamic.core.pxRememberStamp
+import com.appdimens.dynamic.core.spRememberStamp
 
 // EN Rotation facilitator extensions for Compose.
 // PT Extensões facilitadoras para rotação em Compose.
@@ -65,10 +68,10 @@ fun Number.sspRotate(
     applyAspectRatio: Boolean = false,
     customSensitivityK: Float? = null
 ): TextUnit {
-    val metrics = LocalScreenMetrics.current
+    val configuration = currentScreenConfiguration()
     val isTargetOrientation = when (orientation) {
-        Orientation.LANDSCAPE -> metrics.orientation == ScreenOrientation.LANDSCAPE
-        Orientation.PORTRAIT -> metrics.orientation == ScreenOrientation.PORTRAIT
+        Orientation.LANDSCAPE -> configuration.orientation == ScreenConfiguration.ORIENTATION_LANDSCAPE
+        Orientation.PORTRAIT -> configuration.orientation == ScreenConfiguration.ORIENTATION_PORTRAIT
         else -> false
     }
     return if (isTargetOrientation) {
@@ -92,10 +95,10 @@ fun Number.hspRotate(
     applyAspectRatio: Boolean = false,
     customSensitivityK: Float? = null
 ): TextUnit {
-    val metrics = LocalScreenMetrics.current
+    val configuration = currentScreenConfiguration()
     val isTargetOrientation = when (orientation) {
-        Orientation.LANDSCAPE -> metrics.orientation == ScreenOrientation.LANDSCAPE
-        Orientation.PORTRAIT -> metrics.orientation == ScreenOrientation.PORTRAIT
+        Orientation.LANDSCAPE -> configuration.orientation == ScreenConfiguration.ORIENTATION_LANDSCAPE
+        Orientation.PORTRAIT -> configuration.orientation == ScreenConfiguration.ORIENTATION_PORTRAIT
         else -> false
     }
     return if (isTargetOrientation) {
@@ -119,10 +122,10 @@ fun Number.wspRotate(
     applyAspectRatio: Boolean = false,
     customSensitivityK: Float? = null
 ): TextUnit {
-    val metrics = LocalScreenMetrics.current
+    val configuration = currentScreenConfiguration()
     val isTargetOrientation = when (orientation) {
-        Orientation.LANDSCAPE -> metrics.orientation == ScreenOrientation.LANDSCAPE
-        Orientation.PORTRAIT -> metrics.orientation == ScreenOrientation.PORTRAIT
+        Orientation.LANDSCAPE -> configuration.orientation == ScreenConfiguration.ORIENTATION_LANDSCAPE
+        Orientation.PORTRAIT -> configuration.orientation == ScreenConfiguration.ORIENTATION_PORTRAIT
         else -> false
     }
     return if (isTargetOrientation) {
@@ -240,33 +243,33 @@ val Number.sspPxia: Float get() = this.toDynamicScaledPx(DpQualifier.SMALL_WIDTH
  * EN
  * Extension for Int with dynamic scaling based on the **Smallest Width (swDP)**, but
  * without respecting the system font scale.
- * Usage example: `16.nem`.
+ * Usage example: `16.sem`.
  *
  * PT
  * Extensão para Int com dimensionamento dinâmico baseado na **Smallest Width (swDP)**,
  * mas sem respeitar a escala de fonte do sistema.
- * Exemplo de uso: `16.nem`.
+ * Exemplo de uso: `16.sem`.
  */
 @get:Composable
-val Number.nem: TextUnit get() = this.toDynamicScaledSp(DpQualifier.SMALL_WIDTH, fontScale = false)
+val Number.sem: TextUnit get() = this.toDynamicScaledSp(DpQualifier.SMALL_WIDTH, fontScale = false)
 /** a variant explicitly with applyAspectRatio */
 @get:Composable
-val Number.nema: TextUnit get() = this.toDynamicScaledSp(DpQualifier.SMALL_WIDTH, fontScale = false, applyAspectRatio = true)
+val Number.sema: TextUnit get() = this.toDynamicScaledSp(DpQualifier.SMALL_WIDTH, fontScale = false, applyAspectRatio = true)
 /** i variant explicitly with ignoreMultiWindows */
 @get:Composable
-val Number.nemi: TextUnit get() = this.toDynamicScaledSp(DpQualifier.SMALL_WIDTH, fontScale = false, ignoreMultiWindows = true)
+val Number.semi: TextUnit get() = this.toDynamicScaledSp(DpQualifier.SMALL_WIDTH, fontScale = false, ignoreMultiWindows = true)
 /** ia variant explicitly with both */
 @get:Composable
-val Number.nemia: TextUnit get() = this.toDynamicScaledSp(DpQualifier.SMALL_WIDTH, fontScale = false, ignoreMultiWindows = true, applyAspectRatio = true)
+val Number.semia: TextUnit get() = this.toDynamicScaledSp(DpQualifier.SMALL_WIDTH, fontScale = false, ignoreMultiWindows = true, applyAspectRatio = true)
 
 @get:Composable
-val Number.nemPx: Float get() = this.toDynamicScaledPx(DpQualifier.SMALL_WIDTH, fontScale = false)
+val Number.semPx: Float get() = this.toDynamicScaledPx(DpQualifier.SMALL_WIDTH, fontScale = false)
 @get:Composable
-val Number.nemPxa: Float get() = this.toDynamicScaledPx(DpQualifier.SMALL_WIDTH, fontScale = false, applyAspectRatio = true)
+val Number.semPxa: Float get() = this.toDynamicScaledPx(DpQualifier.SMALL_WIDTH, fontScale = false, applyAspectRatio = true)
 @get:Composable
-val Number.nemPxi: Float get() = this.toDynamicScaledPx(DpQualifier.SMALL_WIDTH, fontScale = false, ignoreMultiWindows = true)
+val Number.semPxi: Float get() = this.toDynamicScaledPx(DpQualifier.SMALL_WIDTH, fontScale = false, ignoreMultiWindows = true)
 @get:Composable
-val Number.nemPxia: Float get() = this.toDynamicScaledPx(DpQualifier.SMALL_WIDTH, fontScale = false, ignoreMultiWindows = true, applyAspectRatio = true)
+val Number.semPxia: Float get() = this.toDynamicScaledPx(DpQualifier.SMALL_WIDTH, fontScale = false, ignoreMultiWindows = true, applyAspectRatio = true)
 
 /**
  * EN
@@ -625,7 +628,7 @@ val Number.wemPxiaPh: Float get() = this.toDynamicScaledPx(DpQualifier.WIDTH, fo
  * Scaling logic:
  * 1. Builds a 64-bit packed cache key.
  * 2. If [fontScale] is `true`, the result respects the system font size setting.
- * 3. If [fontScale] is `false` (e.g. via [.nem]), the system font scale is stripped.
+ * 3. If [fontScale] is `false` (e.g. via [.sem]), the system font scale is stripped.
  * 4. Checks [DimenCache] globally.
  *
  * PT
@@ -634,7 +637,7 @@ val Number.wemPxiaPh: Float get() = this.toDynamicScaledPx(DpQualifier.WIDTH, fo
  * Lógica de escalonamento:
  * 1. Constrói uma chave de cache de 64 bits.
  * 2. Se [fontScale] for `true`, o resultado respeita a configuração de tamanho de fonte do sistema.
- * 3. Se [fontScale] for `false` (ex: via [.nem]), a escala de fonte do sistema é removida.
+ * 3. Se [fontScale] for `false` (ex: via [.sem]), a escala de fonte do sistema é removida.
  * 4. Consulta o [DimenCache] globalmente.
  *
  * @param qualifier    Screen dimension qualifier.
@@ -652,13 +655,13 @@ fun Number.toDynamicScaledSp(
     inverter: Inverter = Inverter.DEFAULT,
     ignoreMultiWindows: Boolean = false, applyAspectRatio: Boolean = false, customSensitivityK: Float? = null
 ): TextUnit {
-    val metrics = LocalScreenMetrics.current
-    val ctx = com.appdimens.dynamic.core.staticDimenCallContext(metrics)
+    val configuration = currentScreenConfiguration()
+    val androidContext = localAppDimensContext()
     val density = LocalDensity.current
 
     val cacheKey = DimenCache.buildKey(
         baseValue = this.toFloat(),
-        isLandscape = metrics.orientation == ScreenOrientation.LANDSCAPE,
+        isLandscape = configuration.orientation == ScreenConfiguration.ORIENTATION_LANDSCAPE,
         ignoreMultiWindows = ignoreMultiWindows,
         calcType = DimenCache.CalcType.SCALED,
         qualifier = qualifier,
@@ -667,10 +670,10 @@ fun Number.toDynamicScaledSp(
         valueType = if (fontScale) DimenCache.ValueType.SP_WITH_SCALE else DimenCache.ValueType.SP_NO_SCALE,
         customSensitivityK = customSensitivityK
     )
-    val spStamp = pxRememberStamp(layoutRememberStamp(metrics, ctx), density)
+    val spStamp = spRememberStamp(layoutRememberStamp(configuration), density)
 
     return rememberScaledSp(
-        cacheKey, spStamp, ctx, density, this.toFloat(), metrics,
+        cacheKey, spStamp, androidContext, density, this.toFloat(), configuration,
         qualifier, inverter, fontScale, ignoreMultiWindows, applyAspectRatio, customSensitivityK
     )
 }
@@ -686,15 +689,15 @@ internal fun calculateSspValueCompose(
     ignoreMultiWindows: Boolean,
     applyAspectRatio: Boolean,
     customSensitivityK: Float?,
-    metrics: ScreenMetricsSnapshot,
-    context: DimenCallContext? = null
+    configuration: ScreenConfiguration,
+    context: AppDimensContext? = null
 ): Float {
-    val isLandscape = metrics.orientation == ScreenOrientation.LANDSCAPE
-    val isPortrait = metrics.orientation == ScreenOrientation.PORTRAIT
+    val isLandscape = configuration.orientation == ScreenConfiguration.ORIENTATION_LANDSCAPE
+    val isPortrait = configuration.orientation == ScreenConfiguration.ORIENTATION_PORTRAIT
 
     val actualQualifier = DimenCalculationPlumbing.effectiveQualifier(qualifier, inverter, isLandscape, isPortrait)
 
-    if (DimenCalculationPlumbing.isMultiWindowConstrained(metrics, ignoreMultiWindows)) {
+    if (DimenCalculationPlumbing.isMultiWindowConstrained(configuration, ignoreMultiWindows, context)) {
         return baseValue
     }
 
@@ -703,7 +706,7 @@ internal fun calculateSspValueCompose(
         return DimenCache.calculateRawScaling(baseValue, applyAspectRatio, null)
     }
 
-    val screenDim = DimenCalculationPlumbing.readScreenDp(metrics, actualQualifier)
+    val screenDim = DimenCalculationPlumbing.readScreenDp(configuration, actualQualifier)
     val scale = screenDim * DimenCache.INV_BASE_RATIO
     return if (applyAspectRatio) {
         val diff = screenDim - 300f
@@ -722,19 +725,21 @@ internal fun calculateSspValueCompose(
 internal fun rememberScaledSp(
     cacheKey: Long,
     spStamp: Long,
-    ctx: DimenCallContext,
+    androidContext: AppDimensContext?,
     density: Density,
     baseValue: Float,
-    metrics: ScreenMetricsSnapshot,
+    configuration: ScreenConfiguration,
     qualifier: DpQualifier,
     inverter: Inverter,
     fontScale: Boolean,
     ignoreMultiWindows: Boolean,
     applyAspectRatio: Boolean,
     customSensitivityK: Float?,
-): TextUnit = remember(cacheKey, spStamp) {
-    DimenCache.getOrPut(cacheKey, ctx.cachePersistence) {
-        val raw = calculateSspValueCompose(baseValue, qualifier, inverter, ignoreMultiWindows, applyAspectRatio, customSensitivityK, metrics, ctx)
+    match: Boolean = true,
+    passthrough: TextUnit = TextUnit.Unspecified,
+): TextUnit = rememberDimenSp(cacheKey, spStamp, match = match, passthrough = passthrough) {
+    DimenCache.getOrPut(cacheKey, androidContext) {
+        val raw = calculateSspValueCompose(baseValue, qualifier, inverter, ignoreMultiWindows, applyAspectRatio, customSensitivityK, configuration, androidContext)
         if (fontScale) raw else (raw / density.fontScale)
     }.sp
 }
@@ -747,19 +752,21 @@ internal fun rememberScaledSp(
 internal fun rememberScaledSpPx(
     cacheKey: Long,
     sspPxStamp: Long,
-    ctx: DimenCallContext,
+    androidContext: AppDimensContext?,
     density: Density,
     baseValue: Float,
-    metrics: ScreenMetricsSnapshot,
+    configuration: ScreenConfiguration,
     qualifier: DpQualifier,
     inverter: Inverter,
     fontScale: Boolean,
     ignoreMultiWindows: Boolean,
     applyAspectRatio: Boolean,
     customSensitivityK: Float?,
-): Float = remember(cacheKey, sspPxStamp) {
-    DimenCache.getOrPut(cacheKey, ctx.cachePersistence) {
-        val scaledVal = calculateSspValueCompose(baseValue, qualifier, inverter, ignoreMultiWindows, applyAspectRatio, customSensitivityK, metrics, ctx)
+    match: Boolean = true,
+    passthrough: Float = Float.NaN,
+): Float = rememberDimenSpPx(cacheKey, sspPxStamp, match = match, passthrough = passthrough) {
+    DimenCache.getOrPut(cacheKey, androidContext) {
+        val scaledVal = calculateSspValueCompose(baseValue, qualifier, inverter, ignoreMultiWindows, applyAspectRatio, customSensitivityK, configuration, androidContext)
         val spValue = if (fontScale) scaledVal.sp else (scaledVal / density.fontScale).sp
         density.run { spValue.toPx() }
     }
@@ -795,13 +802,13 @@ fun Number.toDynamicScaledPx(
     applyAspectRatio: Boolean = false,
     customSensitivityK: Float? = null
 ): Float {
-    val metrics = LocalScreenMetrics.current
-    val ctx = com.appdimens.dynamic.core.staticDimenCallContext(metrics)
+    val configuration = currentScreenConfiguration()
+    val androidContext = localAppDimensContext()
     val density = LocalDensity.current
 
     val cacheKey = DimenCache.buildKey(
         baseValue = this.toFloat(),
-        isLandscape = metrics.orientation == ScreenOrientation.LANDSCAPE,
+        isLandscape = configuration.orientation == ScreenConfiguration.ORIENTATION_LANDSCAPE,
         ignoreMultiWindows = ignoreMultiWindows,
         calcType = DimenCache.CalcType.SCALED,
         qualifier = qualifier,
@@ -810,10 +817,10 @@ fun Number.toDynamicScaledPx(
         valueType = if (fontScale) DimenCache.ValueType.SP_PX_WITH_SCALE else DimenCache.ValueType.SP_PX_NO_SCALE,
         customSensitivityK = customSensitivityK
     )
-    val sspPxStamp = pxRememberStamp(layoutRememberStamp(metrics, ctx), density)
+    val sspPxStamp = spRememberStamp(layoutRememberStamp(configuration), density)
 
     return rememberScaledSpPx(
-        cacheKey, sspPxStamp, ctx, density, this.toFloat(), metrics,
+        cacheKey, sspPxStamp, androidContext, density, this.toFloat(), configuration,
         qualifier, inverter, fontScale, ignoreMultiWindows, applyAspectRatio, customSensitivityK
     )
 }
