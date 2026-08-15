@@ -12,6 +12,7 @@ androidx-window = "1.5.1"
 androidx-annotation = "1.9.1"
 junit = "4.13.2"
 kotlinTest = "2.4.10"
+vanniktech = "0.37.0"
 
 [libraries]
 androidx-annotation = { group = "androidx.annotation", name = "annotation", version.ref = "androidx-annotation" }
@@ -35,3 +36,4 @@ android-kmp-library = { id = "com.android.kotlin.multiplatform.library", version
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
+vanniktech-maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "vanniktech" }
