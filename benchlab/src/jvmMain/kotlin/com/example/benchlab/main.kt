@@ -10,7 +10,7 @@ package com.example.benchlab
 
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import com.appdimens.dynamic.core.AppDimensProvider
+import com.appdimens.kmp.core.AppDimensProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File

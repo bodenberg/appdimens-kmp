@@ -1,6 +1,6 @@
 # Power strategy (`compose.power` / `code.power`)
 
-**Artifact:** `io.github.bodenberg:appdimens-dynamic-power:1.0.0` (`:library-power`)
+**Artifact:** `io.github.bodenberg:appdimens-kmp-power:1.0.0` (`:library-power`)
 See [MODULES.md](MODULES.md) · [README installation](../README.md#installation-v100)
 
 **Same extension / facilitator / builder shape as scaled** — replace the prefix `sdp` → `pwsdp`, `hdp` → `pwhdp`, `wdp` → `pwwdp`, `ssp` → `pwssp`, etc. Full table: [COMPOSE-API-CONVENTIONS.md §3](COMPOSE-API-CONVENTIONS.md#3-strategy-prefix-map-mirror-of-scaled).
@@ -25,14 +25,14 @@ Implementation: `calculatePowerDpCompose` in `DimenPowerDp.kt`.
 ## How to use
 
 ```kotlin
-import com.appdimens.dynamic.compose.power.pwsdp
-import com.appdimens.dynamic.compose.power.pwhdp
-import com.appdimens.dynamic.compose.power.pwwdp
+import com.appdimens.kmp.compose.power.pwsdp
+import com.appdimens.kmp.compose.power.pwhdp
+import com.appdimens.kmp.compose.power.pwwdp
 
 Modifier.size(48.pwsdp) // smallest-width axis, power curve
 ```
 
-**Code:** `com.appdimens.dynamic.code.power` — mirrored prefixes (`pwsdp`, etc.) on the same pattern.
+**Code:** `com.appdimens.kmp.code.power` — mirrored prefixes (`pwsdp`, etc.) on the same pattern.
 
 Artifacts: `DimenPowerDp`, `DimenPower`, `DimenPowerSp`, `PowerSp`, … Kotlin facilitators: `DimenPowerDpExtensions.kt`, `DimenPowerSpExtensions.kt`; Plain (Views): `DimenPowerPlainPx.kt`.
 

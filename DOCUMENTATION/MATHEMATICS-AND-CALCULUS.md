@@ -71,11 +71,11 @@ journey
 
 | Factor | Module | Formula (default SW path) |
 |--------|--------|---------------------------|
-| `PowerFactors.scale` | `appdimens-dynamic-power` | $$(sw / 300)^{0.75}$$ |
-| `LogarithmicFactors.scale` | `appdimens-dynamic-logarithmic` | piecewise $$\ln$$ on $$sw$$ |
-| `DiagonalFactors.scale` | `appdimens-dynamic-diagonal` | diagonal / base diagonal |
-| `PerimeterFactors.scale` | `appdimens-dynamic-perimeter` | $$(s_{min}+s_{max}) / 833$$ |
-| `InterpolatedFactors.scale` | `appdimens-dynamic-interpolated` | blend of base and linear |
+| `PowerFactors.scale` | `appdimens-kmp-power` | $$(sw / 300)^{0.75}$$ |
+| `LogarithmicFactors.scale` | `appdimens-kmp-logarithmic` | piecewise $$\ln$$ on $$sw$$ |
+| `DiagonalFactors.scale` | `appdimens-kmp-diagonal` | diagonal / base diagonal |
+| `PerimeterFactors.scale` | `appdimens-kmp-perimeter` | $$(s_{min}+s_{max}) / 833$$ |
+| `InterpolatedFactors.scale` | `appdimens-kmp-interpolated` | blend of base and linear |
 
 ---
 

@@ -6,7 +6,7 @@
 
 ## 1. Executive Summary
 
-**AppDimens Dynamic** is a mathematical scaling engine for Kotlin Multiplatform (`com.appdimens.dynamic`). Its purpose is to map generic UI dimensions (developed against a `300dp` or equivalent reference) to physical window parameters—scaling elegantly across phones, tablets, desktop windows, and unpredictable foldables, on Android, JVM, iOS, macOS and the web.
+**AppDimens Dynamic** is a mathematical scaling engine for Kotlin Multiplatform (`com.appdimens.kmp`). Its purpose is to map generic UI dimensions (developed against a `300dp` or equivalent reference) to physical window parameters—scaling elegantly across phones, tablets, desktop windows, and unpredictable foldables, on Android, JVM, iOS, macOS and the web.
 
 It encapsulates **scaling strategies** (curves) shipped as Maven modules, alongside an autonomous **Resize/Constraint** subsystem that finds the largest fitting size via binary search.
 

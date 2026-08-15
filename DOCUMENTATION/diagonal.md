@@ -1,6 +1,6 @@
 # Diagonal strategy (`compose.diagonal` / `code.diagonal`)
 
-**Artifact:** `io.github.bodenberg:appdimens-dynamic-diagonal:1.0.0` (`:library-diagonal`)
+**Artifact:** `io.github.bodenberg:appdimens-kmp-diagonal:1.0.0` (`:library-diagonal`)
 See [MODULES.md](MODULES.md) · [README installation](../README.md#installation-v100)
 
 **Same API surface as scaled** with prefixes `dgsdp` / `dghdp` / `dgwdp` / `dgssp` / … — see [COMPOSE-API-CONVENTIONS.md §3](COMPOSE-API-CONVENTIONS.md#3-strategy-prefix-map-mirror-of-scaled).
@@ -27,14 +27,14 @@ Implementation: `calculateDiagonalDpCompose` in `DimenDiagonalDp.kt`.
 ## How to use
 
 ```kotlin
-import com.appdimens.dynamic.compose.diagonal.dgsdp
+import com.appdimens.kmp.compose.diagonal.dgsdp
 
 Modifier.size(64.dgsdp)
 ```
 
 Main Compose prefixes: `dgsdp`, `dghdp`, `dgwdp` (plus `a` / `i` / `ia`, `Px`, inverters like `.dgsdpPh`, `.dgsdpLw`, … in `DimenDiagonalDp.kt`).
 
-**Code:** `com.appdimens.dynamic.code.diagonal`.
+**Code:** `com.appdimens.kmp.code.diagonal`.
 
 ## Why use it
 

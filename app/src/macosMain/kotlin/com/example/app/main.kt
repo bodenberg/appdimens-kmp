@@ -11,7 +11,7 @@ package com.example.app
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
-import com.appdimens.dynamic.core.AppDimensProvider
+import com.appdimens.kmp.core.AppDimensProvider
 import com.example.app.compose.SdpDemoScreen
 import platform.AppKit.NSApplication
 import platform.AppKit.NSApplicationActivationPolicy

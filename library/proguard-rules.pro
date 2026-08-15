@@ -44,9 +44,9 @@
 #    keeps their bodies optimizable.
 ################################################################################
 
--keep,allowoptimization public class com.appdimens.dynamic.code.** { public protected *; }
--keep,allowoptimization public class com.appdimens.dynamic.compose.** { public protected *; }
--keep,allowoptimization public class com.appdimens.dynamic.common.** { public protected *; }
+-keep,allowoptimization public class com.appdimens.kmp.code.** { public protected *; }
+-keep,allowoptimization public class com.appdimens.kmp.compose.** { public protected *; }
+-keep,allowoptimization public class com.appdimens.kmp.common.** { public protected *; }
 
 
 ################################################################################
@@ -54,7 +54,7 @@
 #    bodies reference it). None may be removed or renamed; optimization is fine.
 ################################################################################
 
--keep,allowoptimization class com.appdimens.dynamic.core.** { *; }
+-keep,allowoptimization class com.appdimens.kmp.core.** { *; }
 
 
 ################################################################################

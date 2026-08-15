@@ -49,9 +49,9 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.appdimens.dynamic.core.AppDimensContext
-import com.appdimens.dynamic.core.currentScreenConfiguration
-import com.appdimens.dynamic.core.localAppDimensContext
+import com.appdimens.kmp.core.AppDimensContext
+import com.appdimens.kmp.core.currentScreenConfiguration
+import com.appdimens.kmp.core.localAppDimensContext
 import com.example.benchlab.benchmark.*
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -162,7 +162,7 @@ private class BenchlabController(
 
 /** EN Immutable snapshot of the window config captured at run time. PT Snapshot da janela na hora do run. */
 internal data class ScreenConfigSnapshot(
-    val config: com.appdimens.dynamic.core.ScreenConfiguration,
+    val config: com.appdimens.kmp.core.ScreenConfiguration,
     val density: Float,
 )
 

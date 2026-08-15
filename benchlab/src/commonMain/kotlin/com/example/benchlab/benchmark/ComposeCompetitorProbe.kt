@@ -48,8 +48,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.appdimens.dynamic.code.DimenSdp
-import com.appdimens.dynamic.core.localAppDimensContext
+import com.appdimens.kmp.code.DimenSdp
+import com.appdimens.kmp.core.localAppDimensContext
 
 /** EN Identical warm-up iterations per library. PT Warm-up idêntico por biblioteca. */
 internal const val BENCH_WARMUP_COUNT = 20_000

@@ -1,10 +1,10 @@
 ################################################################################
-# AppDimens Dynamic satellite — appdimens-dynamic-perimeter
-# Core R8 rules arrive transitively via appdimens-dynamic (main).
+# AppDimens Dynamic satellite — appdimens-kmp-perimeter
+# Core R8 rules arrive transitively via appdimens-kmp (main).
 ################################################################################
 
--keepnames public class com.appdimens.dynamic.code.perimeter.** { public protected *; }
--keepnames public class com.appdimens.dynamic.compose.perimeter.** { public protected *; }
+-keepnames public class com.appdimens.kmp.code.perimeter.** { public protected *; }
+-keepnames public class com.appdimens.kmp.compose.perimeter.** { public protected *; }
 
 ################################################################################
 # Satellite internal helpers are NOT kept (static-only references, no

@@ -1,6 +1,6 @@
 # Fit strategy (`compose.fit` / `code.fit`)
 
-**Artifact:** `io.github.bodenberg:appdimens-dynamic-fit:1.0.0` (`:library-fit`)
+**Artifact:** `io.github.bodenberg:appdimens-kmp-fit:1.0.0` (`:library-fit`)
 See [MODULES.md](MODULES.md) · [README installation](../README.md#installation-v100)
 
 **Same API surface as scaled** with prefixes `ftsdp` / `fthdp` / `ftwdp` / `ftssp` / … — see [COMPOSE-API-CONVENTIONS.md §3](COMPOSE-API-CONVENTIONS.md#3-strategy-prefix-map-mirror-of-scaled).
@@ -20,14 +20,14 @@ Implementation: `calculateFitDpCompose` in `DimenFitDp.kt`.
 ## How to use
 
 ```kotlin
-import com.appdimens.dynamic.compose.fit.ftsdp
+import com.appdimens.kmp.compose.fit.ftsdp
 
 Modifier.widthIn(max = 400.ftsdp)
 ```
 
 Prefixes: `ftsdp`, `fthdp`, `ftwdp` (+ Sp, px, variants).
 
-**Code:** `com.appdimens.dynamic.code.fit`.
+**Code:** `com.appdimens.kmp.code.fit`.
 
 ## Why use it
 

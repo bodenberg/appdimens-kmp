@@ -1,6 +1,6 @@
 # Percent strategy (`compose.percent` / `code.percent`)
 
-**Artifact:** `io.github.bodenberg:appdimens-dynamic-percent:1.0.0` (`:library-percent`)
+**Artifact:** `io.github.bodenberg:appdimens-kmp-percent:1.0.0` (`:library-percent`)
 See [MODULES.md](MODULES.md) · [README installation](../README.md#installation-v100)
 
 ## What it is
@@ -22,14 +22,14 @@ Suffixes **`a`**, **`i`**, **`ia`** and **inverters** follow the global library 
 ## How to use
 
 ```kotlin
-import com.appdimens.dynamic.compose.percent.psdp
-import com.appdimens.dynamic.compose.percent.spaceW
+import com.appdimens.kmp.compose.percent.psdp
+import com.appdimens.kmp.compose.percent.spaceW
 
 Modifier.padding(12.psdp)
 Modifier.width(10.spaceW) // 10% of Configuration.screenWidthDp
 ```
 
-**Code:** `com.appdimens.dynamic.code.percent` — mirrors extensions and `DimenPercentDp` / `DimenPercentSp` for px and dp.
+**Code:** `com.appdimens.kmp.code.percent` — mirrors extensions and `DimenPercentDp` / `DimenPercentSp` for px and dp.
 
 Use **`space*`** when you need a **literal screen percentage**; use **`psdp`…** when you want the same design “token” as other strategies but with a 1/300-style law on the axis (and optional AR).
 

@@ -9,7 +9,7 @@ plugins {
 
 kotlin {
     android {
-        namespace = "com.appdimens.dynamic.percent"
+        namespace = "com.appdimens.kmp.percent"
         compileSdk = 37
         minSdk = 24
         withHostTest {}

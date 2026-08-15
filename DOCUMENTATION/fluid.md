@@ -1,6 +1,6 @@
 # Fluid strategy (`compose.fluid` / `code.fluid`)
 
-**Artifact:** `io.github.bodenberg:appdimens-dynamic-fluid:1.0.0` (`:library-fluid`)
+**Artifact:** `io.github.bodenberg:appdimens-kmp-fluid:1.0.0` (`:library-fluid`)
 See [MODULES.md](MODULES.md) · [README installation](../README.md#installation-v100)
 
 **Same API surface as scaled** with prefixes `fsdp` / `fhdp` / `fwdp` / `fssp` / … — see [COMPOSE-API-CONVENTIONS.md §3](COMPOSE-API-CONVENTIONS.md#3-strategy-prefix-map-mirror-of-scaled).
@@ -24,8 +24,8 @@ Implementation: `calculateFluidDpCompose` in `DimenFluidDp.kt`.
 ## How to use
 
 ```kotlin
-import com.appdimens.dynamic.compose.fluid.fsdp
-import com.appdimens.dynamic.compose.fluid.fssp
+import com.appdimens.kmp.compose.fluid.fsdp
+import com.appdimens.kmp.compose.fluid.fssp
 
 Modifier.padding(16.fsdp)
 Text("Title", fontSize = 20.fssp)
@@ -33,7 +33,7 @@ Text("Title", fontSize = 20.fssp)
 
 Compose prefixes: `fsdp`, `fhdp`, `fwdp` (and Sp, px, inverter, `a`/`i` variants).
 
-**Code:** `com.appdimens.dynamic.code.fluid`.
+**Code:** `com.appdimens.kmp.code.fluid`.
 
 ## Why use it
 

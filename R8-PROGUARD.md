@@ -11,8 +11,8 @@ This guide explains **why** and **how** to use R8/minify, **what changes** when 
 
 Each published Android AAR ships its own `consumer-rules.pro`:
 
-- **`appdimens-dynamic`** — `common`, scaled `code`/`compose`, plus the few proven-specific core rules (cache-key enums, `ResizeBound`, `ScreenFactors` padding, `kotlin.Metadata`)
-- **`appdimens-dynamic-<strategy>`** — that strategy’s public `code` / `compose` API (core rules arrive transitively)
+- **`appdimens-kmp`** — `common`, scaled `code`/`compose`, plus the few proven-specific core rules (cache-key enums, `ResizeBound`, `ScreenFactors` padding, `kotlin.Metadata`)
+- **`appdimens-kmp-<strategy>`** — that strategy’s public `code` / `compose` API (core rules arrive transitively)
 
 Gradle merges consumer rules from the modules you depend on.
 
@@ -69,7 +69,7 @@ On AGP 9+ this is a documented no-op (full mode is always on); it is kept for pa
 ### 3. Rules: what you edit vs what you get for free
 
 - **Your app:** put app-specific keeps in **`app-android/proguard-rules.pro`** (reflection, JNI, serialization libraries, etc.).
-- **AppDimens Dynamic KMP:** each AAR you depend on ships its own `consumer-rules.pro`, merged by Gradle automatically. Core/scaled rules come from `appdimens-dynamic`; strategy rules come from each `appdimens-dynamic-<strategy>` AAR.
+- **AppDimens Dynamic KMP:** each AAR you depend on ships its own `consumer-rules.pro`, merged by Gradle automatically. Core/scaled rules come from `appdimens-kmp`; strategy rules come from each `appdimens-kmp-<strategy>` AAR.
 
 If a release build **crashes** only after turning on minify or full mode, open **R8 / ProGuard** mapping or stack traces, then adjust **keeps** (see sections below).
 

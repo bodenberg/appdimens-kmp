@@ -1,5 +1,5 @@
 ################################################################################
-# AppDimens Dynamic satellite — appdimens-dynamic-percent — proguard-rules.pro
+# AppDimens Dynamic satellite — appdimens-kmp-percent — proguard-rules.pro
 #
 # LIVE at AAR build time (android optimization { minify = true }): the
 # satellite is PRE-SHRUNK and PRE-OPTIMIZED, never obfuscated
@@ -17,8 +17,8 @@
 -optimizationpasses 10
 -allowaccessmodification
 
--keep public class com.appdimens.dynamic.code.percent.** { public protected *; }
--keep public class com.appdimens.dynamic.compose.percent.** { public protected *; }
+-keep public class com.appdimens.kmp.code.percent.** { public protected *; }
+-keep public class com.appdimens.kmp.compose.percent.** { public protected *; }
 
 -keep class kotlin.Metadata { *; }
 

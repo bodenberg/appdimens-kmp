@@ -1,5 +1,5 @@
 ################################################################################
-# AppDimens Dynamic satellite — appdimens-dynamic-fit — proguard-rules.pro
+# AppDimens Dynamic satellite — appdimens-kmp-fit — proguard-rules.pro
 #
 # LIVE at AAR build time (android optimization { minify = true }): the
 # satellite is PRE-SHRUNK and PRE-OPTIMIZED, never obfuscated
@@ -17,8 +17,8 @@
 -optimizationpasses 10
 -allowaccessmodification
 
--keep public class com.appdimens.dynamic.code.fit.** { public protected *; }
--keep public class com.appdimens.dynamic.compose.fit.** { public protected *; }
+-keep public class com.appdimens.kmp.code.fit.** { public protected *; }
+-keep public class com.appdimens.kmp.compose.fit.** { public protected *; }
 
 -keep class kotlin.Metadata { *; }
 

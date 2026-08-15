@@ -10,12 +10,12 @@ This internal architecture document mandates the precise structural logic, techn
 
 ## 1. Traceability & Package Matrix
 
-**Core Index:** ~180 `.kt` logical components across `:library` (principal) and `:library-<strategy>` satellites. Packages remain `com.appdimens.dynamic.*`.
+**Core Index:** ~180 `.kt` logical components across `:library` (principal) and `:library-<strategy>` satellites. Packages remain `com.appdimens.kmp.*`.
 
 | Subsystem Domain | Gradle / Maven | Crucial Topologies | Active Verification Gates |
 |:---|:---|:---|:---|
-| `core` / `common` | `:library` / `appdimens-dynamic` | `DimenCache`, `DimenMetrics`, `DpQualifier` | `DimenCacheTest`, `StrategyFactorRegistryTest`, `DimenPerformanceTest` |
-| `compose`/`code` scaled + `plain` | `:library` / `appdimens-dynamic` | `DimenSdp*`, `DimenPlainBranch` | `DimenPlainBranchTest` |
+| `core` / `common` | `:library` / `appdimens-kmp` | `DimenCache`, `DimenMetrics`, `DpQualifier` | `DimenCacheTest`, `StrategyFactorRegistryTest`, `DimenPerformanceTest` |
+| `compose`/`code` scaled + `plain` | `:library` / `appdimens-kmp` | `DimenSdp*`, `DimenPlainBranch` | `DimenPlainBranchTest` |
 | `compose.percent` / `code.percent` | `:library-percent` | `DimenPercentSpace`, `*PlainPx` | `PercentFormulasTest` |
 | geometric (`diagonal`/`perimeter`/`fit`/`fill`) | respective `:library-*` | strategy `*Dp` / `*Extensions` | `DiagonalFormulasTest` (+ peer formula tests) |
 | `compose.auto` / `code.auto` | `:library-auto` | `DimenAuto*` | `AutoFormulasTest` |
@@ -65,8 +65,8 @@ flowchart TD
 
 | Gradle project | Maven coordinate | Contents |
 |---|---|---|
-| `:library` | `appdimens-dynamic` | `common`, `core` (+ `DimenMetrics`, `StrategyFactorRegistry` compat), `code.plain`, scaled |
-| `:library-<strategy>` | `appdimens-dynamic-<strategy>` | `code.<strategy>` + `compose.<strategy>` |
+| `:library` | `appdimens-kmp` | `common`, `core` (+ `DimenMetrics`, `StrategyFactorRegistry` compat), `code.plain`, scaled |
+| `:library-<strategy>` | `appdimens-kmp-<strategy>` | `code.<strategy>` + `compose.<strategy>` |
 
 Strategy-specific scales (diagonal/power/log/interpolated/perimeter) are derived lazily from the immutable per-window snapshot (`DimenCache.currentMetrics`) at resolution time, so absent satellites do no work and each window is scaled independently. `StrategyFactorRegistry` remains as a source-compatibility hook only.
 
@@ -105,7 +105,7 @@ sequenceDiagram
 ## 4. Development Quality & Reliability Matrix
 
 ### 4.1 Release Constraints
-1. **Module Artifacting:** Each Gradle module publishes at `appdimens.version` (`1.0.0`). Coordinates: principal `appdimens-dynamic`, strategy modules `appdimens-dynamic-<strategy>`, BOM `appdimens-dynamic-bom`. See [MODULES.md](MODULES.md).
+1. **Module Artifacting:** Each Gradle module publishes at `appdimens.version` (`1.0.0`). Coordinates: principal `appdimens-kmp`, strategy modules `appdimens-kmp-<strategy>`, BOM `appdimens-kmp-bom`. See [MODULES.md](MODULES.md).
 2. **Obfuscation Integrity:** Per-AAR ProGuard consumer rules (`consumer-rules.pro`) ensure public API parity and runtime stability; satellites keep strategy packages, principal keeps core/scaled/plain. 
 
 ### 4.2 Known Technical Risk Mapping

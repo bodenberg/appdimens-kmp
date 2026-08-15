@@ -22,9 +22,9 @@
 #    renamed (mapping-file consumers and non-inlined binaries depend on it).
 ################################################################################
 
--keepnames public class com.appdimens.dynamic.code.** { public protected *; }
--keepnames public class com.appdimens.dynamic.compose.** { public protected *; }
--keepnames public class com.appdimens.dynamic.common.** { public protected *; }
+-keepnames public class com.appdimens.kmp.code.** { public protected *; }
+-keepnames public class com.appdimens.kmp.compose.** { public protected *; }
+-keepnames public class com.appdimens.kmp.common.** { public protected *; }
 
 
 ################################################################################
@@ -41,13 +41,13 @@
 #    entries causes wrong dispatch and silent scaling errors.
 ################################################################################
 
--keepclassmembers enum com.appdimens.dynamic.common.* {
+-keepclassmembers enum com.appdimens.kmp.common.* {
     <fields>;
     <methods>;
 }
 
 # AutoResizePercentBasis ordinals are used in resize math.
--keepnames class com.appdimens.dynamic.core.AutoResizePercentBasis { *; }
+-keepnames class com.appdimens.kmp.core.AutoResizePercentBasis { *; }
 
 
 ################################################################################
@@ -56,9 +56,9 @@
 #    current analysis scope; the resize helpers instantiate them indirectly.
 ################################################################################
 
--keepnames class com.appdimens.dynamic.core.ResizeBound { *; }
--keepnames class com.appdimens.dynamic.core.ResizeBound$* { *; }
--keepnames class com.appdimens.dynamic.core.ResizeBoundKt { *; }
+-keepnames class com.appdimens.kmp.core.ResizeBound { *; }
+-keepnames class com.appdimens.kmp.core.ResizeBound$* { *; }
+-keepnames class com.appdimens.kmp.core.ResizeBoundKt { *; }
 
 
 ################################################################################
@@ -69,7 +69,7 @@
 #    Losing them silently undoes the padding contract without any crash.
 ################################################################################
 
--keepclassmembers class com.appdimens.dynamic.core.DimenCache$ScreenFactors {
+-keepclassmembers class com.appdimens.kmp.core.DimenCache$ScreenFactors {
     <fields>;
 }
 

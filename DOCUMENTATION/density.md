@@ -1,6 +1,6 @@
 # Density strategy (`compose.density` / `code.density`)
 
-**Artifact:** `io.github.bodenberg:appdimens-dynamic-density:1.0.0` (`:library-density`)
+**Artifact:** `io.github.bodenberg:appdimens-kmp-density:1.0.0` (`:library-density`)
 See [MODULES.md](MODULES.md) · [README installation](../README.md#installation-v100)
 
 **Same API surface as scaled** with prefixes `dsdp` / `dhdp` / `dwdp` / `dssp` / … — see [COMPOSE-API-CONVENTIONS.md §3](COMPOSE-API-CONVENTIONS.md#3-strategy-prefix-map-mirror-of-scaled).
@@ -19,14 +19,14 @@ Implementation: `calculateDensityDpCompose` in `DimenDensityDp.kt`.
 ## How to use
 
 ```kotlin
-import com.appdimens.dynamic.compose.density.dsdp
+import com.appdimens.kmp.compose.density.dsdp
 
 Modifier.size(24.dsdp)
 ```
 
 Prefixes: `dsdp`, `dhdp`, `dwdp` (+ Sp, px, variants).
 
-**Code:** `com.appdimens.dynamic.code.density`.
+**Code:** `com.appdimens.kmp.code.density`.
 
 ## Why use it
 

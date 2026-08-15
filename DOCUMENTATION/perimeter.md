@@ -1,6 +1,6 @@
 # Perimeter strategy (`compose.perimeter` / `code.perimeter`)
 
-**Artifact:** `io.github.bodenberg:appdimens-dynamic-perimeter:1.0.0` (`:library-perimeter`)
+**Artifact:** `io.github.bodenberg:appdimens-kmp-perimeter:1.0.0` (`:library-perimeter`)
 See [MODULES.md](MODULES.md) · [README installation](../README.md#installation-v100)
 
 **Same API surface as scaled** with prefixes `prsdp` / `prhdp` / `prwdp` / `prssp` / … — see [COMPOSE-API-CONVENTIONS.md §3](COMPOSE-API-CONVENTIONS.md#3-strategy-prefix-map-mirror-of-scaled).
@@ -25,14 +25,14 @@ Implementation: `calculatePerimeterDpCompose` in `DimenPerimeterDp.kt`.
 ## How to use
 
 ```kotlin
-import com.appdimens.dynamic.compose.perimeter.prsdp
+import com.appdimens.kmp.compose.perimeter.prsdp
 
 Modifier.size(72.prsdp)
 ```
 
 Prefixes: `prsdp`, `prhdp`, `prwdp` (+ Sp, px, variants).
 
-**Code:** `com.appdimens.dynamic.code.perimeter`.
+**Code:** `com.appdimens.kmp.code.perimeter`.
 
 ## Why use it
 

@@ -9,7 +9,7 @@ plugins {
 
 kotlin {
     android {
-        namespace = "com.appdimens.dynamic.diagonal"
+        namespace = "com.appdimens.kmp.diagonal"
         compileSdk = 37
         minSdk = 24
         withHostTest {}

@@ -22,8 +22,8 @@
 -dontwarn com.example.benchlab.**
 
 # AppDimens Dynamic KMP library
--keep class com.appdimens.dynamic.** { *; }
--dontwarn com.appdimens.dynamic.**
+-keep class com.appdimens.kmp.** { *; }
+-dontwarn com.appdimens.kmp.**
 
 # Concorrente 2 (Lib #2 — KMP artifact)
 -keep class network.chaintech.** { *; }

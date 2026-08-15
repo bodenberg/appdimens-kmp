@@ -1,6 +1,6 @@
 # Auto strategy (`compose.auto` / `code.auto`)
 
-**Artifact:** `io.github.bodenberg:appdimens-dynamic-auto:1.0.0` (`:library-auto`)
+**Artifact:** `io.github.bodenberg:appdimens-kmp-auto:1.0.0` (`:library-auto`)
 See [MODULES.md](MODULES.md) · [README installation](../README.md#installation-v100)
 
 **Same API surface as scaled** with prefixes `asdp` / `ahdp` / `awdp` / `assp` / … — see [COMPOSE-API-CONVENTIONS.md §3](COMPOSE-API-CONVENTIONS.md#3-strategy-prefix-map-mirror-of-scaled).
@@ -22,15 +22,15 @@ Implementation: `calculateAutoDpCompose` in `DimenAutoDp.kt`.
 ## How to use
 
 ```kotlin
-import com.appdimens.dynamic.compose.auto.asdp
-import com.appdimens.dynamic.compose.auto.ahdp
+import com.appdimens.kmp.compose.auto.asdp
+import com.appdimens.kmp.compose.auto.ahdp
 
 Modifier.padding(16.asdp)
 ```
 
 Prefixes: `asdp`, `ahdp`, `awdp` (+ Sp, px, inverters, `a`/`i`).
 
-**Code:** `com.appdimens.dynamic.code.auto`.
+**Code:** `com.appdimens.kmp.code.auto`.
 
 ## Why use it
 

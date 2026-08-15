@@ -1,10 +1,10 @@
 ################################################################################
-# AppDimens Dynamic satellite — appdimens-dynamic-logarithmic
-# Core R8 rules arrive transitively via appdimens-dynamic (main).
+# AppDimens Dynamic satellite — appdimens-kmp-logarithmic
+# Core R8 rules arrive transitively via appdimens-kmp (main).
 ################################################################################
 
--keepnames public class com.appdimens.dynamic.code.logarithmic.** { public protected *; }
--keepnames public class com.appdimens.dynamic.compose.logarithmic.** { public protected *; }
+-keepnames public class com.appdimens.kmp.code.logarithmic.** { public protected *; }
+-keepnames public class com.appdimens.kmp.compose.logarithmic.** { public protected *; }
 
 ################################################################################
 # Satellite internal helpers are NOT kept (static-only references, no

@@ -3,7 +3,7 @@
 ## Responsive `dp` / `sp` for **Android · Desktop (JVM) · iOS · macOS · Web (wasmJs)** — Jetpack Compose Multiplatform and Kotlin APIs
 
 <p align="center">
-  <a href="https://github.com/bodenberg/appdimens-dynamic/releases" title="Releases">
+  <a href="https://github.com/bodenberg/appdimens-kmp/releases" title="Releases">
     <img src="https://img.shields.io/badge/version-1.0.0-blue.svg" alt="Version 1.0.0">
   </a>
   &nbsp;
@@ -78,7 +78,7 @@ Write values like `16.sdp` and the library scales them from the current window *
 
 Every platform shares the **same Kotlin API**, the same **cache** and the same **math kernels**. The `code` (non-Compose) APIs take a platform-neutral **`AppDimensContext`** window handle; on Android it wraps the platform `Context` (auto-cached per raw Context).
 
-**This is a faithful Kotlin Multiplatform port of the Android library** (`appdimens-dynamic`): same packages, same extension names, same formulas, same bit-identical precision — plus the desktop, iOS, macOS and web targets.
+**This is a faithful Kotlin Multiplatform port of the Android library** (`appdimens-kmp`): same packages, same extension names, same formulas, same bit-identical precision — plus the desktop, iOS, macOS and web targets.
 
 ---
 
@@ -90,40 +90,40 @@ Every platform shares the **same Kotlin API**, the same **cache** and the same *
 
 ```kotlin
 // commonMain.dependencies (or the platform source set you target)
-implementation(platform("io.github.bodenberg:appdimens-dynamic-bom:1.0.0"))
+implementation(platform("io.github.bodenberg:appdimens-kmp-bom:1.0.0"))
 
-implementation("io.github.bodenberg:appdimens-dynamic")
+implementation("io.github.bodenberg:appdimens-kmp")
 
-implementation("io.github.bodenberg:appdimens-dynamic-percent")
-implementation("io.github.bodenberg:appdimens-dynamic-power")
-implementation("io.github.bodenberg:appdimens-dynamic-fluid")
-implementation("io.github.bodenberg:appdimens-dynamic-auto")
-implementation("io.github.bodenberg:appdimens-dynamic-density")
-implementation("io.github.bodenberg:appdimens-dynamic-diagonal")
-implementation("io.github.bodenberg:appdimens-dynamic-fill")
-implementation("io.github.bodenberg:appdimens-dynamic-fit")
-implementation("io.github.bodenberg:appdimens-dynamic-interpolated")
-implementation("io.github.bodenberg:appdimens-dynamic-logarithmic")
-implementation("io.github.bodenberg:appdimens-dynamic-perimeter")
-implementation("io.github.bodenberg:appdimens-dynamic-resize")
-implementation("io.github.bodenberg:appdimens-dynamic-units")
+implementation("io.github.bodenberg:appdimens-kmp-percent")
+implementation("io.github.bodenberg:appdimens-kmp-power")
+implementation("io.github.bodenberg:appdimens-kmp-fluid")
+implementation("io.github.bodenberg:appdimens-kmp-auto")
+implementation("io.github.bodenberg:appdimens-kmp-density")
+implementation("io.github.bodenberg:appdimens-kmp-diagonal")
+implementation("io.github.bodenberg:appdimens-kmp-fill")
+implementation("io.github.bodenberg:appdimens-kmp-fit")
+implementation("io.github.bodenberg:appdimens-kmp-interpolated")
+implementation("io.github.bodenberg:appdimens-kmp-logarithmic")
+implementation("io.github.bodenberg:appdimens-kmp-perimeter")
+implementation("io.github.bodenberg:appdimens-kmp-resize")
+implementation("io.github.bodenberg:appdimens-kmp-units")
 ```
 
 ### Missing strategy module
 
-If you import `com.appdimens.dynamic.compose.<strategy>` (or `code.<strategy>`) without adding the matching artifact, the Gradle check `checkAppDimensModules` fails with a line such as:
+If you import `com.appdimens.kmp.compose.<strategy>` (or `code.<strategy>`) without adding the matching artifact, the Gradle check `checkAppDimensModules` fails with a line such as:
 
 ```text
-Missing AppDimens module for import …percent… — add: implementation("io.github.bodenberg:appdimens-dynamic-percent:1.0.0")
+Missing AppDimens module for import …percent… — add: implementation("io.github.bodenberg:appdimens-kmp-percent:1.0.0")
 ```
 
-Runtime helper: `com.appdimens.dynamic.core.MissingModule` (package → Maven coordinate). Version comes from the `appdimens.version` Gradle property.
+Runtime helper: `com.appdimens.kmp.core.MissingModule` (package → Maven coordinate). Version comes from the `appdimens.version` Gradle property.
 
 ### Without BOM
 
 ```kotlin
-implementation("io.github.bodenberg:appdimens-dynamic:1.0.0")
-implementation("io.github.bodenberg:appdimens-dynamic-percent:1.0.0")
+implementation("io.github.bodenberg:appdimens-kmp:1.0.0")
+implementation("io.github.bodenberg:appdimens-kmp-percent:1.0.0")
 // same satellites as above, each with :1.0.0
 ```
 
@@ -131,9 +131,9 @@ implementation("io.github.bodenberg:appdimens-dynamic-percent:1.0.0")
 
 | Maven artifact | Contents |
 |----------------|----------|
-| `appdimens-dynamic` | `common`, `core`, `code.plain`, `code` / `compose` **scaled** |
-| `appdimens-dynamic-<strategy>` | `code.<strategy>` + `compose.<strategy>` |
-| `appdimens-dynamic-bom` | Version constraints (`java-platform`) |
+| `appdimens-kmp` | `common`, `core`, `code.plain`, `code` / `compose` **scaled** |
+| `appdimens-kmp-<strategy>` | `code.<strategy>` + `compose.<strategy>` |
+| `appdimens-kmp-bom` | Version constraints (`java-platform`) |
 
 Module graph: [DOCUMENTATION/MODULES.md](DOCUMENTATION/MODULES.md).
 
@@ -144,7 +144,7 @@ Module graph: [DOCUMENTATION/MODULES.md](DOCUMENTATION/MODULES.md).
 ## Quick start — Scaled (Compose Multiplatform)
 
 ```kotlin
-import com.appdimens.dynamic.compose.*
+import com.appdimens.kmp.compose.*
 
 Box(
     Modifier
@@ -177,7 +177,7 @@ This exact code runs unchanged on **Android, desktop, iOS, macOS and the browser
 Use it when you call **`.sdpMode`**, **`.sdpScreen`**, **`.sspMode`**, **`.sspScreen`**, or similar **facilitators** that depend on **UI mode / fold state**. It sets `LocalUiModeType` once for the tree instead of resolving mode on every call, and provides `LocalDimenMetrics` — a coherent per-window snapshot that every `rememberDimen*` helper uses.
 
 ```kotlin
-import com.appdimens.dynamic.core.AppDimensProvider
+import com.appdimens.kmp.core.AppDimensProvider
 
 setContent {
     AppDimensProvider {
@@ -195,7 +195,7 @@ Since **1.0.0** the cache is **partitioned per window snapshot** (`DimenMetrics`
 Call it when the **same Activity stays alive** across **rotation, split-screen, or density/font changes** and you want to refresh internal bookkeeping. If the Activity is **recreated** on config change (default), you don’t need it. Details: [library/PERFORMANCE.md](library/PERFORMANCE.md).
 
 ```kotlin
-import com.appdimens.dynamic.core.DimenCache
+import com.appdimens.kmp.core.DimenCache
 
 override fun onConfigurationChanged(newConfig: Configuration) {
     super.onConfigurationChanged(newConfig)
@@ -243,10 +243,10 @@ Text("No system font scale (sw)", fontSize = 16.sem)   // sem / hem / wem
 ### Facilitators (after `AppDimensProvider` if you use mode/screen)
 
 ```kotlin
-import com.appdimens.dynamic.compose.*
-import com.appdimens.dynamic.common.DpQualifier
-import com.appdimens.dynamic.common.Orientation
-import com.appdimens.dynamic.common.UiModeType
+import com.appdimens.kmp.compose.*
+import com.appdimens.kmp.common.DpQualifier
+import com.appdimens.kmp.common.Orientation
+import com.appdimens.kmp.common.UiModeType
 
 80.sdpRotate(50, orientation = Orientation.LANDSCAPE)
 30.sdpMode(200, UiModeType.TELEVISION)
@@ -274,7 +274,7 @@ Picks the **largest** font or size in a **min…max** range that still **fits** 
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.ui.Modifier
-import com.appdimens.dynamic.compose.resize.autoResizeTextSp
+import com.appdimens.kmp.compose.resize.autoResizeTextSp
 
 BoxWithConstraints(Modifier.fillMaxWidth()) {
     val fontSize = autoResizeTextSp(
@@ -297,9 +297,9 @@ More APIs (`autoResizeSquareSize`, `ResizeBound`, …): [DOCUMENTATION/resize.md
 All non-Compose APIs take a platform-neutral **`AppDimensContext`** window handle. Inside a Composable you can obtain it from `localAppDimensContext()` (provided by `AppDimensProvider`); on Android you can also wrap a raw `Context` via the platform adapter.
 
 ```kotlin
-import com.appdimens.dynamic.core.AppDimensContext
-import com.appdimens.dynamic.code.DimenSdp
-import com.appdimens.dynamic.code.DimenSsp
+import com.appdimens.kmp.core.AppDimensContext
+import com.appdimens.kmp.code.DimenSdp
+import com.appdimens.kmp.code.DimenSsp
 
 // Inside composition (all platforms):
 val appContext = localAppDimensContext()!!
@@ -319,7 +319,7 @@ The same `code` APIs run on **JVM desktop, iOS, macOS and wasmJs** — on those 
 
 ## Physical units (mm, cm, inch)
 
-Approximate **real-world** size on screen (density-based). Compose: use helpers from the library and **`.dp`** on the result where needed — see [DOCUMENTATION/physical-units.md](DOCUMENTATION/physical-units.md). Code module: `com.appdimens.dynamic.code.units.DimenPhysicalUnits` (`toDpFromMm`, …).
+Approximate **real-world** size on screen (density-based). Compose: use helpers from the library and **`.dp`** on the result where needed — see [DOCUMENTATION/physical-units.md](DOCUMENTATION/physical-units.md). Code module: `com.appdimens.kmp.code.units.DimenPhysicalUnits` (`toDpFromMm`, …).
 
 ---
 
@@ -364,7 +364,7 @@ Other strategies (**percent**, **power**, **fluid**, **auto**, **diagonal**, **f
 
 ---
 
-**Views / `code`:** the same **logic-only** Plain branching exists on **`Float` px** + **`AppDimensContext`** — `Dimen*PlainPx.kt` per strategy (e.g. `psdpRotatePlainPx` in `com.appdimens.dynamic.code.percent`), with shared helpers in **`com.appdimens.dynamic.code.plain`** (`DimenPlainBranch.kt`). **Dp/Sp facilitator** sources use the same **`Dimen<Strategy>DpExtensions.kt` / `Dimen<Strategy>SpExtensions.kt`** names as in `compose/<strategy>/` (scaled: `DimenSdpExtensions.kt` / `DimenSspExtensions.kt` under `code/scaled/`). Details in [DOCUMENTATION/COMPOSE-API-CONVENTIONS.md](DOCUMENTATION/COMPOSE-API-CONVENTIONS.md) §4.5 and [DOCUMENTATION/README.md](DOCUMENTATION/README.md).
+**Views / `code`:** the same **logic-only** Plain branching exists on **`Float` px** + **`AppDimensContext`** — `Dimen*PlainPx.kt` per strategy (e.g. `psdpRotatePlainPx` in `com.appdimens.kmp.code.percent`), with shared helpers in **`com.appdimens.kmp.code.plain`** (`DimenPlainBranch.kt`). **Dp/Sp facilitator** sources use the same **`Dimen<Strategy>DpExtensions.kt` / `Dimen<Strategy>SpExtensions.kt`** names as in `compose/<strategy>/` (scaled: `DimenSdpExtensions.kt` / `DimenSspExtensions.kt` under `code/scaled/`). Details in [DOCUMENTATION/COMPOSE-API-CONVENTIONS.md](DOCUMENTATION/COMPOSE-API-CONVENTIONS.md) §4.5 and [DOCUMENTATION/README.md](DOCUMENTATION/README.md).
 
 ---
 

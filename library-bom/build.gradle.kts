@@ -1,5 +1,5 @@
 // AppDimens KMP — BOM (java-platform) mirroring the Android original:
-// version constraints for appdimens-dynamic and appdimens-dynamic-<strategy> modules.
+// version constraints for appdimens-kmp and appdimens-kmp-<strategy> modules.
 plugins {
     `java-platform`
 }
@@ -13,19 +13,19 @@ javaPlatform {
 
 dependencies {
     constraints {
-        api("io.github.bodenberg:appdimens-dynamic:$libraryVersion")
-        api("io.github.bodenberg:appdimens-dynamic-auto:$libraryVersion")
-        api("io.github.bodenberg:appdimens-dynamic-density:$libraryVersion")
-        api("io.github.bodenberg:appdimens-dynamic-diagonal:$libraryVersion")
-        api("io.github.bodenberg:appdimens-dynamic-fill:$libraryVersion")
-        api("io.github.bodenberg:appdimens-dynamic-fit:$libraryVersion")
-        api("io.github.bodenberg:appdimens-dynamic-fluid:$libraryVersion")
-        api("io.github.bodenberg:appdimens-dynamic-interpolated:$libraryVersion")
-        api("io.github.bodenberg:appdimens-dynamic-logarithmic:$libraryVersion")
-        api("io.github.bodenberg:appdimens-dynamic-percent:$libraryVersion")
-        api("io.github.bodenberg:appdimens-dynamic-perimeter:$libraryVersion")
-        api("io.github.bodenberg:appdimens-dynamic-power:$libraryVersion")
-        api("io.github.bodenberg:appdimens-dynamic-resize:$libraryVersion")
-        api("io.github.bodenberg:appdimens-dynamic-units:$libraryVersion")
+        api("io.github.bodenberg:appdimens-kmp:$libraryVersion")
+        api("io.github.bodenberg:appdimens-kmp-auto:$libraryVersion")
+        api("io.github.bodenberg:appdimens-kmp-density:$libraryVersion")
+        api("io.github.bodenberg:appdimens-kmp-diagonal:$libraryVersion")
+        api("io.github.bodenberg:appdimens-kmp-fill:$libraryVersion")
+        api("io.github.bodenberg:appdimens-kmp-fit:$libraryVersion")
+        api("io.github.bodenberg:appdimens-kmp-fluid:$libraryVersion")
+        api("io.github.bodenberg:appdimens-kmp-interpolated:$libraryVersion")
+        api("io.github.bodenberg:appdimens-kmp-logarithmic:$libraryVersion")
+        api("io.github.bodenberg:appdimens-kmp-percent:$libraryVersion")
+        api("io.github.bodenberg:appdimens-kmp-perimeter:$libraryVersion")
+        api("io.github.bodenberg:appdimens-kmp-power:$libraryVersion")
+        api("io.github.bodenberg:appdimens-kmp-resize:$libraryVersion")
+        api("io.github.bodenberg:appdimens-kmp-units:$libraryVersion")
     }
 }

@@ -9,7 +9,7 @@ plugins {
 
 kotlin {
     android {
-        namespace = "com.appdimens.dynamic.resize"
+        namespace = "com.appdimens.kmp.resize"
         compileSdk = 37
         minSdk = 24
         withHostTest {}

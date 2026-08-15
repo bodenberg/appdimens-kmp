@@ -9,7 +9,7 @@ plugins {
 
 kotlin {
     android {
-        namespace = "com.appdimens.dynamic.power"
+        namespace = "com.appdimens.kmp.power"
         compileSdk = 37
         minSdk = 24
         withHostTest {}

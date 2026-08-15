@@ -6,24 +6,24 @@
 app (KMP demo: Android + JVM + iOS + macOS + wasmJs)   app-android (Android-only demo)
 benchlab (KMP benchmark)                               benchlab-android (Android-only benchmark)
  │
- ├── library                      → io.github.bodenberg:appdimens-dynamic
- ├── library-bom                  → …:appdimens-dynamic-bom
- ├── library-auto                 → …:appdimens-dynamic-auto
- ├── library-density              → …:appdimens-dynamic-density
- ├── library-diagonal             → …:appdimens-dynamic-diagonal
- ├── library-fill                 → …:appdimens-dynamic-fill
- ├── library-fit                  → …:appdimens-dynamic-fit
- ├── library-fluid                → …:appdimens-dynamic-fluid
- ├── library-interpolated         → …:appdimens-dynamic-interpolated
- ├── library-logarithmic          → …:appdimens-dynamic-logarithmic
- ├── library-percent              → …:appdimens-dynamic-percent
- ├── library-perimeter            → …:appdimens-dynamic-perimeter
- ├── library-power                → …:appdimens-dynamic-power
- ├── library-resize               → …:appdimens-dynamic-resize
- └── library-units                → …:appdimens-dynamic-units
+ ├── library                      → io.github.bodenberg:appdimens-kmp
+ ├── library-bom                  → …:appdimens-kmp-bom
+ ├── library-auto                 → …:appdimens-kmp-auto
+ ├── library-density              → …:appdimens-kmp-density
+ ├── library-diagonal             → …:appdimens-kmp-diagonal
+ ├── library-fill                 → …:appdimens-kmp-fill
+ ├── library-fit                  → …:appdimens-kmp-fit
+ ├── library-fluid                → …:appdimens-kmp-fluid
+ ├── library-interpolated         → …:appdimens-kmp-interpolated
+ ├── library-logarithmic          → …:appdimens-kmp-logarithmic
+ ├── library-percent              → …:appdimens-kmp-percent
+ ├── library-perimeter            → …:appdimens-kmp-perimeter
+ ├── library-power                → …:appdimens-kmp-power
+ ├── library-resize               → …:appdimens-kmp-resize
+ └── library-units                → …:appdimens-kmp-units
 ```
 
-Satellites depend only on `:library` (`api(project(":library"))`). Android Gradle `namespace` values are unique per module (`com.appdimens.dynamic` for the principal, `com.appdimens.dynamic.<strategy>` for satellites). Kotlin packages remain `com.appdimens.dynamic.*`.
+Satellites depend only on `:library` (`api(project(":library"))`). Android Gradle `namespace` values are unique per module (`com.appdimens.kmp` for the principal, `com.appdimens.kmp.<strategy>` for satellites). Kotlin packages remain `com.appdimens.kmp.*`.
 
 ## Targets (KMP)
 
@@ -44,9 +44,9 @@ Every library module (`:library` and all satellites) compiles for:
 
 | Artifact | Contents |
 |----------|----------|
-| `appdimens-dynamic` | `common`, `core`, **scaled**, **plain** |
-| `appdimens-dynamic-<strategy>` | `code.<strategy>` + `compose.<strategy>` |
-| `appdimens-dynamic-bom` | Version constraints for the set above (`java-platform`) |
+| `appdimens-kmp` | `common`, `core`, **scaled**, **plain** |
+| `appdimens-kmp-<strategy>` | `code.<strategy>` + `compose.<strategy>` |
+| `appdimens-kmp-bom` | Version constraints for the set above (`java-platform`) |
 
 All published coordinates share `appdimens.version` in `gradle.properties` (**1.0.0**).
 
@@ -54,9 +54,9 @@ All published coordinates share `appdimens.version` in `gradle.properties` (**1.
 
 ```kotlin
 // commonMain.dependencies (or the platform source set you target)
-implementation(platform("io.github.bodenberg:appdimens-dynamic-bom:1.0.0"))
-implementation("io.github.bodenberg:appdimens-dynamic")
-implementation("io.github.bodenberg:appdimens-dynamic-percent")
+implementation(platform("io.github.bodenberg:appdimens-kmp-bom:1.0.0"))
+implementation("io.github.bodenberg:appdimens-kmp")
+implementation("io.github.bodenberg:appdimens-kmp-percent")
 ```
 
 Without the BOM, pin the same version on each coordinate. See [README — Installation](../README.md#installation-v100).

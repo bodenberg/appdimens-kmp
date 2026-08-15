@@ -21,8 +21,8 @@
  */
 package com.example.benchlab.benchmark
 
-import com.appdimens.dynamic.code.DimenSdp
-import com.appdimens.dynamic.core.AppDimensContext
+import com.appdimens.kmp.code.DimenSdp
+import com.appdimens.kmp.core.AppDimensContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext

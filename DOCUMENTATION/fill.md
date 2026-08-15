@@ -1,6 +1,6 @@
 # Fill strategy (`compose.fill` / `code.fill`)
 
-**Artifact:** `io.github.bodenberg:appdimens-dynamic-fill:1.0.0` (`:library-fill`)
+**Artifact:** `io.github.bodenberg:appdimens-kmp-fill:1.0.0` (`:library-fill`)
 See [MODULES.md](MODULES.md) · [README installation](../README.md#installation-v100)
 
 **Same API surface as scaled** with prefixes `flsdp` / `flhdp` / `flwdp` / `flssp` / … — see [COMPOSE-API-CONVENTIONS.md §3](COMPOSE-API-CONVENTIONS.md#3-strategy-prefix-map-mirror-of-scaled).
@@ -20,14 +20,14 @@ Implementation: `calculateFillDpCompose` in `DimenFillDp.kt`.
 ## How to use
 
 ```kotlin
-import com.appdimens.dynamic.compose.fill.flsdp
+import com.appdimens.kmp.compose.fill.flsdp
 
 Modifier.height(120.flsdp)
 ```
 
 Prefixes: `flsdp`, `flhdp`, `flwdp` (+ Sp, px, variants).
 
-**Code:** `com.appdimens.dynamic.code.fill`.
+**Code:** `com.appdimens.kmp.code.fill`.
 
 ## Why use it
 

@@ -10,20 +10,20 @@ You write **once** and your code automatically adapts to any device — **phone,
 
 ```kotlin
 // commonMain.dependencies (or the platform source set you target)
-implementation(platform("io.github.bodenberg:appdimens-dynamic-bom:1.0.0"))
-implementation("io.github.bodenberg:appdimens-dynamic")
-implementation("io.github.bodenberg:appdimens-dynamic-percent")
-implementation("io.github.bodenberg:appdimens-dynamic-resize")
+implementation(platform("io.github.bodenberg:appdimens-kmp-bom:1.0.0"))
+implementation("io.github.bodenberg:appdimens-kmp")
+implementation("io.github.bodenberg:appdimens-kmp-percent")
+implementation("io.github.bodenberg:appdimens-kmp-resize")
 ```
 
 Without the BOM, pin `:1.0.0` on each coordinate. Details: [README](./README.md) · [MODULES.md](./DOCUMENTATION/MODULES.md).
 
 | Strategy in this guide | Maven module |
 |------------------------|--------------|
-| **Scaled** (`sdp` / `hdp` / `wdp` / `ssp`) | `appdimens-dynamic` |
-| Percent, Power, Fluid, Auto, Diagonal, Fill, Fit, Interpolated, Logarithmic, Perimeter, Density | `appdimens-dynamic-<name>` |
-| Resize (`autoResize*`) | `appdimens-dynamic-resize` |
-| Physical units (mm / cm / in) | `appdimens-dynamic-units` |
+| **Scaled** (`sdp` / `hdp` / `wdp` / `ssp`) | `appdimens-kmp` |
+| Percent, Power, Fluid, Auto, Diagonal, Fill, Fit, Interpolated, Logarithmic, Perimeter, Density | `appdimens-kmp-<name>` |
+| Resize (`autoResize*`) | `appdimens-kmp-resize` |
+| Physical units (mm / cm / in) | `appdimens-kmp-units` |
 
 ---
 
@@ -166,10 +166,10 @@ Result = (Percentage / 100) × Screen_Size
 **Code:**
 
 ```kotlin
-import com.appdimens.dynamic.compose.percent.psdp
-import com.appdimens.dynamic.compose.percent.phdp
-import com.appdimens.dynamic.compose.percent.pwdp
-import com.appdimens.dynamic.compose.percent.pssp
+import com.appdimens.kmp.compose.percent.psdp
+import com.appdimens.kmp.compose.percent.phdp
+import com.appdimens.kmp.compose.percent.pwdp
+import com.appdimens.kmp.compose.percent.pssp
 
 Modifier.padding(12.psdp)
 Modifier.height(40.phdp)
@@ -382,7 +382,7 @@ Result = Value × (DPI / 160)
 
 ```kotlin
 import androidx.compose.foundation.layout.BoxWithConstraints
-import com.appdimens.dynamic.compose.resize.autoResizeTextSp
+import com.appdimens.kmp.compose.resize.autoResizeTextSp
 
 BoxWithConstraints(Modifier.fillMaxWidth()) {
     val fontSize = autoResizeTextSp(
@@ -403,7 +403,7 @@ BoxWithConstraints(Modifier.fillMaxWidth()) {
 **Example — largest square that fits:**
 
 ```kotlin
-import com.appdimens.dynamic.compose.resize.autoResizeSquareSize
+import com.appdimens.kmp.compose.resize.autoResizeSquareSize
 
 BoxWithConstraints(Modifier.fillMaxSize()) {
     val side = autoResizeSquareSize(min = 24, max = 120, step = 4)
@@ -419,7 +419,7 @@ BoxWithConstraints(Modifier.fillMaxSize()) {
 
 ```kotlin
 import androidx.compose.ui.unit.dp
-import com.appdimens.dynamic.compose.DimenPhysicalUnits
+import com.appdimens.kmp.compose.DimenPhysicalUnits
 
 @Composable
 fun RulerBar() {
@@ -431,7 +431,7 @@ fun RulerBar() {
 }
 ```
 
-There are helpers in **`com.appdimens.dynamic.code.units`** for non-Compose code. Full table: [DOCUMENTATION/physical-units.md](DOCUMENTATION/physical-units.md).
+There are helpers in **`com.appdimens.kmp.code.units`** for non-Compose code. Full table: [DOCUMENTATION/physical-units.md](DOCUMENTATION/physical-units.md).
 
 ---
 

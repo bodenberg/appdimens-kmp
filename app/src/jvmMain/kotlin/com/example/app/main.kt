@@ -6,7 +6,7 @@ package com.example.app
 
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import com.appdimens.dynamic.core.AppDimensProvider
+import com.appdimens.kmp.core.AppDimensProvider
 import com.example.app.compose.SdpDemoScreen
 
 fun main() = application {

@@ -9,7 +9,7 @@ plugins {
 
 kotlin {
     android {
-        namespace = "com.appdimens.dynamic.fill"
+        namespace = "com.appdimens.kmp.fill"
         compileSdk = 37
         minSdk = 24
         withHostTest {}

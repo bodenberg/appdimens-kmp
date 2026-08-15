@@ -1,10 +1,10 @@
 ################################################################################
-# AppDimens Dynamic satellite — appdimens-dynamic-density
-# Core R8 rules arrive transitively via appdimens-dynamic (main).
+# AppDimens Dynamic satellite — appdimens-kmp-density
+# Core R8 rules arrive transitively via appdimens-kmp (main).
 ################################################################################
 
--keepnames public class com.appdimens.dynamic.code.density.** { public protected *; }
--keepnames public class com.appdimens.dynamic.compose.density.** { public protected *; }
+-keepnames public class com.appdimens.kmp.code.density.** { public protected *; }
+-keepnames public class com.appdimens.kmp.compose.density.** { public protected *; }
 
 ################################################################################
 # Satellite internal helpers are NOT kept (static-only references, no

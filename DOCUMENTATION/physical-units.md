@@ -1,6 +1,6 @@
 # Physical units (`compose` + `code.units`)
 
-**Artifact:** `io.github.bodenberg:appdimens-dynamic-units:1.0.0` (`:library-units`)
+**Artifact:** `io.github.bodenberg:appdimens-kmp-units:1.0.0` (`:library-units`)
 See [MODULES.md](MODULES.md) · [README installation](../README.md)
 
 ## What it is
@@ -16,16 +16,16 @@ Conversion of **real-world** measures (millimeters, centimeters, inches) using t
 
 Pure helpers (`convertMmToCm`, `inchToMm`, …) are **math-only** between unit labels and need no context.
 
-**Code module (`com.appdimens.dynamic.code.units.DimenPhysicalUnits`):** the same conversions for non-Compose code (pass an `AppDimensContext` obtained from `localAppDimensContext()` inside a Composable, or a platform adapter on Android).
+**Code module (`com.appdimens.kmp.code.units.DimenPhysicalUnits`):** the same conversions for non-Compose code (pass an `AppDimensContext` obtained from `localAppDimensContext()` inside a Composable, or a platform adapter on Android).
 
 ## How to use
 
-**Compose** (import `com.appdimens.dynamic.compose.mm`, `.cm`, `.inch`):
+**Compose** (import `com.appdimens.kmp.compose.mm`, `.cm`, `.inch`):
 
 ```kotlin
 import androidx.compose.ui.unit.dp
-import com.appdimens.dynamic.compose.mm
-import com.appdimens.dynamic.compose.cm
+import com.appdimens.kmp.compose.mm
+import com.appdimens.kmp.compose.cm
 
 Modifier.width(10f.mm.dp)
 Modifier.height(2.5f.cm.dp)

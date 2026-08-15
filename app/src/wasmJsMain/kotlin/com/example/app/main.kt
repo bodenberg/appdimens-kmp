@@ -8,7 +8,7 @@ package com.example.app
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
-import com.appdimens.dynamic.core.AppDimensProvider
+import com.appdimens.kmp.core.AppDimensProvider
 import com.example.app.compose.SdpDemoScreen
 
 @OptIn(ExperimentalComposeUiApi::class)

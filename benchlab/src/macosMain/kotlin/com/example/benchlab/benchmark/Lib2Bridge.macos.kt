@@ -17,7 +17,7 @@ package com.example.benchlab.benchmark
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.appdimens.dynamic.core.localAppDimensContext
+import com.appdimens.kmp.core.localAppDimensContext
 
 @Composable
 internal actual fun lib2SdpDp(value: Int): Dp {

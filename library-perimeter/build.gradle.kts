@@ -9,7 +9,7 @@ plugins {
 
 kotlin {
     android {
-        namespace = "com.appdimens.dynamic.perimeter"
+        namespace = "com.appdimens.kmp.perimeter"
         compileSdk = 37
         minSdk = 24
         withHostTest {}

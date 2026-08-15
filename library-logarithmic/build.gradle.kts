@@ -9,7 +9,7 @@ plugins {
 
 kotlin {
     android {
-        namespace = "com.appdimens.dynamic.logarithmic"
+        namespace = "com.appdimens.kmp.logarithmic"
         compileSdk = 37
         minSdk = 24
         withHostTest {}

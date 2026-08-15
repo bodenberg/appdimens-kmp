@@ -1,8 +1,8 @@
 # AppDimens Dynamic documentation — strategies by package
 
-This folder goes deeper into each **scaling strategy** in [AppDimens Dynamic](../README.md): what it is, the formula, how to import it, and when to pick each mode. Each strategy’s code lives in `com.appdimens.dynamic.compose.<strategy>` and `com.appdimens.dynamic.code.<strategy>` with **no cross-imports** between strategies.
+This folder goes deeper into each **scaling strategy** in [AppDimens Dynamic](../README.md): what it is, the formula, how to import it, and when to pick each mode. Each strategy’s code lives in `com.appdimens.kmp.compose.<strategy>` and `com.appdimens.kmp.code.<strategy>` with **no cross-imports** between strategies.
 
-**Modules (1.0.0):** principal `appdimens-dynamic` (scaled + core/common/plain); strategy modules `appdimens-dynamic-<strategy>`; BOM `appdimens-dynamic-bom`. See [README — Installation](../README.md#installation-v100) · [MODULES.md](MODULES.md).
+**Modules (1.0.0):** principal `appdimens-kmp` (scaled + core/common/plain); strategy modules `appdimens-kmp-<strategy>`; BOM `appdimens-kmp-bom`. See [README — Installation](../README.md#installation-v100) · [MODULES.md](MODULES.md).
 
 ### 1.0.0 Changes (KMP port)
 
@@ -20,7 +20,7 @@ This folder goes deeper into each **scaling strategy** in [AppDimens Dynamic](..
 
 For **cache, bypass, and performance**, see also [library/PERFORMANCE.md](../library/PERFORMANCE.md).
 
-**Naming parity (`compose` vs `code`):** In the multi-module tree, each strategy lives under **`library/`** (scaled) or **`library-<strategy>/`**, pairing **`Dimen<Strategy>DpExtensions.kt`** (layout facilitators → `Float` px + `AppDimensContext`) with **`Dimen<Strategy>SpExtensions.kt`** where Sp facilitators exist — the same filenames as under `compose/<strategy>/`, so it is easy to jump between UI toolkits. **Scaled** uses **`DimenSdpExtensions.kt`** and **`DimenSspExtensions.kt`** inside the `scaled/` subfolder (packages stay top-level `compose` / `code`). **Plain** helpers remain in **`Dimen<Strategy>PlainPx.kt`** per strategy plus shared logic in **`com.appdimens.dynamic.code.plain`** (principal artifact).
+**Naming parity (`compose` vs `code`):** In the multi-module tree, each strategy lives under **`library/`** (scaled) or **`library-<strategy>/`**, pairing **`Dimen<Strategy>DpExtensions.kt`** (layout facilitators → `Float` px + `AppDimensContext`) with **`Dimen<Strategy>SpExtensions.kt`** where Sp facilitators exist — the same filenames as under `compose/<strategy>/`, so it is easy to jump between UI toolkits. **Scaled** uses **`DimenSdpExtensions.kt`** and **`DimenSspExtensions.kt`** inside the `scaled/` subfolder (packages stay top-level `compose` / `code`). **Plain** helpers remain in **`Dimen<Strategy>PlainPx.kt`** per strategy plus shared logic in **`com.appdimens.kmp.code.plain`** (principal artifact).
 
 **Compose API catalog:** [COMPOSE-API-CONVENTIONS.md](COMPOSE-API-CONVENTIONS.md) (scaled surface + prefix map; §4.5 View/`code` Plain). Resize: [resize.md](resize.md).
 
@@ -34,21 +34,21 @@ For **cache, bypass, and performance**, see also [library/PERFORMANCE.md](../lib
 |----------|------------------------|----------|
 | **Unified math (all strategies)** | — | [MATHEMATICS-AND-CALCULUS.md](MATHEMATICS-AND-CALCULUS.md) |
 | **Module graph / packaging** | see [MODULES.md](MODULES.md) | [MODULES.md](MODULES.md) |
-| **BOM (version alignment only)** | `appdimens-dynamic-bom` | [MODULES.md](MODULES.md) |
-| Scaled (default SDP / HDP / WDP) | `appdimens-dynamic` (principal) | [scaled.md](scaled.md) |
-| Percent (linear 1/300 + `space*`) | `appdimens-dynamic-percent` | [percent.md](percent.md) |
-| Power (sublinear) | `appdimens-dynamic-power` | [power.md](power.md) |
-| Fluid (320–768 dp band) | `appdimens-dynamic-fluid` | [fluid.md](fluid.md) |
-| Auto (linear + log after 480 dp) | `appdimens-dynamic-auto` | [auto.md](auto.md) |
-| Diagonal | `appdimens-dynamic-diagonal` | [diagonal.md](diagonal.md) |
-| Fill (“cover”) | `appdimens-dynamic-fill` | [fill.md](fill.md) |
-| Fit (“contain”) | `appdimens-dynamic-fit` | [fit.md](fit.md) |
-| Interpolated | `appdimens-dynamic-interpolated` | [interpolated.md](interpolated.md) |
-| Logarithmic | `appdimens-dynamic-logarithmic` | [logarithmic.md](logarithmic.md) |
-| Perimeter | `appdimens-dynamic-perimeter` | [perimeter.md](perimeter.md) |
-| Density | `appdimens-dynamic-density` | [density.md](density.md) |
-| Resize (constraint-based auto-fit) | `appdimens-dynamic-resize` | [resize.md](resize.md) |
-| Physical units (mm, cm, in) | `appdimens-dynamic-units` | [physical-units.md](physical-units.md) |
+| **BOM (version alignment only)** | `appdimens-kmp-bom` | [MODULES.md](MODULES.md) |
+| Scaled (default SDP / HDP / WDP) | `appdimens-kmp` (principal) | [scaled.md](scaled.md) |
+| Percent (linear 1/300 + `space*`) | `appdimens-kmp-percent` | [percent.md](percent.md) |
+| Power (sublinear) | `appdimens-kmp-power` | [power.md](power.md) |
+| Fluid (320–768 dp band) | `appdimens-kmp-fluid` | [fluid.md](fluid.md) |
+| Auto (linear + log after 480 dp) | `appdimens-kmp-auto` | [auto.md](auto.md) |
+| Diagonal | `appdimens-kmp-diagonal` | [diagonal.md](diagonal.md) |
+| Fill (“cover”) | `appdimens-kmp-fill` | [fill.md](fill.md) |
+| Fit (“contain”) | `appdimens-kmp-fit` | [fit.md](fit.md) |
+| Interpolated | `appdimens-kmp-interpolated` | [interpolated.md](interpolated.md) |
+| Logarithmic | `appdimens-kmp-logarithmic` | [logarithmic.md](logarithmic.md) |
+| Perimeter | `appdimens-kmp-perimeter` | [perimeter.md](perimeter.md) |
+| Density | `appdimens-kmp-density` | [density.md](density.md) |
+| Resize (constraint-based auto-fit) | `appdimens-kmp-resize` | [resize.md](resize.md) |
+| Physical units (mm, cm, in) | `appdimens-kmp-units` | [physical-units.md](physical-units.md) |
 
 ### Quick links
 

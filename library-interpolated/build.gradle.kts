@@ -9,7 +9,7 @@ plugins {
 
 kotlin {
     android {
-        namespace = "com.appdimens.dynamic.interpolated"
+        namespace = "com.appdimens.kmp.interpolated"
         compileSdk = 37
         minSdk = 24
         withHostTest {}

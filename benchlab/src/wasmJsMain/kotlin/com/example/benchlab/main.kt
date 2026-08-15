@@ -8,7 +8,7 @@ package com.example.benchlab
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
-import com.appdimens.dynamic.core.AppDimensProvider
+import com.appdimens.kmp.core.AppDimensProvider
 import kotlin.js.JsString
 import kotlin.js.toJsArray
 import kotlinx.browser.document

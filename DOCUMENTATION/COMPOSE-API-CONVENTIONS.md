@@ -3,7 +3,7 @@
 This document is the **authoritative surface-area reference** for Jetpack Compose extensions in **scaled** mode, plus rules that **every other strategy** (`percent`, `power`, `fluid`, …) mirrors with a different name prefix.
 
 **Sources:**
-- Scaled: `library/src/commonMain/kotlin/com/appdimens/dynamic/compose/scaled/` (Kotlin package `com.appdimens.dynamic.compose`) — same files under `code/scaled/` for the non-Compose API
+- Scaled: `library/src/commonMain/kotlin/com/appdimens/dynamic/compose/scaled/` (Kotlin package `com.appdimens.kmp.compose`) — same files under `code/scaled/` for the non-Compose API
 - Other strategies: `library-<strategy>/src/commonMain/kotlin/com/appdimens/dynamic/compose/<strategy>/` (and `code/<strategy>/` for the non-Compose API)
 
 Artifacts: [MODULES.md](MODULES.md).
@@ -17,22 +17,22 @@ Artifacts: [MODULES.md](MODULES.md).
 Most Compose extensions live in the top-level package (re-exported from strategy packages):
 
 ```kotlin
-import com.appdimens.dynamic.compose.sdp
-import com.appdimens.dynamic.compose.hdp
-import com.appdimens.dynamic.compose.wdp
-import com.appdimens.dynamic.compose.ssp
-import com.appdimens.dynamic.compose.scaledDp
-import com.appdimens.dynamic.compose.scaledSp
-import com.appdimens.dynamic.common.DpQualifier
-import com.appdimens.dynamic.common.Orientation
-import com.appdimens.dynamic.common.UiModeType
+import com.appdimens.kmp.compose.sdp
+import com.appdimens.kmp.compose.hdp
+import com.appdimens.kmp.compose.wdp
+import com.appdimens.kmp.compose.ssp
+import com.appdimens.kmp.compose.scaledDp
+import com.appdimens.kmp.compose.scaledSp
+import com.appdimens.kmp.common.DpQualifier
+import com.appdimens.kmp.common.Orientation
+import com.appdimens.kmp.common.UiModeType
 ```
 
 Strategy-specific imports (examples):
 
 ```kotlin
-import com.appdimens.dynamic.compose.percent.psdp
-import com.appdimens.dynamic.compose.power.pwsdp
+import com.appdimens.kmp.compose.percent.psdp
+import com.appdimens.kmp.compose.power.pwsdp
 ```
 
 ---
@@ -113,7 +113,7 @@ Replace the **bold** stem to get the same API shape in another package:
 
 **Builder classes (Compose + `code`)** use the same prefixed names for terminal accessors (e.g. density builder ends with `.dsdp` / `.dssp` / `.dsem`, not `.sdp`). On the **`code`** module, JVM static entry points live in **`Dimen{Strategy}Dp`** objects (e.g. `DimenAutoDp.asdp`); the **custom-dimension builder** type is **`Dimen{Strategy}`** (e.g. `DimenAuto`). The **scaled** strategy keeps **`DimenScaled`** and **`DimenSdp`** / **`DimenSsp`** unchanged.
 
-**Source files — `code` mirrors `compose`:** For each strategy, Kotlin facilitators for Views live in the **same** `Dimen<Strategy>DpExtensions.kt` / `Dimen<Strategy>SpExtensions.kt` filenames as in `compose/<strategy>/` (under `code/<strategy>/`). **Scaled** uses `code/scaled/DimenSdpExtensions.kt` and `DimenSspExtensions.kt` (package `com.appdimens.dynamic.code`), analogous to `compose/scaled/` with package `com.appdimens.dynamic.compose`.
+**Source files — `code` mirrors `compose`:** For each strategy, Kotlin facilitators for Views live in the **same** `Dimen<Strategy>DpExtensions.kt` / `Dimen<Strategy>SpExtensions.kt` filenames as in `compose/<strategy>/` (under `code/<strategy>/`). **Scaled** uses `code/scaled/DimenSdpExtensions.kt` and `DimenSspExtensions.kt` (package `com.appdimens.kmp.code`), analogous to `compose/scaled/` with package `com.appdimens.kmp.compose`.
 
 ---
 
@@ -180,14 +180,14 @@ Same for **`hdpScreen*`**, **`wdpScreen*`**.
 
 Compose **logic-only** Plain overloads use **`Dp` / `TextUnit`** alternates (no second scaling). On the non-Compose **`code`** side, the same branching is exposed as **`Float` extensions** whose receiver and alternate arguments are **already in px** (`layout` or **text** px, depending on use), plus an explicit **`AppDimensContext`** window handle for `Configuration` / UI-mode cache — the same handle on every platform (Android wraps the platform `Context`):
 
-- **Per strategy:** `Dimen*PlainPx.kt` under `com.appdimens.dynamic.code.<strategy>` (e.g. `DimenScaledPlainPx.kt` in `code.scaled`, `DimenPercentPlainPx.kt` in `code.percent`). Naming mirrors Compose: `sdpRotatePlainPx`, `psdpRotatePlainPx`, `sspRotatePlainPx`, etc., for **`RotatePlain`**, **`ModePlain`**, **`QualifierPlain`**, **`ScreenPlain`**.
-- **Shared helpers:** `com.appdimens.dynamic.code.plain` — `DimenPlainBranch.kt` (`plainRotatePx`, `plainModePx`, `plainQualifierPx`, `plainScreenPx`).
+- **Per strategy:** `Dimen*PlainPx.kt` under `com.appdimens.kmp.code.<strategy>` (e.g. `DimenScaledPlainPx.kt` in `code.scaled`, `DimenPercentPlainPx.kt` in `code.percent`). Naming mirrors Compose: `sdpRotatePlainPx`, `psdpRotatePlainPx`, `sspRotatePlainPx`, etc., for **`RotatePlain`**, **`ModePlain`**, **`QualifierPlain`**, **`ScreenPlain`**.
+- **Shared helpers:** `com.appdimens.kmp.code.plain` — `DimenPlainBranch.kt` (`plainRotatePx`, `plainModePx`, `plainQualifierPx`, `plainScreenPx`).
 
 **Example (percent / layout px):**
 
 ```kotlin
-import com.appdimens.dynamic.code.percent.psdpRotatePlainPx
-import com.appdimens.dynamic.common.Orientation
+import com.appdimens.kmp.code.percent.psdpRotatePlainPx
+import com.appdimens.kmp.common.Orientation
 
 val a = layoutPx.psdpRotatePlainPx(appContext, rotationPx, Orientation.LANDSCAPE)
 ```

@@ -1,6 +1,6 @@
 # Resize module (`compose.resize` / `code.resize`)
 
-**Artifact:** `io.github.bodenberg:appdimens-dynamic-resize:1.0.0` (`:library-resize`)
+**Artifact:** `io.github.bodenberg:appdimens-kmp-resize:1.0.0` (`:library-resize`)
 See [MODULES.md](MODULES.md) · [README installation](../README.md#installation-v100)
 
 ## What it is
@@ -22,7 +22,7 @@ Call these **inside** `BoxWithConstraints { ... }` (`BoxWithConstraintsScope` ex
 
 ```kotlin
 import androidx.compose.foundation.layout.BoxWithConstraints
-import com.appdimens.dynamic.compose.resize.autoResizeTextSp
+import com.appdimens.kmp.compose.resize.autoResizeTextSp
 
 BoxWithConstraints(Modifier.fillMaxWidth()) {
     val fontSize = autoResizeTextSp(
@@ -36,13 +36,13 @@ BoxWithConstraints(Modifier.fillMaxWidth()) {
 }
 ```
 
-**Views / non-Compose Kotlin:** `com.appdimens.dynamic.code.resize.DimenResize` — pixel APIs (`rangePx`, `fittingPx`) on the same `core` math.
+**Views / non-Compose Kotlin:** `com.appdimens.kmp.code.resize.DimenResize` — pixel APIs (`rangePx`, `fittingPx`) on the same `core` math.
 
 ---
 
 ## Usage examples
 
-All snippets assume `import androidx.compose.foundation.layout.*` and `import com.appdimens.dynamic.compose.resize.*` where needed.
+All snippets assume `import androidx.compose.foundation.layout.*` and `import com.appdimens.kmp.compose.resize.*` where needed.
 
 ### Text — same `TextStyle` for measure and draw
 
@@ -58,7 +58,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import com.appdimens.dynamic.compose.resize.autoResizeTextSp
+import com.appdimens.kmp.compose.resize.autoResizeTextSp
 
 @Composable
 fun AutoResizeHeadline(title: String, modifier: Modifier = Modifier) {
@@ -98,7 +98,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.appdimens.dynamic.compose.resize.autoResizeTextSp
+import com.appdimens.kmp.compose.resize.autoResizeTextSp
 
 @Composable
 fun PromoBanner() {
@@ -140,7 +140,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
-import com.appdimens.dynamic.compose.resize.autoResizeTextSp
+import com.appdimens.kmp.compose.resize.autoResizeTextSp
 
 @Composable
 fun SingleLineEllipsisSample() {
@@ -177,8 +177,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
-import com.appdimens.dynamic.compose.resize.autoResizeTextSp
-import com.appdimens.dynamic.compose.ssp
+import com.appdimens.kmp.compose.resize.autoResizeTextSp
+import com.appdimens.kmp.compose.ssp
 
 @Composable
 fun ScaledBoundsSample() {
@@ -212,7 +212,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.appdimens.dynamic.compose.resize.autoResizeTextSp
+import com.appdimens.kmp.compose.resize.autoResizeTextSp
 
 @Composable
 fun MetricCard(label: String, value: String) {
@@ -259,7 +259,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import com.appdimens.dynamic.compose.resize.autoResizeSquareSize
+import com.appdimens.kmp.compose.resize.autoResizeSquareSize
 
 @Composable
 fun AdaptiveThumbnail(drawableRes: Int, modifier: Modifier = Modifier) {
@@ -305,8 +305,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.appdimens.dynamic.compose.resize.autoResizeHeightSize
-import com.appdimens.dynamic.compose.resize.autoResizeWidthSize
+import com.appdimens.kmp.compose.resize.autoResizeHeightSize
+import com.appdimens.kmp.compose.resize.autoResizeWidthSize
 
 @Composable
 fun WidthHeightBarsSample() {
@@ -356,8 +356,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.appdimens.dynamic.core.AutoResizePercentBasis
-import com.appdimens.dynamic.compose.resize.autoResizeTextSpPercent
+import com.appdimens.kmp.core.AutoResizePercentBasis
+import com.appdimens.kmp.compose.resize.autoResizeTextSpPercent
 
 @Composable
 fun PercentBoxTextSample() {
@@ -395,8 +395,8 @@ Use these when an overload takes `ResizeBound` for **min** / **max** / **step** 
 **Example (text range from screen height %):**
 
 ```kotlin
-import com.appdimens.dynamic.core.resizeFixedSp
-import com.appdimens.dynamic.core.resizePercentH
+import com.appdimens.kmp.core.resizeFixedSp
+import com.appdimens.kmp.core.resizePercentH
 
 autoResizeTextSp(
     text = "Headline",
@@ -410,7 +410,7 @@ autoResizeTextSp(
 
 ## `AutoResizePercentBasis` (`core`)
 
-The enum lives in **`com.appdimens.dynamic.core.AutoResizePercentBasis`** — that is the type to import.
+The enum lives in **`com.appdimens.kmp.core.AutoResizePercentBasis`** — that is the type to import.
 
 Used by **`autoResizeTextSpPercent`** (Compose) and **`DimenResize.rangePxPercentOfInnerBox`** / **`fittingTextSpPercentPx`** (Views/code) to choose which **inner** box edge defines 0–100%:
 

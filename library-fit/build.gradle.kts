@@ -9,7 +9,7 @@ plugins {
 
 kotlin {
     android {
-        namespace = "com.appdimens.dynamic.fit"
+        namespace = "com.appdimens.kmp.fit"
         compileSdk = 37
         minSdk = 24
         withHostTest {}

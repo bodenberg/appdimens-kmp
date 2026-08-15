@@ -7,7 +7,7 @@ package com.example.app
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.appdimens.dynamic.core.AppDimensProvider
+import com.appdimens.kmp.core.AppDimensProvider
 import com.example.app.compose.SdpDemoScreen
 
 class ExampleActivity : ComponentActivity() {

@@ -48,18 +48,18 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.appdimens.dynamic.compose.resize.autoResizeHeightSize
-import com.appdimens.dynamic.compose.resize.autoResizeSquareSize
-import com.appdimens.dynamic.compose.resize.autoResizeTextSp
-import com.appdimens.dynamic.compose.resize.autoResizeWidthSize
-import com.appdimens.dynamic.common.DpQualifier
-import com.appdimens.dynamic.common.Orientation
-import com.appdimens.dynamic.common.UiModeType
-import com.appdimens.dynamic.compose.ssp
+import com.appdimens.kmp.compose.resize.autoResizeHeightSize
+import com.appdimens.kmp.compose.resize.autoResizeSquareSize
+import com.appdimens.kmp.compose.resize.autoResizeTextSp
+import com.appdimens.kmp.compose.resize.autoResizeWidthSize
+import com.appdimens.kmp.common.DpQualifier
+import com.appdimens.kmp.common.Orientation
+import com.appdimens.kmp.common.UiModeType
+import com.appdimens.kmp.compose.ssp
 
 /**
- * EN The demo screen. Compose it inside [com.appdimens.dynamic.core.AppDimensProvider].
- * PT A tela do demo. Compose dentro de [com.appdimens.dynamic.core.AppDimensProvider].
+ * EN The demo screen. Compose it inside [com.appdimens.kmp.core.AppDimensProvider].
+ * PT A tela do demo. Compose dentro de [com.appdimens.kmp.core.AppDimensProvider].
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -423,7 +423,7 @@ fun ExampleCard(title: String, description: String, boxSize: Dp, boxColor: Color
 }
 
 /**
- * EN Shows [com.appdimens.dynamic.compose.resize] inside [BoxWithConstraints]: text sp range, square side, width bar.
+ * EN Shows [com.appdimens.kmp.compose.resize] inside [BoxWithConstraints]: text sp range, square side, width bar.
  * PT Mostra resize no [BoxWithConstraints]: texto (sp), quadrado (lado), barra (largura).
  */
 @Composable

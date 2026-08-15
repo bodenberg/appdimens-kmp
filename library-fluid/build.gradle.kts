@@ -9,7 +9,7 @@ plugins {
 
 kotlin {
     android {
-        namespace = "com.appdimens.dynamic.fluid"
+        namespace = "com.appdimens.kmp.fluid"
         compileSdk = 37
         minSdk = 24
         withHostTest {}

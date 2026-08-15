@@ -1,6 +1,6 @@
 # Interpolated strategy (`compose.interpolated` / `code.interpolated`)
 
-**Artifact:** `io.github.bodenberg:appdimens-dynamic-interpolated:1.0.0` (`:library-interpolated`)
+**Artifact:** `io.github.bodenberg:appdimens-kmp-interpolated:1.0.0` (`:library-interpolated`)
 See [MODULES.md](MODULES.md) · [README installation](../README.md#installation-v100)
 
 **Same API surface as scaled** with prefixes `isdp` / `ihdp` / `iwdp` / `issp` / … — see [COMPOSE-API-CONVENTIONS.md §3](COMPOSE-API-CONVENTIONS.md#3-strategy-prefix-map-mirror-of-scaled).
@@ -25,14 +25,14 @@ Implementation: `calculateInterpolatedDpCompose` in `DimenInterpolatedDp.kt`.
 ## How to use
 
 ```kotlin
-import com.appdimens.dynamic.compose.interpolated.isdp
+import com.appdimens.kmp.compose.interpolated.isdp
 
 Modifier.padding(14.isdp)
 ```
 
 Prefixes: `isdp`, `ihdp`, `iwdp` (+ Sp, px, variants).
 
-**Code:** `com.appdimens.dynamic.code.interpolated`.
+**Code:** `com.appdimens.kmp.code.interpolated`.
 
 ## Why use it
 

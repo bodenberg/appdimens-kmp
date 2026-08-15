@@ -1,6 +1,6 @@
 # Scaled strategy (`compose` / mirrored `code` — sources under `compose/scaled/`)
 
-**Artifact:** `io.github.bodenberg:appdimens-dynamic:1.0.0` (`:library`)
+**Artifact:** `io.github.bodenberg:appdimens-kmp:1.0.0` (`:library`)
 API catalog: [COMPOSE-API-CONVENTIONS.md](COMPOSE-API-CONVENTIONS.md) · modules: [MODULES.md](MODULES.md)
 
 ## What it is
@@ -21,19 +21,19 @@ Common suffixes: **`a`** = aspect ratio; **`i`** = ignore multi-window; **`ia`**
 
 ## How to use
 
-**Compose** — import extensions from `com.appdimens.dynamic.compose` (the package that exposes `sdp`, `hdp`, `wdp`, `ssp`, etc. — the source files live under `compose/scaled/` but the package is top-level `compose`):
+**Compose** — import extensions from `com.appdimens.kmp.compose` (the package that exposes `sdp`, `hdp`, `wdp`, `ssp`, etc. — the source files live under `compose/scaled/` but the package is top-level `compose`):
 
 ```kotlin
-import com.appdimens.dynamic.compose.sdp
-import com.appdimens.dynamic.compose.hdp
-import com.appdimens.dynamic.compose.wdp
+import com.appdimens.kmp.compose.sdp
+import com.appdimens.kmp.compose.hdp
+import com.appdimens.kmp.compose.wdp
 
 Modifier.padding(16.sdp).width(100.wdp)
 ```
 
 The **`code`** module also exposes **`Int`** and **`Float`** receiver overloads for `sdp` / `hdp` / `wdp` (and `a` / `i` / `ia` variants), plus `toDynamicScaledPx` / `toDynamicScaledDp`, to avoid `Number` boxing on hot paths. The **`Number`** overloads remain for backward compatibility.
 
-**Code (Views / Kotlin)** — `com.appdimens.dynamic.code.DimenSdp`, `DimenSsp`, extensions `ssp`, `scaledSp()`, etc.
+**Code (Views / Kotlin)** — `com.appdimens.kmp.code.DimenSdp`, `DimenSsp`, extensions `ssp`, `scaledSp()`, etc.
 
 Each strategy follows the same **file pattern**: `Dimen*Dp`, `*DpExtensions`, `*Scaled`, `*Sp`, `*SpExtensions`, `*SpScaled` (in `scaled`, Sp templates may use names like `DimenSsp*` in legacy code).
 

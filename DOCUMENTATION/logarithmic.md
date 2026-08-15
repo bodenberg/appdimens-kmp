@@ -1,6 +1,6 @@
 # Logarithmic strategy (`compose.logarithmic` / `code.logarithmic`)
 
-**Artifact:** `io.github.bodenberg:appdimens-dynamic-logarithmic:1.0.0` (`:library-logarithmic`)
+**Artifact:** `io.github.bodenberg:appdimens-kmp-logarithmic:1.0.0` (`:library-logarithmic`)
 See [MODULES.md](MODULES.md) · [README installation](../README.md#installation-v100)
 
 **Same API surface as scaled** with prefixes `logsdp` / `loghdp` / `logwdp` / `logssp` / … — see [COMPOSE-API-CONVENTIONS.md §3](COMPOSE-API-CONVENTIONS.md#3-strategy-prefix-map-mirror-of-scaled).
@@ -27,14 +27,14 @@ Implementation: `calculateLogarithmicDpCompose` in `DimenLogarithmicDp.kt`.
 ## How to use
 
 ```kotlin
-import com.appdimens.dynamic.compose.logarithmic.logsdp
+import com.appdimens.kmp.compose.logarithmic.logsdp
 
 Modifier.height(56.logsdp)
 ```
 
 Prefixes: `logsdp`, `loghdp`, `logwdp` (+ Sp, px, variants).
 
-**Code:** `com.appdimens.dynamic.code.logarithmic`.
+**Code:** `com.appdimens.kmp.code.logarithmic`.
 
 ## Why use it
 
