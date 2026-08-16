@@ -46,7 +46,6 @@ import com.appdimens.kmp.core.spRememberStamp
 // EN Rotation facilitator extensions for Sp.
 // PT Extensões facilitadoras para rotação (Sp).
 
-// Removed duplicate Int.logsspRotate (kept in DimenLogarithmicSp.kt)
 
 /**
  * EN Pixel (Float) variant of [logsspRotate].
@@ -585,7 +584,6 @@ fun TextUnit.logwspScreenPlainPx(screen: TextUnit, uiModeType: UiModeType, quali
     val qualifierMatch = getQualifierValue(qualifierType, configuration) >= qualifierValue.toFloat()
     return if (uiModeMatch && qualifierMatch) density.run { screen.toPx() } else density.run { this@logwspScreenPlainPx.toPx() }
 }
-// Removed duplicate Int.loghspRotate (kept in DimenLogarithmicSp.kt)
 
 /**
  * EN Pixel (Float) variant of [loghspRotate].
@@ -819,7 +817,6 @@ fun TextUnit.loghspRotatePlainPx(
     )
 }
 
-// Removed duplicate Int.logwspRotate (kept in DimenLogarithmicSp.kt)
 
 /**
  * EN Pixel (Float) variant of [logwspRotate].
@@ -1057,7 +1054,6 @@ fun TextUnit.logwspRotatePlainPx(
 // EN UiModeType facilitator extensions for Sp.
 // PT Extensões facilitadoras para UiModeType (Sp).
 
-// Removed duplicate Int.logsspMode (kept in DimenLogarithmicSp.kt)
 
 /**
  * EN Pixel (Float) variant of [logsspMode].
@@ -1269,7 +1265,6 @@ fun TextUnit.logsspModePlainPx(
     )
 }
 
-// Removed duplicate Int.loghspMode (kept in DimenLogarithmicSp.kt)
 
 /**
  * EN Pixel (Float) variant of [loghspMode].
@@ -1481,7 +1476,6 @@ fun TextUnit.loghspModePlainPx(
     )
 }
 
-// Removed duplicate Int.logwspMode (kept in DimenLogarithmicSp.kt)
 
 /**
  * EN Pixel (Float) variant of [logwspMode].

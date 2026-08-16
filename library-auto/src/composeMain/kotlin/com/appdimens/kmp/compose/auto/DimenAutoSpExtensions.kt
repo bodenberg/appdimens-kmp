@@ -46,7 +46,6 @@ import com.appdimens.kmp.core.spRememberStamp
 // EN Rotation facilitator extensions for Sp.
 // PT Extensões facilitadoras para rotação (Sp).
 
-// Removed duplicate Int.asspRotate (kept in DimenAutoSp.kt)
 
 /**
  * EN Pixel (Float) variant of [asspRotate].
@@ -585,7 +584,6 @@ fun TextUnit.awspScreenPlainPx(screen: TextUnit, uiModeType: UiModeType, qualifi
     val qualifierMatch = getQualifierValue(qualifierType, configuration) >= qualifierValue.toFloat()
     return if (uiModeMatch && qualifierMatch) density.run { screen.toPx() } else density.run { this@awspScreenPlainPx.toPx() }
 }
-// Removed duplicate Int.ahspRotate (kept in DimenAutoSp.kt)
 
 /**
  * EN Pixel (Float) variant of [ahspRotate].
@@ -819,7 +817,6 @@ fun TextUnit.ahspRotatePlainPx(
     )
 }
 
-// Removed duplicate Int.awspRotate (kept in DimenAutoSp.kt)
 
 /**
  * EN Pixel (Float) variant of [awspRotate].
@@ -1057,7 +1054,6 @@ fun TextUnit.awspRotatePlainPx(
 // EN UiModeType facilitator extensions for Sp.
 // PT Extensões facilitadoras para UiModeType (Sp).
 
-// Removed duplicate Int.asspMode (kept in DimenAutoSp.kt)
 
 /**
  * EN Pixel (Float) variant of [asspMode].
@@ -1269,7 +1265,6 @@ fun TextUnit.asspModePlainPx(
     )
 }
 
-// Removed duplicate Int.ahspMode (kept in DimenAutoSp.kt)
 
 /**
  * EN Pixel (Float) variant of [ahspMode].
@@ -1481,7 +1476,6 @@ fun TextUnit.ahspModePlainPx(
     )
 }
 
-// Removed duplicate Int.awspMode (kept in DimenAutoSp.kt)
 
 /**
  * EN Pixel (Float) variant of [awspMode].

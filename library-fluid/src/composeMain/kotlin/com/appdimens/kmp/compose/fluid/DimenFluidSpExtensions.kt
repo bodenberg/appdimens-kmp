@@ -46,7 +46,6 @@ import com.appdimens.kmp.core.spRememberStamp
 // EN Rotation facilitator extensions for Sp.
 // PT Extensões facilitadoras para rotação (Sp).
 
-// Removed duplicate Int.fsspRotate (kept in DimenFluidSp.kt)
 
 /**
  * EN Pixel (Float) variant of [fsspRotate].
@@ -585,7 +584,6 @@ fun TextUnit.fwspScreenPlainPx(screen: TextUnit, uiModeType: UiModeType, qualifi
     val qualifierMatch = getQualifierValue(qualifierType, configuration) >= qualifierValue.toFloat()
     return if (uiModeMatch && qualifierMatch) density.run { screen.toPx() } else density.run { this@fwspScreenPlainPx.toPx() }
 }
-// Removed duplicate Int.fhspRotate (kept in DimenFluidSp.kt)
 
 /**
  * EN Pixel (Float) variant of [fhspRotate].
@@ -819,7 +817,6 @@ fun TextUnit.fhspRotatePlainPx(
     )
 }
 
-// Removed duplicate Int.fwspRotate (kept in DimenFluidSp.kt)
 
 /**
  * EN Pixel (Float) variant of [fwspRotate].
@@ -1057,7 +1054,6 @@ fun TextUnit.fwspRotatePlainPx(
 // EN UiModeType facilitator extensions for Sp.
 // PT Extensões facilitadoras para UiModeType (Sp).
 
-// Removed duplicate Int.fsspMode (kept in DimenFluidSp.kt)
 
 /**
  * EN Pixel (Float) variant of [fsspMode].
@@ -1269,7 +1265,6 @@ fun TextUnit.fsspModePlainPx(
     )
 }
 
-// Removed duplicate Int.fhspMode (kept in DimenFluidSp.kt)
 
 /**
  * EN Pixel (Float) variant of [fhspMode].
@@ -1481,7 +1476,6 @@ fun TextUnit.fhspModePlainPx(
     )
 }
 
-// Removed duplicate Int.fwspMode (kept in DimenFluidSp.kt)
 
 /**
  * EN Pixel (Float) variant of [fwspMode].

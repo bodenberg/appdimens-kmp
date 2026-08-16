@@ -46,7 +46,6 @@ import com.appdimens.kmp.core.spRememberStamp
 // EN Rotation facilitator extensions for Sp.
 // PT Extensões facilitadoras para rotação (Sp).
 
-// Removed duplicate Int.dsspRotate (kept in DimenDensitySp.kt)
 
 /**
  * EN Pixel (Float) variant of [dsspRotate].
@@ -585,7 +584,6 @@ fun TextUnit.dwspScreenPlainPx(screen: TextUnit, uiModeType: UiModeType, qualifi
     val qualifierMatch = getQualifierValue(qualifierType, configuration) >= qualifierValue.toFloat()
     return if (uiModeMatch && qualifierMatch) density.run { screen.toPx() } else density.run { this@dwspScreenPlainPx.toPx() }
 }
-// Removed duplicate Int.dhspRotate (kept in DimenDensitySp.kt)
 
 /**
  * EN Pixel (Float) variant of [dhspRotate].
@@ -819,7 +817,6 @@ fun TextUnit.dhspRotatePlainPx(
     )
 }
 
-// Removed duplicate Int.dwspRotate (kept in DimenDensitySp.kt)
 
 /**
  * EN Pixel (Float) variant of [dwspRotate].
@@ -1057,7 +1054,6 @@ fun TextUnit.dwspRotatePlainPx(
 // EN UiModeType facilitator extensions for Sp.
 // PT Extensões facilitadoras para UiModeType (Sp).
 
-// Removed duplicate Int.dsspMode (kept in DimenDensitySp.kt)
 
 /**
  * EN Pixel (Float) variant of [dsspMode].
@@ -1269,7 +1265,6 @@ fun TextUnit.dsspModePlainPx(
     )
 }
 
-// Removed duplicate Int.dhspMode (kept in DimenDensitySp.kt)
 
 /**
  * EN Pixel (Float) variant of [dhspMode].
@@ -1481,7 +1476,6 @@ fun TextUnit.dhspModePlainPx(
     )
 }
 
-// Removed duplicate Int.dwspMode (kept in DimenDensitySp.kt)
 
 /**
  * EN Pixel (Float) variant of [dwspMode].

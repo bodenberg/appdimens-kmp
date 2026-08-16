@@ -46,7 +46,6 @@ import com.appdimens.kmp.core.spRememberStamp
 // EN Rotation facilitator extensions for Sp.
 // PT Extensões facilitadoras para rotação (Sp).
 
-// Removed duplicate Int.sspRotate (kept in DimenSsp.kt)
 
 /**
  * EN Pixel (Float) variant of [sspRotate].
@@ -311,7 +310,6 @@ fun TextUnit.sspRotatePlainPx(rotation: TextUnit, orientation: Orientation = Ori
     return if (isTargetOrientation) density.run { rotation.toPx() } else density.run { this@sspRotatePlainPx.toPx() }
 }
 
-// Removed duplicate Int.hspRotate (kept in DimenSsp.kt)
 
 /**
  * EN Pixel (Float) variant of [hspRotate].
@@ -576,7 +574,6 @@ fun TextUnit.hspRotatePlainPx(rotation: TextUnit, orientation: Orientation = Ori
     return if (isTargetOrientation) density.run { rotation.toPx() } else density.run { this@hspRotatePlainPx.toPx() }
 }
 
-// Removed duplicate Int.wspRotate (kept in DimenSsp.kt)
 
 /**
  * EN Pixel (Float) variant of [wspRotate].
@@ -845,7 +842,6 @@ fun TextUnit.wspRotatePlainPx(rotation: TextUnit, orientation: Orientation = Ori
 // EN UiModeType facilitator extensions for Sp.
 // PT Extensões facilitadoras para UiModeType (Sp).
 
-// Removed duplicate Int.sspMode (kept in DimenSsp.kt)
 
 /**
  * EN Pixel (Float) variant of [sspMode].
@@ -1078,7 +1074,6 @@ fun TextUnit.sspModePlainPx(mode: TextUnit, uiModeType: UiModeType): Float {
     return if (currentUiModeType == uiModeType) density.run { mode.toPx() } else density.run { this@sspModePlainPx.toPx() }
 }
 
-// Removed duplicate Int.hspMode (kept in DimenSsp.kt)
 
 /**
  * EN Pixel (Float) variant of [hspMode].
@@ -1311,7 +1306,6 @@ fun TextUnit.hspModePlainPx(mode: TextUnit, uiModeType: UiModeType): Float {
     return if (currentUiModeType == uiModeType) density.run { mode.toPx() } else density.run { this@hspModePlainPx.toPx() }
 }
 
-// Removed duplicate Int.wspMode (kept in DimenSsp.kt)
 
 /**
  * EN Pixel (Float) variant of [wspMode].

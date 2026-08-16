@@ -35,7 +35,7 @@ Ready to contribute code? Follow these steps:
 
 * **Code Style:** Follow standard Kotlin/Compose coding conventions (the project uses `kotlin.code.style=official`).
 * **Modules:** Strategy code lives in `:library-<strategy>`; shared cache/core/scaled/plain stay in `:library`. Satellites depend only on `:library`. `:library-bom` publishes version constraints only. See [DOCUMENTATION/MODULES.md](DOCUMENTATION/MODULES.md).
-* **Multiplatform:** the library targets **Android, JVM, iOS (`iosArm64`/`iosSimulatorArm64`), macOS (`macosArm64`) and wasmJs (browser)**. New code must compile for **all** targets — keep platform logic behind `expect/actual` in `androidMain` / `jvmMain` / `iosMain` / `macosMain` / `wasmJsMain` (or `nativeMain` for shared native code).
+* **Multiplatform:** the library targets **Android, JVM, iOS (`iosArm64`/`iosSimulatorArm64`), macOS (`macosArm64`), wasmJs (browser), Linux (`linuxX64`/`linuxArm64`) and Windows (`mingwX64`)**. New code must compile for **all** targets — keep platform logic behind `expect/actual` in `androidMain` / `jvmMain` / `iosMain` / `macosMain` / `wasmJsMain` / `linuxMain` / `mingwMain` (or `nativeMain` for shared native code). Linux and Windows expose the `code` API only.
 * **Documentation:** If you add a new scaling method, parameter, or module, update the README installation matrix, the strategy page under `DOCUMENTATION/`, and [MODULES.md](DOCUMENTATION/MODULES.md). Keep KDoc on public APIs (the project uses bilingual EN/PT KDoc).
 * **Tests:** Run the JVM tests and the Android host tests:
 

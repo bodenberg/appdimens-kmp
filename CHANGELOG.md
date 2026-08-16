@@ -45,6 +45,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - BenchLab desktop (release, real window): **Dynamic 3.3 ns/op vs Lib #2 342 ns/op — ×95–104 faster**, anti-DCE checksums identical (bit-identical precision)
 - BenchLab on device (Xiaomi, release, R8): **Dynamic 23.9 ns/op vs Lib #2 1.3 µs/op — ×54 faster**, values 1:1
 - Formulas validated bit-identical against the official `appdimens-dynamic` Android library
+- **Published to Maven Central** — all 15 artifacts (`appdimens-kmp` core + 13 strategy modules + `appdimens-kmp-bom`) at `io.github.bodenberg:*:1.0.1`, GPG-signed, with full KMP variant matrix (Android AAR, JVM, iOS, macOS, JS, wasmJs, Linux x64/arm64, Windows mingwX64); consumer fixture resolved from Central (BOM + core + percent + power) and executed successfully
 
 ---
 
