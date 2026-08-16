@@ -1,7 +1,7 @@
 # Mathematics and Calculus — AppDimens Dynamic
 
 > [!NOTE]
-> Formal reference for geometry mapping against the per-window `ScreenConfiguration` snapshot (derived from `android.content.res.Configuration` on Android, the AWT window on JVM, `UIScreen`/`NSScreen` on iOS/macOS, and the browser viewport on wasmJs).
+> Formal reference for geometry mapping against the per-window `ScreenConfiguration` snapshot (derived from `android.content.res.Configuration` on Android, the AWT window on JVM, `UIScreen`/`NSScreen` on iOS/macOS, the browser viewport on JS/wasmJs, and a caller-built `ScreenConfiguration` on Linux/Windows native).
 > **Related:** [PRD](PRD.md) · [PDR](PDR.md) · [Resize](resize.md) · [MODULES](MODULES.md)
 >
 

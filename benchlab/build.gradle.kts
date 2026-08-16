@@ -38,7 +38,7 @@ compose.desktop {
                 org.jetbrains.compose.desktop.application.dsl.TargetFormat.Deb,
             )
             packageName = "BenchLab"
-            packageVersion = "1.0.0"
+            packageVersion = "1.0.1"
         }
     }
 }

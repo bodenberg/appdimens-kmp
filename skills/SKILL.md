@@ -5,11 +5,11 @@ description: Use this skill for any Kotlin Multiplatform responsive layout or sc
 
 # AppDimens KMP — project workflow
 
-**Library (1.0.0):** `appdimens-kmp` (scaled + core), `appdimens-kmp-<strategy>`, BOM `appdimens-kmp-bom`. Packages use the **`com.appdimens.kmp.*`** root (this is the Kotlin Multiplatform library — the Android-only predecessor used `com.appdimens.dynamic.*`; do not mix them). See [MODULES.md](../DOCUMENTATION/MODULES.md).
+**Library (1.0.1):** `appdimens-kmp` (scaled + core), `appdimens-kmp-<strategy>`, BOM `appdimens-kmp-bom`. Packages use the **`com.appdimens.kmp.*`** root (this is the Kotlin Multiplatform library — the Android-only predecessor used `com.appdimens.dynamic.*`; do not mix them). See [MODULES.md](../DOCUMENTATION/MODULES.md).
 
-**Platforms:** Android (min SDK 24) · JVM desktop · iOS (`iosArm64`/`iosSimulatorArm64`) · macOS (`macosArm64`) · Web (wasmJs). One API for all of them.
+**Platforms:** Android (min SDK 24) · JVM desktop · iOS (`iosArm64`/`iosSimulatorArm64`) · macOS (`macosArm64`) · Web (Kotlin/JS + wasmJs) · Linux (`linuxX64`/`linuxArm64`) · Windows (`mingwX64`). One API for all of them (Linux/Windows expose the `code` API only).
 
-**Install:** `platform("io.github.bodenberg:appdimens-kmp-bom:1.0.0")` then the modules you need. Kotlin imports are `com.appdimens.kmp.*`.
+**Install:** `platform("io.github.bodenberg:appdimens-kmp-bom:1.0.1")` then the modules you need. Kotlin imports are `com.appdimens.kmp.*`.
 
 On release bumps, update version URLs in this file, `library-map.md`, and `reference.md` together.
 
@@ -24,7 +24,16 @@ On release bumps, update version URLs in this file, `library-map.md`, and `refer
 - R8 pre-shrink for all 14 Android AARs (`optimization { minify = true }`)
 - BenchLab KMP — competitor benchmark that runs on Android, JVM, iOS, macOS and the browser
 
-**Authoritative docs (repo root, Git ref `1.0.0`):**
+**What's New in 1.0.1 (audit fixes + full target matrix):**
+- `fastPartition` race fixed — metrics + partition published as one atomic `FastPartitionSlot` (was two independent atomics that could serve another window's metrics)
+- Android context cache cycle fixed — `WeakHashMap<Context, WeakReference<AndroidAppDimensContext>>` (value no longer holds the key strongly)
+- Configuration listeners disposable — `registerConfigurationListener` returns `ConfigurationRegistration.dispose()`; the Android registry unregisters `ComponentCallbacks` when the last listener is removed
+- Strict race tests — `DimenCacheRaceTest` requires the exact expected value per key/snapshot
+- New targets: classic Kotlin/JS (`js`, IR), `linuxX64`, `linuxArm64`, `mingwX64` (all modules, via the shared `appdimens.kmp-library` convention plugin)
+- Encapsulated diagnostics — `DimenCache.isInitialized` is a plain `Boolean`, `cacheStats()` returns immutable `CacheStats`; experimental atomics are `internal`
+- CI restored — `verify-linux` + `verify-apple` gates; wrapper `distributionSha256Sum` pinned; Compose dev repo removed
+
+**Authoritative docs (repo root, Git ref `1.0.1`):**
 - [README.md](../README.md) — install, `AppDimensProvider`, `DimenCache` (snapshot-partitioned; event-driven config watcher; specialized kernels), platform table
 - [DOCUMENTATION/MODULES.md](../DOCUMENTATION/MODULES.md) — Maven/Gradle graph (principal vs satellites) + target table
 - [DOCUMENTATION/README.md](../DOCUMENTATION/README.md) — all strategies, decision flow

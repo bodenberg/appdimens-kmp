@@ -4,8 +4,6 @@ package com.appdimens.kmp.power
 
 import com.appdimens.kmp.core.AppDimensContext
 import com.appdimens.kmp.core.ScreenConfiguration
-import com.appdimens.kmp.core.currentScreenConfiguration
-import com.appdimens.kmp.core.localAppDimensContext
 
 import com.appdimens.kmp.core.DimenCache
 

@@ -12,7 +12,7 @@ plugins {
 }
 
 val libraryVersion: String =
-    providers.gradleProperty("appdimens.version").orElse("1.0.0").get()
+    providers.gradleProperty("appdimens.version").orElse("1.0.1").get()
 
 javaPlatform {
     allowDependencies()

@@ -31,7 +31,7 @@ The library features a **Lock-Free Snapshot-Partitioned Cache** with an intellig
 ## 2. BenchLab — 3-Way Competitor Comparison
 
 > [!IMPORTANT]
-> **Measurement**: `benchlab` module, **release** builds. On Android the harness runs headlessly via the `AUTO_START` intent extra; on desktop/web the JVM/wasm entry points accept the same `AUTO_START` flag. The harness measures **Dynamic 1.0.0** × **SDPS 3.1.6** × **Lib #2** inside the **same composition** (identical warm-up, 9 samples × 50,000 iterations, per-sample order rotation, anti-DCE checksums, chunked 5,000 ops/frame).
+> **Measurement**: `benchlab` module, **release** builds. On Android the harness runs headlessly via the `AUTO_START` intent extra; on desktop/web the JVM/wasm entry points accept the same `AUTO_START` flag. The harness measures **Dynamic 1.0.1** × **SDPS 3.1.6** × **Lib #2** inside the **same composition** (identical warm-up, 9 samples × 50,000 iterations, per-sample order rotation, anti-DCE checksums, chunked 5,000 ops/frame).
 
 ### 2.1 Android (physical device)
 
@@ -39,7 +39,7 @@ The library features a **Lock-Free Snapshot-Partitioned Cache** with an intellig
 
 **Benchmark B — Engine (off main thread) — median per 1dp call:**
 
-| Metric | Dynamic 1.0.0 | SDPS 3.1.6 | Lib #2 |
+| Metric | Dynamic 1.0.1 | SDPS 3.1.6 | Lib #2 |
 | :--- | :---: | :---: | :---: |
 | **Engine mixed (12 dims)** | **~10 ns** | ~3.2 µs | N/A (no non-Compose API) |
 | **Legacy sdp T3 (hot JIT)** | **~10 ns** | ~3.3 µs | ~1.1 µs |
@@ -52,7 +52,7 @@ The library features a **Lock-Free Snapshot-Partitioned Cache** with an intellig
 
 **Device:** this machine's JVM (x86-64) · window 790×570 dp · desktop release run with `AUTO_START`.
 
-| Metric | Dynamic 1.0.0 | Lib #2 |
+| Metric | Dynamic 1.0.1 | Lib #2 |
 | :--- | :---: | :---: |
 | **Engine (per 1dp call)** | **~3.0–3.3 ns** | ~320–400 ns |
 
@@ -62,7 +62,7 @@ The library features a **Lock-Free Snapshot-Partitioned Cache** with an intellig
 
 **Browser:** headless Chromium · viewport 1280×900 (sw=900dp, density 1.0) · optimized wasm production build.
 
-| Metric | Dynamic 1.0.0 | Lib #2 |
+| Metric | Dynamic 1.0.1 | Lib #2 |
 | :--- | :---: | :---: |
 | **Engine (per 1dp call)** | **~12–16 ns** | ~2,000–2,034 ns |
 
@@ -139,4 +139,4 @@ graph TD
 ```
 
 ---
-*Report Updated: 2026-08-15 · AppDimens Dynamic KMP 1.0.0 · Data from current test runs: BenchLab (Benchmark A Compose + Benchmark B Engine + legacy tests) on Android (Xiaomi 2107113SG), JVM desktop, and wasmJs browser · release builds (R8 on Android, optimized wasm) · precision bit-identical across platforms*
+*Report Updated: 2026-08-15 · AppDimens Dynamic KMP 1.0.1 · Data from current test runs: BenchLab (Benchmark A Compose + Benchmark B Engine + legacy tests) on Android (Xiaomi 2107113SG), JVM desktop, and wasmJs browser · release builds (R8 on Android, optimized wasm) · precision bit-identical across platforms*

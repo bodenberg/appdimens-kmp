@@ -10,6 +10,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.test.runTest
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -38,12 +39,12 @@ class DimenCacheRaceTest {
                             baseValue, false, false, DimenCache.CalcType.FLUID,
                             DpQualifier.SMALL_WIDTH, Inverter.DEFAULT, false, DimenCache.ValueType.DP
                         )
-                        val result = DimenCache.getOrPut(key) { baseValue * 2f }
-                        if (result != baseValue * 2f) {
-                            val peeked = DimenCache.peek(key)
-                            if (peeked != null && peeked != baseValue * 2f) {
-                                wrongCount.fetchAndIncrement()
-                            }
+                        val expected = baseValue * 2f
+                        val result = DimenCache.getOrPut(key) { expected }
+                        // CRITICAL FIX: Any incorrect return is a bug — do not allow
+                        // transient wrong values to pass via a subsequent peek().
+                        if (result != expected) {
+                            wrongCount.fetchAndIncrement()
                         }
                     }
                 }
@@ -95,7 +96,10 @@ class DimenCacheRaceTest {
                     val idx = t % 2
                     for (i in 0 until iterations) {
                         val result = DimenCache.getOrPut(keys[idx], metrics) { values[idx] }
-                        if (result != values[0] && result != values[1]) {
+                        // CRITICAL FIX: Each thread must get its OWN value back,
+                        // not merely "one of the two valid values". Accepting the
+                        // other key's value hides linearizability violations.
+                        if (result != values[idx]) {
                             wrongCount.fetchAndIncrement()
                         }
                     }
@@ -106,6 +110,63 @@ class DimenCacheRaceTest {
         assertTrue(
             wrongCount.load() == 0,
             "Same-slot collision should never produce a value other than the two expected ones, got ${wrongCount.load()} wrong"
+        )
+    }
+
+    /**
+     * Verifies that the fastPartitionSlot fix correctly isolates two metrics snapshots.
+     * Each snapshot has its own compute function returning a distinct value; under
+     * heavy interleaving, a reader of snapshot A must never see snapshot B's result.
+     */
+    @Test
+    fun concurrentSnapshots_neverReturnValueFromAnotherSnapshot() = runTest {
+        val metricsA = DimenMetrics(
+            screenWidthDp = 300, screenHeightDp = 533,
+            smallestScreenWidthDp = 300, densityDpi = 160,
+            fontScaleBits = 1f.toRawBits(),
+            orientation = ScreenConfiguration.ORIENTATION_PORTRAIT,
+            uiMode = 0, isInMultiWindowMode = false,
+        )
+        val metricsB = DimenMetrics(
+            screenWidthDp = 600, screenHeightDp = 960,
+            smallestScreenWidthDp = 600, densityDpi = 320,
+            fontScaleBits = 1f.toRawBits(),
+            orientation = ScreenConfiguration.ORIENTATION_PORTRAIT,
+            uiMode = 0, isInMultiWindowMode = false,
+        )
+
+        val sameKey = DimenCache.buildKey(
+            42f, false, false, DimenCache.CalcType.FLUID,
+            DpQualifier.SMALL_WIDTH, Inverter.DEFAULT, false, DimenCache.ValueType.DP
+        )
+
+        val failures = AtomicInt(0)
+        val iterations = 20_000
+
+        coroutineScope {
+            (0 until 8).map { worker ->
+                async(Dispatchers.Default) {
+                    repeat(iterations) {
+                        val useA = (worker + it) % 2 == 0
+                        val metrics = if (useA) metricsA else metricsB
+                        val expected = if (useA) 111f else 999f
+
+                        val actual = DimenCache.getOrPut(sameKey, metrics) {
+                            expected
+                        }
+
+                        if (actual != expected) {
+                            failures.fetchAndIncrement()
+                        }
+                    }
+                }
+            }.awaitAll()
+        }
+
+        assertTrue(
+            failures.load() == 0,
+            "Cross-snapshot contamination: ${failures.load()} wrong values " +
+                "out of ${8 * iterations} reads"
         )
     }
 }

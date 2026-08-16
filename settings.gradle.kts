@@ -9,7 +9,6 @@ pluginManagement {
         }
         mavenCentral()
         gradlePluginPortal()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 }
 
@@ -19,10 +18,13 @@ pluginManagement {
 // settings repositories below still apply everywhere.
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
+    // EN Stable-only resolution: Compose Multiplatform 1.11.1 is published to Maven
+    //    Central, so the Compose dev repository is NOT in the resolution path.
+    // PT Resolução só com repositórios estáveis: Compose Multiplatform 1.11.1 está
+    //    no Maven Central, então o repositório dev do Compose NÃO faz parte do path.
     repositories {
         google()
         mavenCentral()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 }
 
@@ -33,6 +35,8 @@ dependencyResolutionManagement {
 //    pacote yarn a partir dele, e espaços são ilegais em nomes de pacote npm
 //    ("AppDimens KMP" → `yarn install` falha com “Name contains illegal characters”).
 rootProject.name = "appdimens-kmp"
+
+includeBuild("build-logic")
 
 include(":library")
 include(":library-auto")

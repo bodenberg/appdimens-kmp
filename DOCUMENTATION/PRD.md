@@ -1,12 +1,12 @@
 # Product Requirements Document (PRD) — AppDimens Dynamic
 
 > [!NOTE]
-> **Version:** `1.0.0` — modules: [MODULES.md](MODULES.md)
+> **Version:** `1.0.1` — modules: [MODULES.md](MODULES.md)
 > **Related:** [PDR](PDR.md) · [Mathematics](MATHEMATICS-AND-CALCULUS.md) · [API Conventions](COMPOSE-API-CONVENTIONS.md)
 
 ## 1. Executive Summary
 
-**AppDimens Dynamic** is a mathematical scaling engine for Kotlin Multiplatform (`com.appdimens.kmp`). Its purpose is to map generic UI dimensions (developed against a `300dp` or equivalent reference) to physical window parameters—scaling elegantly across phones, tablets, desktop windows, and unpredictable foldables, on Android, JVM, iOS, macOS and the web.
+**AppDimens Dynamic** is a mathematical scaling engine for Kotlin Multiplatform (`com.appdimens.kmp`). Its purpose is to map generic UI dimensions (developed against a `300dp` or equivalent reference) to physical window parameters—scaling elegantly across phones, tablets, desktop windows, and unpredictable foldables, on Android, JVM, iOS, macOS, the web (Kotlin/JS + wasmJs), Linux and Windows.
 
 It encapsulates **scaling strategies** (curves) shipped as Maven modules, alongside an autonomous **Resize/Constraint** subsystem that finds the largest fitting size via binary search.
 
@@ -38,7 +38,7 @@ mindmap
       Max Area Fits Predicate
       Zero-GC Floating Arrays
     Consumer Platforms
-      Compose Multiplatform (Android/Desktop/iOS/macOS/Web)
+      Compose Multiplatform (Android/Desktop/iOS/macOS/Web) · `code` API also on Linux/Windows native
       Non-Compose code API (AppDimensContext)
       Pure Kotlin Math Core
     Thread Safe Cache Layer
@@ -53,7 +53,7 @@ mindmap
 
 ### FR-0: Systemic Foundation & Architecture
 - **FR-0.1 (Module Separation):** Each strategy must exist as an independent computational node. `compose.percent` cannot import `compose.power`.
-- **FR-0.2 (Telemetry & Reading):** Raw dimensions must derive from the platform window configuration — on Android from `android.content.res.Configuration`, on desktop/web/iOS/macOS from the live window/viewport snapshot exposed as `ScreenConfiguration`.
+- **FR-0.2 (Telemetry & Reading):** Raw dimensions must derive from the platform window configuration — on Android from `android.content.res.Configuration`, on desktop/web/iOS/macOS from the live window/viewport snapshot exposed as `ScreenConfiguration`, and on Linux/Windows native from a `ScreenConfiguration` you build (no windowing API in the Kotlin/Native stdlib — `defaultPlatformContext()` returns `null` there).
 - **FR-0.3 (Platform Parity):** All Compose API nodes (`*DpExtensions`) must explicitly feature symmetric `code` equivalents for legacy migration.
 
 ### FR-1: Dimension Mathematics & Curves

@@ -1,7 +1,7 @@
 # Resize module (`compose.resize` / `code.resize`)
 
-**Artifact:** `io.github.bodenberg:appdimens-kmp-resize:1.0.0` (`:library-resize`)
-See [MODULES.md](MODULES.md) · [README installation](../README.md#installation-v100)
+**Artifact:** `io.github.bodenberg:appdimens-kmp-resize:1.0.1` (`:library-resize`)
+See [MODULES.md](MODULES.md) · [README installation](../README.md#installation-v101)
 
 ## What it is
 

@@ -1,7 +1,7 @@
 # Interpolated strategy (`compose.interpolated` / `code.interpolated`)
 
-**Artifact:** `io.github.bodenberg:appdimens-kmp-interpolated:1.0.0` (`:library-interpolated`)
-See [MODULES.md](MODULES.md) · [README installation](../README.md#installation-v100)
+**Artifact:** `io.github.bodenberg:appdimens-kmp-interpolated:1.0.1` (`:library-interpolated`)
+See [MODULES.md](MODULES.md) · [README installation](../README.md#installation-v101)
 
 **Same API surface as scaled** with prefixes `isdp` / `ihdp` / `iwdp` / `issp` / … — see [COMPOSE-API-CONVENTIONS.md §3](COMPOSE-API-CONVENTIONS.md#3-strategy-prefix-map-mirror-of-scaled).
 

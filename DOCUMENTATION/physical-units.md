@@ -1,6 +1,6 @@
 # Physical units (`compose` + `code.units`)
 
-**Artifact:** `io.github.bodenberg:appdimens-kmp-units:1.0.0` (`:library-units`)
+**Artifact:** `io.github.bodenberg:appdimens-kmp-units:1.0.1` (`:library-units`)
 See [MODULES.md](MODULES.md) · [README installation](../README.md)
 
 ## What it is

@@ -59,7 +59,7 @@ class DimenPerformanceTest {
     @BeforeTest
     fun setup() {
         DimenCache.isEnabled.store(true)
-        DimenCache.isInitialized.store(true)
+        DimenCache.initializedAtomic.store(true)
         DimenCache.isInitializedFast.store(true)
         for (i in 0 until batchSize) {
             DimenCache.getOrPut(batchKeysNoAr[i]) { batchValues[i] }
@@ -275,7 +275,7 @@ class DimenPerformanceTest {
     @Test
     fun benchmarkCacheLookupPerCalcType() {
         DimenCache.isEnabled.store(true)
-        DimenCache.isInitialized.store(true)
+        DimenCache.initializedAtomic.store(true)
         DimenCache.isInitializedFast.store(true)
         checksum = 0f
 

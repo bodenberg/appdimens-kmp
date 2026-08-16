@@ -2,21 +2,21 @@
 
 ## Quick Introduction
 
-You write **once** and your code automatically adapts to any device — **phone, tablet, desktop window, iOS, macOS or browser**. The library provides **14 different strategies**, each with its own “growth formula”, and the same Kotlin API runs on every platform.
+You write **once** and your code automatically adapts to any device — **phone, tablet, desktop window, iOS, macOS, browser, Linux or Windows**. The library provides **14 different strategies**, each with its own “growth formula”, and the same Kotlin API runs on every platform (Linux/Windows native expose the `code` API).
 
 ---
 
-## Installation (v1.0.0)
+## Installation (v1.0.1)
 
 ```kotlin
 // commonMain.dependencies (or the platform source set you target)
-implementation(platform("io.github.bodenberg:appdimens-kmp-bom:1.0.0"))
+implementation(platform("io.github.bodenberg:appdimens-kmp-bom:1.0.1"))
 implementation("io.github.bodenberg:appdimens-kmp")
 implementation("io.github.bodenberg:appdimens-kmp-percent")
 implementation("io.github.bodenberg:appdimens-kmp-resize")
 ```
 
-Without the BOM, pin `:1.0.0` on each coordinate. Details: [README](./README.md) · [MODULES.md](./DOCUMENTATION/MODULES.md).
+Without the BOM, pin `:1.0.1` on each coordinate. Details: [README](./README.md) · [MODULES.md](./DOCUMENTATION/MODULES.md).
 
 | Strategy in this guide | Maven module |
 |------------------------|--------------|
@@ -629,6 +629,6 @@ val padding = 16.scaledDp()
 | **Rotate / Mode / Qualifier / Screen** | One-liner conditional sizing |
 | **scaledDp / scaledSp** | Chain many rules, then `.sdp` / `.ssp` |
 | **mm / cm / inch** | Real-world units → dp on screen |
-| **Multiplatform**  | Same API on Android, desktop, iOS, macOS and web |
+| **Multiplatform**  | Same API on Android, desktop, iOS, macOS, web, Linux and Windows |
 
 When in doubt, stay on **SCALED** (`sdp` / `hdp` / `wdp`) and add these tools only when a real layout problem appears.

@@ -1,6 +1,6 @@
 # AppDimens KMP — library map
 
-**Doc base (repo root, Git ref `1.0.0`):** this repository (`appdimens-kmp`)
+**Doc base (repo root, Git ref `1.0.1`):** this repository (`appdimens-kmp`)
 
 Read this file when you need package locations, Compose↔`code` symmetry, or core types.
 
@@ -8,7 +8,7 @@ Read this file when you need package locations, Compose↔`code` symmetry, or co
 
 ---
 
-## Gradle / Maven modules (1.0.0)
+## Gradle / Maven modules (1.0.1)
 
 | Strategy | Gradle project | Maven artifact | Source roots (commonMain) |
 |---|---|---|---|
@@ -39,7 +39,10 @@ Full graph: [DOCUMENTATION/MODULES.md](../DOCUMENTATION/MODULES.md). Satellites 
 | iOS device | `iosMain` | `UIScreen` handle |
 | iOS simulator (Apple Silicon) | `iosMain` | `iosSimulatorArm64` |
 | macOS | `macosMain` | `NSScreen` handle |
+| Web / Kotlin/JS (IR) | `jsMain` | browser viewport |
 | Web / wasmJs | `wasmJsMain` | browser viewport |
+| Linux native | `linuxMain` | `code` API only — `defaultPlatformContext() = null` |
+| Windows native | `mingwMain` | `code` API only — `defaultPlatformContext() = null` |
 | Shared native | `nativeMain` | code shared between iOS and macOS |
 
 ## Package layout (packages span `:library` and `:library-*`)
@@ -82,7 +85,7 @@ Upstream sample modules only — not in the Maven artifacts. Use for pattern ref
 
 - **KMP demo (`app`)** — [app/README.md](../app/README.md)
   - Compose Multiplatform: `app/src/commonMain/kotlin/com/example/app/compose/SdpDemoScreen.kt` (interactive SDP/HDP/WDP demo, auto-resize examples) · `DemoCalcRouting.kt`
-  - Entry points: `jvmMain/kotlin/com/example/app/main.kt` (desktop) · `iosMain/kotlin/com/example/app/MainViewController.kt` · `macosMain/kotlin/com/example/app/main.kt` · `wasmJsMain/kotlin/com/example/app/main.kt` (web)
+  - Entry points: `jvmMain/kotlin/com/example/app/main.kt` (desktop) · `iosMain/kotlin/com/example/app/MainViewController.kt` · `macosMain/kotlin/com/example/app/main.kt` · `jsMain`/`wasmJsMain/kotlin/com/example/app/main.kt` (web)
 - **Android-only demo (`app-android`)** — release builds with R8 (`proguard-rules.pro`, `-optimizationpasses 10`).
 - **BenchLab (`benchlab` / `benchlab-android`)** — competitor benchmark (Dynamic vs SDPS vs Lib #2) on Android, JVM, iOS, macOS and web; `AUTO_START` flag for headless runs; results in [PERFORMANCE.md](../PERFORMANCE.md) / [PERFORMANCE-COMPARATIVE.md](../PERFORMANCE-COMPARATIVE.md).
 

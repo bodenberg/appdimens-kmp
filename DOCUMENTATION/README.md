@@ -2,11 +2,11 @@
 
 This folder goes deeper into each **scaling strategy** in [AppDimens Dynamic](../README.md): what it is, the formula, how to import it, and when to pick each mode. Each strategy’s code lives in `com.appdimens.kmp.compose.<strategy>` and `com.appdimens.kmp.code.<strategy>` with **no cross-imports** between strategies.
 
-**Modules (1.0.0):** principal `appdimens-kmp` (scaled + core/common/plain); strategy modules `appdimens-kmp-<strategy>`; BOM `appdimens-kmp-bom`. See [README — Installation](../README.md#installation-v100) · [MODULES.md](MODULES.md).
+**Modules (1.0.1):** principal `appdimens-kmp` (scaled + core/common/plain); strategy modules `appdimens-kmp-<strategy>`; BOM `appdimens-kmp-bom`. See [README — Installation](../README.md#installation-v101) · [MODULES.md](MODULES.md).
 
 ### 1.0.0 Changes (KMP port)
 
-- **Full Kotlin Multiplatform port**: same packages, API and math on Android, JVM, iOS (`iosArm64`/`iosSimulatorArm64`), macOS (`macosArm64`) and wasmJs (browser).
+- **Full Kotlin Multiplatform port**: same packages, API and math on Android, JVM, iOS (`iosArm64`/`iosSimulatorArm64`), macOS (`macosArm64`), Kotlin/JS and wasmJs (browser).
 - **Platform-neutral `AppDimensContext`**: non-Compose APIs take a window handle instead of an Android `Context`; per-platform adapters (Android `Context`, AWT window, `UIScreen`, `NSScreen`, browser viewport).
 - **Event-driven config watcher**: Android keeps the `ComponentCallbacks2` listener; desktop/web/iOS/macOS rebuild the snapshot on live window configuration (resize-aware on every platform).
 - **Specialized kernels**: Zero-branch resolution per family/qualifier (`resolveSdpPx`, `resolveSdpaPx`, etc.).
@@ -15,6 +15,16 @@ This folder goes deeper into each **scaling strategy** in [AppDimens Dynamic](..
 - **DimenMetrics eager AR**: `normalizedAspectRatio` / `logNormalizedAspectRatio` changed from `lazy` to plain `val`.
 - **R8 pre-shrink for all AARs**: all 14 Android modules ship R8-optimized bytecode (`optimization { minify = true }`).
 - **BenchLab KMP**: competitor benchmark (Dynamic vs SDPS vs Lib #2) that runs on Android, JVM, iOS, macOS and the browser.
+
+### 1.0.1 Changes (audit fixes + full target matrix)
+
+- **`fastPartition` race fixed**: the fast partition is now a single atomic `FastPartitionSlot(metrics, partition)` — before, two independent atomics could pair a snapshot partition with another window's metrics and return a wrong dimension under concurrency.
+- **Android context cache cycle fixed**: the `WeakHashMap<Context, …>` value no longer holds the key strongly (now a `WeakReference`), so Activities/Contexts are collectable.
+- **Configuration listeners disposable**: `registerConfigurationListener` returns `ConfigurationRegistration` with `dispose()`; the Android registry unregisters `ComponentCallbacks` when the last listener is removed.
+- **Strict race tests**: `DimenCacheRaceTest` requires the exact expected value per key/snapshot — no more false negatives.
+- **New targets**: classic Kotlin/JS (`js`, IR), `linuxX64`, `linuxArm64`, `mingwX64` on every module via the shared `appdimens.kmp-library` convention plugin. Linux/Windows expose the `code` API only.
+- **Encapsulated diagnostics**: `DimenCache.isInitialized` is a plain `Boolean` and `cacheStats()` returns immutable `CacheStats`; experimental atomics are `internal`.
+- **CI restored**: `verify-linux` + `verify-apple` gates; wrapper `distributionSha256Sum` pinned; Compose dev repository removed from the resolution path.
 
 **Product docs:** [PRD.md](PRD.md) · [PDR.md](PDR.md) · [MATHEMATICS-AND-CALCULUS.md](MATHEMATICS-AND-CALCULUS.md).
 
@@ -30,7 +40,7 @@ For **cache, bypass, and performance**, see also [library/PERFORMANCE.md](../lib
 
 ## Summary
 
-| Strategy | Maven artifact (1.0.0) | Document |
+| Strategy | Maven artifact (1.0.1) | Document |
 |----------|------------------------|----------|
 | **Unified math (all strategies)** | — | [MATHEMATICS-AND-CALCULUS.md](MATHEMATICS-AND-CALCULUS.md) |
 | **Module graph / packaging** | see [MODULES.md](MODULES.md) | [MODULES.md](MODULES.md) |
@@ -55,7 +65,7 @@ For **cache, bypass, and performance**, see also [library/PERFORMANCE.md](../lib
 - [PRD.md](PRD.md) · [PDR.md](PDR.md)
 
 0. [KDoc API — root index](index.md)  
-0a. [Modules — Maven/Gradle graph (1.0.0)](MODULES.md)  
+0a. [Modules — Maven/Gradle graph (1.0.1)](MODULES.md)  
 0b. [Mathematics & calculus — formal reference](MATHEMATICS-AND-CALCULUS.md)  
 1. [Compose API reference — conventions & scaled catalog](COMPOSE-API-CONVENTIONS.md)  
 2. [Scaled](scaled.md) — recommended starting point  

@@ -1,6 +1,6 @@
 # BenchLab (KMP)
 
-Competitor benchmark for **AppDimens Dynamic KMP**: measures **Dynamic 1.0.0** vs **SDPS 3.1.6** vs **Lib #2** on every supported platform with identical methodology (same composition, identical warm-up, 9 samples × 50,000 iterations, per-sample order rotation, anti-DCE checksums, chunked at 5,000 ops/frame).
+Competitor benchmark for **AppDimens Dynamic KMP**: measures **Dynamic 1.0.1** vs **SDPS 3.1.6** vs **Lib #2** on every supported platform with identical methodology (same composition, identical warm-up, 9 samples × 50,000 iterations, per-sample order rotation, anti-DCE checksums, chunked at 5,000 ops/frame).
 
 ## Targets
 

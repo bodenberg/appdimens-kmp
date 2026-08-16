@@ -1,7 +1,7 @@
 # Power strategy (`compose.power` / `code.power`)
 
-**Artifact:** `io.github.bodenberg:appdimens-kmp-power:1.0.0` (`:library-power`)
-See [MODULES.md](MODULES.md) · [README installation](../README.md#installation-v100)
+**Artifact:** `io.github.bodenberg:appdimens-kmp-power:1.0.1` (`:library-power`)
+See [MODULES.md](MODULES.md) · [README installation](../README.md#installation-v101)
 
 **Same extension / facilitator / builder shape as scaled** — replace the prefix `sdp` → `pwsdp`, `hdp` → `pwhdp`, `wdp` → `pwwdp`, `ssp` → `pwssp`, etc. Full table: [COMPOSE-API-CONVENTIONS.md §3](COMPOSE-API-CONVENTIONS.md#3-strategy-prefix-map-mirror-of-scaled).
 

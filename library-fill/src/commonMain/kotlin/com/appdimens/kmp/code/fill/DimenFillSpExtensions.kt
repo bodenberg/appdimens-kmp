@@ -28,8 +28,6 @@ package com.appdimens.kmp.code.fill
 
 import com.appdimens.kmp.core.AppDimensContext
 import com.appdimens.kmp.core.ScreenConfiguration
-import com.appdimens.kmp.core.currentScreenConfiguration
-import com.appdimens.kmp.core.localAppDimensContext
 
 import com.appdimens.kmp.common.DpQualifier
 import com.appdimens.kmp.common.Orientation

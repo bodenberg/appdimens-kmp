@@ -1,10 +1,10 @@
-# AppDimens Dynamic KMP — Gradle / Maven modules (1.0.0)
+# AppDimens Dynamic KMP — Gradle / Maven modules (1.0.1)
 
 ## Module graph
 
 ```
-app (KMP demo: Android + JVM + iOS + macOS + wasmJs)   app-android (Android-only demo)
-benchlab (KMP benchmark)                               benchlab-android (Android-only benchmark)
+app (KMP demo: Android + JVM + iOS + macOS + js + wasmJs)   app-android (Android-only demo)
+benchlab (KMP benchmark)                                     benchlab-android (Android-only benchmark)
  │
  ├── library                      → io.github.bodenberg:appdimens-kmp
  ├── library-bom                  → …:appdimens-kmp-bom
@@ -36,9 +36,12 @@ Every library module (`:library` and all satellites) compiles for:
 | **iOS device** | `iosArm64()` |
 | **iOS simulator (Apple Silicon)** | `iosSimulatorArm64()` |
 | **macOS** | `macosArm64()` |
+| **Web / Kotlin/JS (IR)** | `js(IR)` |
 | **Web / wasmJs (browser)** | `wasmJs { browser() }` |
+| **Linux native** (`code` API only) | `linuxX64()` + `linuxArm64()` |
+| **Windows native** (`code` API only) | `mingwX64()` |
 
-`commonMain` holds all strategy math, cache and Compose APIs; `androidMain` / `jvmMain` / `iosMain` / `macosMain` / `wasmJsMain` hold only the platform window-handle adapters (`expect`/`actual`). `nativeMain` shares native code between iOS and macOS.
+`commonMain` holds all strategy math, cache and Compose APIs; `androidMain` / `jvmMain` / `iosMain` / `macosMain` / `jsMain` / `wasmJsMain` / `linuxMain` / `mingwMain` hold only the platform window-handle adapters (`expect`/`actual`). `nativeMain` shares native code between iOS and macOS. On Linux/Windows the shared `appdimens.kmp-library` convention plugin sets `defaultPlatformContext() = null` (no windowing API in the Kotlin/Native stdlib) — build an `AppDimensContext` from a `ScreenConfiguration` or use the `DimenMetrics` overloads directly.
 
 ## Artifacts
 
@@ -48,18 +51,18 @@ Every library module (`:library` and all satellites) compiles for:
 | `appdimens-kmp-<strategy>` | `code.<strategy>` + `compose.<strategy>` |
 | `appdimens-kmp-bom` | Version constraints for the set above (`java-platform`) |
 
-All published coordinates share `appdimens.version` in `gradle.properties` (**1.0.0**).
+All published coordinates share `appdimens.version` in `gradle.properties` (**1.0.1**).
 
 ## Installation
 
 ```kotlin
 // commonMain.dependencies (or the platform source set you target)
-implementation(platform("io.github.bodenberg:appdimens-kmp-bom:1.0.0"))
+implementation(platform("io.github.bodenberg:appdimens-kmp-bom:1.0.1"))
 implementation("io.github.bodenberg:appdimens-kmp")
 implementation("io.github.bodenberg:appdimens-kmp-percent")
 ```
 
-Without the BOM, pin the same version on each coordinate. See [README — Installation](../README.md#installation-v100).
+Without the BOM, pin the same version on each coordinate. See [README — Installation](../README.md#installation-v101).
 
 ## Core layout
 

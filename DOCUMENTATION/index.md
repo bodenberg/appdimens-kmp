@@ -7,8 +7,8 @@ For product scope, architecture, and formal math, see also:
 | [PRD.md](PRD.md) | Product requirements (FR/NFR) |
 | [PDR.md](PDR.md) | Technical design, development plan, traceability matrix |
 | [MATHEMATICS-AND-CALCULUS.md](MATHEMATICS-AND-CALCULUS.md) | Formulas, constants, the `DimenMetrics` window snapshot + per-strategy calculation kernels |
-| [**Modules** — Maven/Gradle graph](MODULES.md) | Artifact matrix and install (`1.0.0`) |
-| [**Skill** — `appdimens-kmp-workflow`](../skills/SKILL.md) | Agent workflow for AppDimens KMP integration (Compose vs `code`, scaling vs resize, multi-platform preflight); companion [reference.md](../skills/reference.md) and [library-map.md](../skills/library-map.md) (package map, strategy → doc links at Git ref `1.0.0`) |
+| [**Modules** — Maven/Gradle graph](MODULES.md) | Artifact matrix and install (`1.0.1`) |
+| [**Skill** — `appdimens-kmp-workflow`](../skills/SKILL.md) | Agent workflow for AppDimens KMP integration (Compose vs `code`, scaling vs resize, multi-platform preflight); companion [reference.md](../skills/reference.md) and [library-map.md](../skills/library-map.md) (package map, strategy → doc links at Git ref `1.0.1`) |
 
 Narrative strategy guides and the full doc hub: [README.md](README.md).
 

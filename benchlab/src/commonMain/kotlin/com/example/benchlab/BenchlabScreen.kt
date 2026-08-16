@@ -104,7 +104,21 @@ private class BenchlabController(
     private var probeDeferred: CompletableDeferred<ComposeProbeResult>? = null
     private var legacyProbeDeferred: CompletableDeferred<Concorrente2ProbeResult>? = null
 
+    // EN True while a run is in flight. Overlapping runs (e.g. the autoStart
+    //    LaunchedEffect re-firing while the window config settles) would replace
+    //    probeDeferred mid-flight, making the earlier run wait for the full
+    //    timeout and cascade. Guarded so a second run() during an active one is
+    //    a no-op.
+    // PT Verdadeiro enquanto um run está em andamento. Runs sobrepostos (ex.: o
+    //    LaunchedEffect do autoStart re-disparando enquanto a janela ajusta)
+    //    substituiriam probeDeferred no meio do voo, fazendo o run anterior
+    //    esperar o timeout inteiro e cascatear. Com o guard, um segundo run()
+    //    durante um ativo é um no-op.
+    private var runInFlight = false
+
     fun run(onScreenConfig: ScreenConfigSnapshot) {
+        if (runInFlight) return
+        runInFlight = true
         scope.launch {
             reset()
             try {
@@ -138,6 +152,7 @@ private class BenchlabController(
                 _legacyProbeActive.value = false
                 probeDeferred = null
                 legacyProbeDeferred = null
+                runInFlight = false
             }
         }
     }
@@ -217,6 +232,27 @@ fun BenchlabScreen(
     }
 
     var exportMessage by remember { mutableStateOf<String?>(null) }
+
+    // EN Headless automation: when autoStart finishes the run, auto-export the
+    //    report exactly once (the same path as the manual “Export Report” button)
+    //    so CI / scripts get the .txt without a human click. Guarded by
+    //    [exportMessage] being still null so recompositions cannot re-export.
+    // PT Automação headless: quando o autoStart conclui o run, exporta o relatório
+    //    automaticamente uma única vez (mesmo caminho do botão “Export Report”)
+    //    para CI / scripts receberem o .txt sem clique manual.
+    LaunchedEffect(phase, result) {
+        if (autoStart && phase == BenchPhase.DONE && result != null && exportMessage == null) {
+            val saver = reportSaver
+            if (saver != null) {
+                exportMessage = try {
+                    saver(generateReport(result!!))
+                } catch (e: Exception) {
+                    benchLog("Auto-export failed: $e")
+                    "Erro ao exportar relatório"
+                }
+            }
+        }
+    }
 
     // EN New-methodology 2-way probe (chunked, main thread).
     // PT Sonda 2-vias da metodologia nova (fatiada, main thread).

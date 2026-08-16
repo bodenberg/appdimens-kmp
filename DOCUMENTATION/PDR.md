@@ -1,7 +1,7 @@
 # Project Design Document (PDR) — AppDimens Dynamic
 
 > [!NOTE]
-> **Version:** `1.0.0` — modules: [MODULES.md](MODULES.md)
+> **Version:** `1.0.1` — modules: [MODULES.md](MODULES.md)
 > **Related:** [PRD](PRD.md) · [Mathematics](MATHEMATICS-AND-CALCULUS.md) · [Performance](../library/PERFORMANCE.md) · [README](../README.md)
 
 This internal architecture document mandates the precise structural logic, technical dependencies, caching behaviors, and quality integration required by the AppDimens Dynamic library modules.
@@ -61,7 +61,7 @@ flowchart TD
 > [!IMPORTANT]
 > **Architectural Invariant:** Code/Modules defined as `compose.<strategy>` **must never** intersect or implicitly construct elements of a differing strategy module. Code routing is strict: `strategy` \(\rightarrow\) `core` \(\rightarrow\) `common`. Satellites depend **only** on the principal artifact — never on each other.
 
-### 2.0 Maven / Gradle module graph (1.0.0)
+### 2.0 Maven / Gradle module graph (1.0.1)
 
 | Gradle project | Maven coordinate | Contents |
 |---|---|---|
@@ -79,6 +79,7 @@ Strategy-specific scales (diagonal/power/log/interpolated/perimeter) are derived
 * **64-bit Payload Signature:** Keys generated using a complex boolean flag logic including parameters: `applyAspectRatio`, `baseValue(float_bits)`, `CalcType_Enum`, `DpQualifier`, and `multiWindowConstraints`. 
 * **State Bypass Architecture:** `shouldBypassCache` skips snapshot-cache writes for multiply-only / default-path types (see [library/PERFORMANCE.md](../library/PERFORMANCE.md)).
 * **Snapshot Pre-rendering:** The immutable `DimenMetrics` snapshot (size, density, font scale, orientation, ui mode, multi-window) is built once per window/configuration change; shared factors (`scale`, AR, density) and satellite strategy scales are derived from it. `ScreenFactors` is retained only for binary/source compatibility.
+* **Coherent fast partition (since 1.0.1):** the fast partition is published as **one** atomic `FastPartitionSlot(metrics, partition)` — metrics and partition are never stored through two independent atomics, so a resolution can never pair one window's snapshot with another's partition.
 
 ---
 
@@ -105,7 +106,7 @@ sequenceDiagram
 ## 4. Development Quality & Reliability Matrix
 
 ### 4.1 Release Constraints
-1. **Module Artifacting:** Each Gradle module publishes at `appdimens.version` (`1.0.0`). Coordinates: principal `appdimens-kmp`, strategy modules `appdimens-kmp-<strategy>`, BOM `appdimens-kmp-bom`. See [MODULES.md](MODULES.md).
+1. **Module Artifacting:** Each Gradle module publishes at `appdimens.version` (`1.0.1`). Coordinates: principal `appdimens-kmp`, strategy modules `appdimens-kmp-<strategy>`, BOM `appdimens-kmp-bom`. See [MODULES.md](MODULES.md).
 2. **Obfuscation Integrity:** Per-AAR ProGuard consumer rules (`consumer-rules.pro`) ensure public API parity and runtime stability; satellites keep strategy packages, principal keeps core/scaled/plain. 
 
 ### 4.2 Known Technical Risk Mapping

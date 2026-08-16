@@ -7,9 +7,9 @@
 | 1.0.x | :white_check_mark: |
 | < 1.0 | :x: |
 
-Security fixes for **1.0.0+** apply to the full published set (`appdimens-kmp`, strategy modules, and `appdimens-kmp-bom`) at the shared version line.
+Security fixes for **1.0.x** apply to the full published set (`appdimens-kmp`, strategy modules, and `appdimens-kmp-bom`) at the shared version line.
 
-> **Note:** the Android-only predecessor (`appdimens-kmp` 3.x, Android-only packaging) is superseded by the Kotlin Multiplatform **1.0.0** line, which carries the same math, cache and R8 contract forward. 3.x is no longer actively patched — migrate to 1.0.0 (same packages and imports).
+> **Note:** the Android-only predecessor (`appdimens-kmp` 3.x, Android-only packaging) is superseded by the Kotlin Multiplatform **1.0.x** line, which carries the same math, cache and R8 contract forward. 3.x is no longer actively patched — migrate to 1.0.1 (same packages and imports).
 
 ## Reporting a Vulnerability
 

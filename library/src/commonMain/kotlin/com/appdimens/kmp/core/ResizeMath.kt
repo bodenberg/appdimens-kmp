@@ -8,8 +8,6 @@ package com.appdimens.kmp.core
 
 import com.appdimens.kmp.core.AppDimensContext
 import com.appdimens.kmp.core.ScreenConfiguration
-import com.appdimens.kmp.core.currentScreenConfiguration
-import com.appdimens.kmp.core.localAppDimensContext
 
 import kotlin.math.max
 import kotlin.math.min

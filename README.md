@@ -1,10 +1,10 @@
 # AppDimens Dynamic — KMP
 
-## Responsive `dp` / `sp` for **Android · Desktop (JVM) · iOS · macOS · Web (wasmJs)** — Jetpack Compose Multiplatform and Kotlin APIs
+## Responsive `dp` / `sp` for **Android · Desktop (JVM) · iOS · macOS · Web (JS + Wasm) · Linux · Windows** — Jetpack Compose Multiplatform and Kotlin APIs
 
 <p align="center">
   <a href="https://github.com/bodenberg/appdimens-kmp/releases" title="Releases">
-    <img src="https://img.shields.io/badge/version-1.0.0-blue.svg" alt="Version 1.0.0">
+    <img src="https://img.shields.io/badge/version-1.0.1-blue.svg" alt="Version 1.0.1">
   </a>
   &nbsp;
   <a href="LICENSE" title="Apache License 2.0">
@@ -15,7 +15,7 @@
     <img src="https://img.shields.io/badge/KMP-Kotlin%20Multiplatform-7F52FF.svg?logo=kotlin&logoColor=white" alt="Kotlin Multiplatform">
   </a>
   &nbsp;
-  <img src="https://img.shields.io/badge/Android%20%7C%20JVM%20%7C%20iOS%20%7C%20macOS%20%7C%20Web-3DDC84.svg?logo=android&logoColor=white" alt="Platforms">
+  <img src="https://img.shields.io/badge/Android%20%7C%20JVM%20%7C%20iOS%20%7C%20macOS%20%7C%20Web%20%7C%20Linux%20%7C%20Windows-3DDC84.svg?logo=android&logoColor=white" alt="Platforms">
   &nbsp;
   <img src="https://img.shields.io/badge/Kotlin-2.x-7F52FF.svg?logo=kotlin&logoColor=white" alt="Kotlin">
   &nbsp;
@@ -58,39 +58,48 @@
 
 ![AppDimens Banner](IMAGES/banner_top.png)
 
-Write values like `16.sdp` and the library scales them from the current window **Configuration** (size, density, optional flags) — on **every platform**: Android, JVM desktop, iOS, macOS and the browser (WebAssembly).
+Write values like `16.sdp` and the library scales them from the current window **Configuration** (size, density, optional flags) — on **every platform**: Android, JVM desktop, iOS, macOS, the browser (Kotlin/JS + WebAssembly), **Linux** and **Windows**.
 
 **New here?** Use **Quick start** below, then [**GUIDE-FOR-BEGINNERS**](./GUIDE-FOR-BEGINNERS) for every strategy in plain language.
 
-**Documentation:** [DOCUMENTATION/README.md](DOCUMENTATION/README.md) · [DOCUMENTATION/MODULES.md](DOCUMENTATION/MODULES.md) · [PRD](DOCUMENTATION/PRD.md) · [PDR](DOCUMENTATION/PDR.md) · [Mathematics](DOCUMENTATION/MATHEMATICS-AND-CALCULUS.md)
+**Documentation:** [DOCUMENTATION/README.md](DOCUMENTATION/README.md) · [DOCUMENTATION/MODULES.md](DOCUMENTATION/MODULES.md) · [PRD](DOCUMENTATION/PRD.md) · [PDR](DOCUMENTATION/PDR.md) · [Mathematics](DOCUMENTATION/MATHEMATICS-AND-CALCULUS.md) · [Changelog](CHANGELOG.md)
 
 ---
 
-## Supported platforms (1.0.0)
+## Supported platforms (1.0.1)
 
-| Target | Notes |
-|--------|-------|
-| **Android** (min SDK 24) | Full Jetpack Compose integration, `Context`-wrapping window handle, foldables via `androidx.window`, event-driven config watcher (`ComponentCallbacks2`) |
-| **JVM desktop** | Compose Desktop (AWT window) — live window configuration, resize-aware |
-| **iOS** (`iosArm64`, `iosSimulatorArm64`) | Compose iOS (`UIScreen`-derived window handle) |
-| **macOS** (`macosArm64`) | Compose native macOS (`NSScreen`-derived window handle) |
-| **Web / wasmJs** | Compose for Web (browser) — live viewport size and density |
+| Target | Compose API | `code` API | Notes |
+|--------|:---:|:---:|-------|
+| **Android** (min SDK 24) | ✅ | ✅ | Full Jetpack Compose integration, `Context`-wrapping window handle, foldables via `androidx.window`, event-driven config watcher (`ComponentCallbacks2`) |
+| **JVM desktop** | ✅ | ✅ | Compose Desktop (AWT window) — live window configuration, resize-aware |
+| **iOS** (`iosArm64`, `iosSimulatorArm64`) | ✅ | ✅ | Compose iOS (`UIScreen`-derived window handle) |
+| **macOS** (`macosArm64`) | ✅ | ✅ | Compose native macOS (`NSScreen`-derived window handle) |
+| **Web / Kotlin/JS** (`js`, IR) | ✅ | ✅ | Compose for Web (browser) — live viewport size and density |
+| **Web / wasmJs** | ✅ | ✅ | Compose for Web (browser) — live viewport size and density |
+| **Linux** (`linuxX64`, `linuxArm64`) | — | ✅ | Native Kotlin — `code` API only. No windowing API in the Kotlin/Native stdlib, so `defaultPlatformContext()` returns `null` (build an `AppDimensContext` from a `ScreenConfiguration` or use the `DimenMetrics` overloads). Compose Multiplatform does not publish `ui`/`foundation` for Linux native |
+| **Windows** (`mingwX64`) | — | ✅ | Native Kotlin — `code` API only (same `defaultPlatformContext() = null` contract as Linux; no Win32 bindings in the stdlib, no Compose `ui` artifacts for MinGW) |
+
+> **Intel Apple (`iosX64` / `macosX64`), tvOS and watchOS are not in the matrix**: Compose
+> Multiplatform 1.11 publishes no `ui`/`foundation` artifacts for those targets, so the
+> Compose layer cannot compile there (and the code API alone would fragment the
+> per-platform handle contract). The supported Apple targets are exactly the ones the
+> ecosystem publishes.
 
 Every platform shares the **same Kotlin API**, the same **cache** and the same **math kernels**. The `code` (non-Compose) APIs take a platform-neutral **`AppDimensContext`** window handle; on Android it wraps the platform `Context` (auto-cached per raw Context).
 
-**This is a faithful Kotlin Multiplatform port of the Android library** (`appdimens-kmp`): same packages, same extension names, same formulas, same bit-identical precision — plus the desktop, iOS, macOS and web targets.
+**This is a faithful Kotlin Multiplatform port of the Android library** (`appdimens-kmp`): same packages, same extension names, same formulas, same bit-identical precision — plus the desktop, iOS, macOS, web, Linux and Windows targets.
 
 ---
 
-## Installation (v1.0.0)
+## Installation (v1.0.1)
 
-**1.0.0** keeps the modular packaging: the library ships as a **principal** artifact (`common` + `core` + **scaled** + **plain**) plus optional strategy modules. Kotlin packages and imports are unchanged.
+**1.0.1** keeps the modular packaging: the library ships as a **principal** artifact (`common` + `core` + **scaled** + **plain**) plus optional strategy modules. Kotlin packages and imports are unchanged.
 
 ### With BOM (common to all platforms)
 
 ```kotlin
 // commonMain.dependencies (or the platform source set you target)
-implementation(platform("io.github.bodenberg:appdimens-kmp-bom:1.0.0"))
+implementation(platform("io.github.bodenberg:appdimens-kmp-bom:1.0.1"))
 
 implementation("io.github.bodenberg:appdimens-kmp")
 
@@ -114,7 +123,7 @@ implementation("io.github.bodenberg:appdimens-kmp-units")
 If you import `com.appdimens.kmp.compose.<strategy>` (or `code.<strategy>`) without adding the matching artifact, the Gradle check `checkAppDimensModules` fails with a line such as:
 
 ```text
-Missing AppDimens module for import …percent… — add: implementation("io.github.bodenberg:appdimens-kmp-percent:1.0.0")
+Missing AppDimens module for import …percent… — add: implementation("io.github.bodenberg:appdimens-kmp-percent:1.0.1")
 ```
 
 Runtime helper: `com.appdimens.kmp.core.MissingModule` (package → Maven coordinate). Version comes from the `appdimens.version` Gradle property.
@@ -122,9 +131,9 @@ Runtime helper: `com.appdimens.kmp.core.MissingModule` (package → Maven coordi
 ### Without BOM
 
 ```kotlin
-implementation("io.github.bodenberg:appdimens-kmp:1.0.0")
-implementation("io.github.bodenberg:appdimens-kmp-percent:1.0.0")
-// same satellites as above, each with :1.0.0
+implementation("io.github.bodenberg:appdimens-kmp:1.0.1")
+implementation("io.github.bodenberg:appdimens-kmp-percent:1.0.1")
+// same satellites as above, each with :1.0.1
 ```
 
 ### Artifact matrix
@@ -156,7 +165,7 @@ Box(
 }
 ```
 
-This exact code runs unchanged on **Android, desktop, iOS, macOS and the browser** — the extensions read the live per-window configuration automatically.
+This exact code runs unchanged on **Android, desktop, iOS, macOS and the browser (JS + Wasm)** — the extensions read the live per-window configuration automatically.
 
 | Extension | Based on | Typical use |
 |-----------|----------|-------------|
@@ -186,7 +195,7 @@ setContent {
 }
 ```
 
-`AppDimensProvider` works on **all platforms**. Outside Android (desktop, web, iOS, macOS) it builds the window context from the **live window configuration**, so a resize or rotation creates a new snapshot and every resolution self-heals — the same guarantee the Android `Context` provides natively.
+`AppDimensProvider` works on **all Compose-capable platforms**. Outside Android (desktop, web, iOS, macOS) it builds the window context from the **live window configuration**, so a resize or rotation creates a new snapshot and every resolution self-heals — the same guarantee the Android `Context` provides natively. (Linux/Windows native expose the `code` API only.)
 
 ### `DimenCache.invalidateOnConfigChange`
 
@@ -313,7 +322,7 @@ val fontPx = DimenSsp.ssp(appContext, 16)
 // 16.ssp(appContext), DimenSdp.scaled(16).screen(...).sdp(appContext), sdpRotate, …
 ```
 
-The same `code` APIs run on **JVM desktop, iOS, macOS and wasmJs** — on those platforms `localAppDimensContext()` resolves the live window/screen handle (AWT window, `UIScreen`, `NSScreen`, browser viewport).
+The same `code` APIs run on **every target** — JVM desktop, iOS, macOS, js/wasmJs, Linux and Windows. On Compose-capable platforms `localAppDimensContext()` resolves the live window/screen handle (AWT window, `UIScreen`, `NSScreen`, browser viewport); on Linux/Windows native build your own `AppDimensContext` from a `ScreenConfiguration` (or use the `DimenMetrics` overloads directly).
 
 ---
 
@@ -340,7 +349,7 @@ Other strategies (**percent**, **power**, **fluid**, **auto**, **diagonal**, **f
 | Resource | Use for |
 |----------|---------|
 | [DOCUMENTATION/README.md](DOCUMENTATION/README.md) | Per-strategy explanations |
-| [DOCUMENTATION/MODULES.md](DOCUMENTATION/MODULES.md) | Gradle/Maven module graph (1.0.0) |
+| [DOCUMENTATION/MODULES.md](DOCUMENTATION/MODULES.md) | Gradle/Maven module graph (1.0.1) |
 | [COMPOSE-API-CONVENTIONS.md](DOCUMENTATION/COMPOSE-API-CONVENTIONS.md) | Every Compose property & facilitator (scaled catalog + prefix map) |
 | [DOCUMENTATION/index.md](DOCUMENTATION/index.md) | Package index |
 
@@ -368,12 +377,12 @@ Other strategies (**percent**, **power**, **fluid**, **auto**, **diagonal**, **f
 
 ---
 
-## Highlights (1.0.0)
+## Highlights (1.0.1)
 
 - Code-only scaling (no XML dimen grids) · **SDP / HDP / WDP** + **14** scaling modes  \
 - **Aspect ratio** & **multi-window** flags · **Inverters** & **facilitators** · **Foldable** awareness on Android via WindowManager  \
 - **Physical units** · **Resize** helpers · **DimenScaled** chains  \
-- **Kotlin Multiplatform**: identical API and math on Android, JVM, iOS, macOS and wasmJs  \
+- **Kotlin Multiplatform**: identical API and math on Android, JVM, iOS, macOS, js/wasmJs, Linux and Windows  \
 - **Fast lane on every platform**: Compose reads one CompositionLocal + one multiply; `code` reads one volatile slot + identity compare + two multiplies  \
 - **Resize-aware on every platform**: desktop/web/iOS/macOS providers rebuild the snapshot from the live window configuration  \
 - **AARs pre-shrunk with R8** at build time (all 14 modules) — consumers get optimized bytecode even in debug  \
@@ -382,7 +391,7 @@ Other strategies (**percent**, **power**, **fluid**, **auto**, **diagonal**, **f
 
 | Change | Description |
 |--------|-------------|
-| **Full KMP port** | Same packages/API/math as the Android original, compiled for Android, JVM, iOS (`iosArm64`/`iosSimulatorArm64`), macOS (`macosArm64`) and wasmJs (browser). |
+| **Full KMP port** | Same packages/API/math as the Android original, compiled for Android, JVM, iOS (`iosArm64`/`iosSimulatorArm64`), macOS (`macosArm64`), Kotlin/JS, wasmJs (browser), Linux (`linuxX64`/`linuxArm64`, `code` API) and Windows (`mingwX64`, `code` API). |
 | **Platform-neutral `AppDimensContext`** | Non-Compose APIs take a window handle instead of an Android `Context`; per-platform adapters (Android `Context`, AWT window, `UIScreen`, `NSScreen`, browser viewport). |
 | **Event-driven config watcher** | Android keeps the `ComponentCallbacks2` listener; desktop/web/iOS/macOS rebuild the snapshot on live window configuration. |
 | **Specialized kernels** | `resolveSdpPx`, `resolveSdpDp`, `resolveSdpaPx`, `resolveSdpaDp`, `resolveHdpPx`, `resolveHdpDp`, `resolveWdpPx`, `resolveWdpDp` — one kernel per family/qualifier, zero branches, volatile load + identity compare + legacy multiply order. |
@@ -392,6 +401,19 @@ Other strategies (**percent**, **power**, **fluid**, **auto**, **diagonal**, **f
 | **R8 pre-shrink for all AARs** | All 14 library modules ship R8-optimized bytecode (`optimization { minify = true }` + `-optimizationpasses 10` + `-allowaccessmodification`), mirroring the Android release builds. |
 | **BenchLab KMP** | Competitor benchmark (Dynamic vs SDPS vs Lib #2) that runs on Android, JVM, iOS, macOS and the browser. |
 
+### What's New in 1.0.1 (audit fixes + full target matrix)
+
+| Change | Description |
+|--------|-------------|
+| **`fastPartition` race fixed** | The fast partition was two independent atomics (`fastPartition` + `fastPartitionMetrics`); an interleaving could pair a snapshot partition with another window's metrics and return a wrong dimension under concurrency. Now a single atomic `FastPartitionSlot(metrics, partition)` publishes both as one coherent state. |
+| **Android context cache cycle fixed** | `WeakHashMap<Context, AndroidAppDimensContext>` was neutralized because the value held the key strongly. The value is now a `WeakReference`, so Activities/Contexts are collectable again. |
+| **Configuration listeners now disposable** | `registerConfigurationListener` returns a `ConfigurationRegistration` with `dispose()`; the Android registry unregisters `ComponentCallbacks` and drops per-app listener sets when the last listener is removed — no more accumulator of live contexts. |
+| **Strict race tests** | `DimenCacheRaceTest` now requires the exact expected value per key/snapshot (no longer accepts “any valid value”); a wrong transient read is counted even if a later peek was correct. |
+| **Full KMP target matrix** | Added classic **Kotlin/JS** (`js`, IR), **Linux** (`linuxX64` + `linuxArm64`) and **Windows** (`mingwX64`) targets; every module is built from a shared `appdimens.kmp-library` convention plugin. |
+| **Encapsulated diagnostics API** | `DimenCache.isInitialized` is now a plain `Boolean` and `cacheStats()` returns an immutable `CacheStats` — the experimental atomics are `internal`, keeping the public ABI clean. |
+| **Restored CI** | `verify-linux` (Linux + JVM + JS + wasm tests) and `verify-apple` (macOS runner compiling `iosSimulatorArm64` / `macosArm64`) re-added as release gates. |
+| **Distribution hardening** | `distributionSha256Sum` pinned in the Gradle wrapper; the Compose dev repository was removed from `settings.gradle.kts`; LICENSE (Apache-2.0) and signed Maven publishing with sources are configured. |
+
 ---
 
-*Apache License 2.0 — responsive layout utilities for Kotlin Multiplatform (Android · JVM · iOS · macOS · Web).*
+*Apache License 2.0 — responsive layout utilities for Kotlin Multiplatform (Android · JVM · iOS · macOS · Web · Linux · Windows).*

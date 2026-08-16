@@ -33,6 +33,8 @@ internal class SynchronizedIdentityMap<K : Any, V : Any>(
     }
 
     override fun containsKey(key: K): Boolean = map.containsKey(key)
+
+    override fun remove(key: K): Boolean = map.remove(key) != null
 }
 
 @PublishedApi

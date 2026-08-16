@@ -112,7 +112,19 @@ object DimenCache {
      */
     @PublishedApi
     internal val isInitializedFast = AtomicBoolean(false)
-    val isInitialized = AtomicBoolean(false)
+
+    /**
+     * EN Internal atomic backing the public [isInitialized] flag. Kept `internal` so
+     *    the experimental atomic type never leaks into the public ABI while tests in
+     *    this module can still manipulate it directly.
+     * PT Atomic interno que sustenta a flag pública [isInitialized]. Mantido `internal`
+     *    para que o tipo atômico experimental nunca vaze para o ABI público.
+     */
+    internal val initializedAtomic = AtomicBoolean(false)
+
+    /** EN True once [init] has run for the first time. PT Verdadeiro após o primeiro [init]. */
+    val isInitialized: Boolean
+        get() = initializedAtomic.load()
 
     /**
      * EN Calculation types based on the library's package structure.
@@ -147,9 +159,12 @@ object DimenCache {
     @PublishedApi
     internal val diagnosticsEnabled = AtomicBoolean(false)
 
-    val hitCount      = AtomicLong(0L)
-    val missCount     = AtomicLong(0L)
-    val evictionCount = AtomicLong(0L)
+    @PublishedApi
+    internal val hitCount      = AtomicLong(0L)
+    @PublishedApi
+    internal val missCount     = AtomicLong(0L)
+    @PublishedApi
+    internal val evictionCount = AtomicLong(0L)
 
     /**
      * EN Master switch for the cache system. If disabled, all calls will recompute.
@@ -355,21 +370,43 @@ object DimenCache {
 
     /**
      * Weak so a test/isolated context does not leak; the real window lives for the process.
+     * The value is a [ConfigurationRegistration] so we can dispose it if needed.
      */
-    private val watchedContexts = weakIdentityMap<AppDimensContext, Boolean>()
+    private val watchedContexts = weakIdentityMap<AppDimensContext, ConfigurationRegistration>()
     private val watchedContextsLock = SynchronizedObject()
 
     /**
      * EN Registers the platform window listener exactly once per [AppDimensContext]
-     * instance. Called only from [metricsFor] / [init] — never from the hot lane.
-     * PT Registra o listener de janela uma única vez por instância de [AppDimensContext].
+     * instance and stores the [ConfigurationRegistration] so it can be disposed.
+     * Called only from [metricsFor] / [init] — never from the hot lane.
+     * PT Registra o listener de janela uma única vez por instância de [AppDimensContext]
+     * e armazena a [ConfigurationRegistration] para descarte quando necessário.
      */
     private fun ensureConfigWatcher(context: AppDimensContext) {
         locked(watchedContextsLock) {
-            if (watchedContexts[context] != true) {
-                watchedContexts[context] = true
-                context.registerConfigurationListener { onContextConfigChanged(context) }
+            if (watchedContexts[context] == null) {
+                // CRITICAL FIX: The listener is registered via the platform (e.g. Android
+                // ComponentCallbacks2), and the registration is stored weakly. When the
+                // context is collected by GC, the weak entry is removed. We also store
+                // the registration so callers can explicitly dispose if needed.
+                val registration = context.registerConfigurationListener {
+                    onContextConfigChanged(context)
+                }
+                watchedContexts[context] = registration
             }
+        }
+    }
+
+    /**
+     * EN Disposes the config watcher for [context], releasing the strong reference
+     *    chain that could otherwise keep an Activity/Context alive.
+     * PT Descarta o watcher de configuração para [context], liberando a cadeia de
+     *    referências fortes que poderia manter uma Activity/Context viva.
+     */
+    fun disposeConfigWatcher(context: AppDimensContext) {
+        locked<Unit>(watchedContextsLock) {
+            watchedContexts[context]?.dispose()
+            watchedContexts.remove(context)
         }
     }
 
@@ -435,14 +472,29 @@ object DimenCache {
     // against one immutable snapshot for thousands of calls; the map hash+equals of
     // DimenMetrics would otherwise run on every cache hit. Multi-window apps simply
     // re-sync this pair each time the active window alternates (correct, and rare).
+    //
+    // CRITICAL FIX: metrics + partition must be published as ONE atomic slot.
+    // The previous design used two independent AtomicReference fields, which allowed
+    // Thread B to store its partition before Thread A stored its metrics, producing
+    // an incoherent pair (partition_B + metrics_A). A third reader could then look
+    // up metrics_A, hit the identity match, and read partition_B — returning a
+    // result belonging to a different window/snapshot.
     @PublishedApi
-    internal val fastPartitionMetrics = AtomicReference<DimenMetrics>(DimenMetrics.DEFAULT)
+    internal class FastPartitionSlot(
+        val metrics: DimenMetrics,
+        val partition: SnapshotCache,
+    )
 
     @PublishedApi
     internal val EMPTY_PARTITION = SnapshotCache(0)
 
     @PublishedApi
-    internal val fastPartition = AtomicReference<SnapshotCache>(EMPTY_PARTITION)
+    internal val EMPTY_FAST_PARTITION_SLOT =
+        FastPartitionSlot(DimenMetrics.DEFAULT, EMPTY_PARTITION)
+
+    @PublishedApi
+    internal val fastPartitionSlot =
+        AtomicReference<FastPartitionSlot>(EMPTY_FAST_PARTITION_SLOT)
 
     @PublishedApi
     internal fun cacheFor(metrics: DimenMetrics): SnapshotCache = locked(snapshotCacheLock) {
@@ -498,12 +550,16 @@ object DimenCache {
             return withMetrics(metrics) { compute() }
         }
 
-        var partition = fastPartition.load()
-        if (partition === EMPTY_PARTITION || fastPartitionMetrics.load() !== metrics) {
-            partition = cacheFor(metrics)
-            fastPartition.store(partition)
-            fastPartitionMetrics.store(metrics)
+        var partitionSlot = fastPartitionSlot.load()
+        if (partitionSlot.partition === EMPTY_PARTITION || partitionSlot.metrics !== metrics) {
+            val partition = cacheFor(metrics)
+            // Publish metrics + partition as ONE coherent state.
+            // This eliminates the impossible state partition(B) + metrics(A)
+            // that was possible with two independent atomics.
+            partitionSlot = FastPartitionSlot(metrics, partition)
+            fastPartitionSlot.store(partitionSlot)
         }
+        val partition = partitionSlot.partition
         val slot = slotFor(key)
         val existing = partition.entries.loadAt(slot)
         if (existing.valueBits != EMPTY_ENTRY.valueBits && existing.key == key) {
@@ -852,7 +908,7 @@ object DimenCache {
             updateFactors(config)
             lastConfiguration = ConfigSnapshot.from(config)
             isInitializedFast.store(true)
-            isInitialized.store(true)
+            initializedAtomic.store(true)
         } finally {
             isInitializing.store(false)
         }
@@ -1143,8 +1199,7 @@ object DimenCache {
         // an in-flight resolver may finish on an old partition, but it can never publish
         // into the new cache after the clear.
         locked(snapshotCacheLock) { snapshotCaches.clear() }
-        fastPartition.store(EMPTY_PARTITION)
-        fastPartitionMetrics.store(DimenMetrics.DEFAULT)
+        fastPartitionSlot.store(EMPTY_FAST_PARTITION_SLOT)
         fastWindowSlot.store(EMPTY_FAST_WINDOW_SLOT)
         fastMwSlot.store(EMPTY_MW_SLOT)
         notifyResetListeners()

@@ -1,10 +1,14 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
+/**
+ * AppDimens KMP — core library (scaled strategy + shared snapshot-partitioned cache).
+ *
+ * The KMP target matrix and source-set hierarchy (composeMain/webMain/composeTest)
+ * come from the `appdimens.kmp-library` convention plugin; this file only adds what
+ * is specific to the core: Android namespace + R8 consumer contract, the extra
+ * androidx-window dependency (foldables), the coroutines-test dependency and the
+ * Maven Central publishing coordinates.
+ */
 plugins {
-    alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.compose.multiplatform)
-    alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.android.kmp.library)
+    id("appdimens.kmp-library")
     // EN Same publishing plugin as the Android original (appdimens-dynamic).
     // PT Mesmo plugin de publicação do Android original (appdimens-dynamic).
     alias(libs.plugins.vanniktech.maven.publish)
@@ -13,9 +17,6 @@ plugins {
 kotlin {
     android {
         namespace = "com.appdimens.kmp"
-        compileSdk = 37
-        minSdk = 24
-        withHostTest {}
         // EN Ship the same R8 consumer contract as the Android original: keep the public
         //    API names (code/compose/common), the cache-key enum members, kotlin.Metadata,
         //    the ResizeBound sealed hierarchy and the ScreenFactors padding fields — see
@@ -39,54 +40,12 @@ kotlin {
         }
     }
 
-    jvm {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
-        }
-    }
-
-    iosArm64()
-    iosSimulatorArm64()
-    macosArm64()
-
-    @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
-    wasmJs {
-        // EN Compose-based tests need a browser environment (skiko.wasm cannot be
-        //    loaded from plain Node), so library tests run via the browser test task.
-        // PT Testes baseados em Compose precisam de ambiente de navegador (skiko.wasm
-        //    não carrega em Node puro), então os testes da biblioteca rodam via browser.
-        browser()
-    }
-
     sourceSets {
-        commonMain.dependencies {
-            implementation(libs.compose.runtime)
-            implementation(libs.compose.ui)
-            implementation(libs.compose.foundation)
-            implementation(libs.kotlinx.coroutines.core)
-            implementation(libs.kotlinx.atomicfu)
+        androidMain.dependencies {
+            implementation(libs.androidx.window)
         }
         commonTest.dependencies {
-            implementation(kotlin("test"))
             implementation(libs.kotlinx.coroutines.test)
-            implementation(libs.kotlinx.coroutines.core)
-        }
-        androidMain.dependencies {
-            implementation(libs.androidx.annotation)
-            implementation(libs.androidx.window)
-            implementation(libs.kotlinx.coroutines.core)
-        }
-        jvmMain.dependencies {
-            implementation(libs.kotlinx.coroutines.core)
-        }
-        iosMain.dependencies {
-            implementation(libs.kotlinx.coroutines.core)
-        }
-        nativeMain.dependencies {
-            implementation(libs.kotlinx.coroutines.core)
-        }
-        wasmJsMain.dependencies {
-            implementation(libs.kotlinx.browser)
             implementation(libs.kotlinx.coroutines.core)
         }
     }
@@ -108,14 +67,17 @@ kotlin {
 //    foi desligado em junho/2025. Credenciais vêm de ~/.gradle/gradle.properties
 //    (nunca commitadas).
 val libraryVersion: String =
-    providers.gradleProperty("appdimens.version").orElse("1.0.0").get()
+    providers.gradleProperty("appdimens.version").orElse("1.0.1").get()
 
 mavenPublishing {
     coordinates("io.github.bodenberg", "appdimens-kmp", libraryVersion)
 
     pom {
         name.set("AppDimens KMP — Core + Scaled")
-        description.set("AppDimens KMP core: shared snapshot-partitioned cache and plumbing plus the default scaled strategy (sdp/hdp/wdp/ssp). Kotlin Multiplatform — Android, JVM, iOS, macOS and Web.")
+        description.set(
+            "AppDimens KMP core: shared snapshot-partitioned cache and plumbing plus the default scaled strategy (sdp/hdp/wdp/ssp). " +
+                "Kotlin Multiplatform — Android, JVM, iOS, macOS, Web (JS + Wasm), Linux and Windows."
+        )
         url.set("https://github.com/bodenberg/appdimens-kmp")
 
         licenses {

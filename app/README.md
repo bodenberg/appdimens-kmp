@@ -9,6 +9,7 @@ Sample application demonstrating **AppDimens Dynamic KMP** on every supported pl
 | **JVM desktop** | `jvmMain/kotlin/com/example/app/main.kt` (`application { mainClass = … }`) |
 | **iOS** | `iosMain/kotlin/com/example/app/MainViewController.kt` (`MainViewController()` exported to the framework) |
 | **macOS** | `macosMain/kotlin/com/example/app/main.kt` (native `Window` + NSApplication run loop) |
+| **Web / Kotlin/JS** | `jsMain/kotlin/com/example/app/main.kt` (browser) |
 | **Web / wasmJs** | `wasmJsMain/kotlin/com/example/app/main.kt` (browser) |
 | **Android** | see the `app-android` module (Android-only variant) |
 

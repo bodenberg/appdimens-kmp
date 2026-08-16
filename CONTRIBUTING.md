@@ -1,6 +1,6 @@
 # Contributing to AppDimens (DYNAMIC KMP)
 
-First off, thank you for considering contributing to AppDimens! It’s contributions like yours that make the developer experience better for everyone handling **screen fragmentation across Android, desktop, iOS, macOS and the web**.
+First off, thank you for considering contributing to AppDimens! It’s contributions like yours that make the developer experience better for everyone handling **screen fragmentation across Android, desktop (JVM), iOS, macOS, web (Kotlin/JS + wasmJs), Linux and Windows**.
 
 ## How Can I Contribute?
 
@@ -10,7 +10,7 @@ If you find a calculation error, a rendering glitch, or a crash:
 
 * Check the [Issues](https://www.google.com/search?q=https://github.com/bodenberg/appdimens-sdps/issues) page to see if it has already been reported.
 * If not, open a new issue. Please include:
-  * The device model / screen density (DPI) **and platform** (Android, JVM, iOS, macOS, Web) where the issue occurred.
+  * The device model / screen density (DPI) **and platform** (Android, JVM, iOS, macOS, Web, Linux, Windows) where the issue occurred.
   * A brief code snippet or layout showing how the library was used.
   * The expected vs. actual result.
 

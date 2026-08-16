@@ -1,8 +1,8 @@
 # AppDimens KMP — library map (concise)
 
-**Modules (1.0.0):** [DOCUMENTATION/MODULES.md](../DOCUMENTATION/MODULES.md)
+**Modules (1.0.1):** [DOCUMENTATION/MODULES.md](../DOCUMENTATION/MODULES.md)
 
-**Doc base (repo root, Git ref `1.0.0`):** this repository (`appdimens-kmp`)
+**Doc base (repo root, Git ref `1.0.1`):** this repository (`appdimens-kmp`)
 
 This file supplements [SKILL.md](SKILL.md). Read it when you need **package locations**, **symmetry between Compose and `code`**, or **core types**.
 
@@ -15,7 +15,7 @@ Full Gradle/Maven matrix: [MODULES.md](../DOCUMENTATION/MODULES.md) · [library-
 - **`com.appdimens.kmp.compose.<strategy>`** / **`code.<strategy>`** — sources under `library/` (scaled + plain) or `library-<strategy>/`. Scaled's Compose package is top-level `compose` (files under `compose/scaled/`); its `code` package is top-level `code` (files under `code/scaled/`).
 - **`compose.resize` / `code.resize`** — constraint resize (not `calculateRawScaling`).
 
-Platform window-handle adapters (per `AppDimensContext`): `androidMain` wraps `android.content.Context` (auto-cached per raw Context); `jvmMain` wraps the AWT window; `iosMain` wraps `UIScreen`; `macosMain` wraps `NSScreen`; `wasmJsMain` wraps the browser viewport. Shared native code lives in `nativeMain`.
+Platform window-handle adapters (per `AppDimensContext`): `androidMain` wraps `android.content.Context` (auto-cached per raw Context); `jvmMain` wraps the AWT window; `iosMain` wraps `UIScreen`; `macosMain` wraps `NSScreen`; `jsMain`/`wasmJsMain` wrap the browser viewport; `linuxMain`/`mingwMain` have no windowing API (`defaultPlatformContext() = null` — build an `AppDimensContext` from a `ScreenConfiguration` or use the `DimenMetrics` overloads). Shared native code lives in `nativeMain`.
 
 Build hint for missing satellites: `MissingModule` (`com.appdimens.kmp.core`) + the `checkAppDimensModules` Gradle check.
 
@@ -44,7 +44,7 @@ Build hint for missing satellites: `MissingModule` (`com.appdimens.kmp.core`) + 
 
 Upstream sample modules only (not shipped inside `io.github.bodenberg:appdimens-kmp`); use for pattern reference:
 
-- **KMP demo (`app`)** — [`app/README.md`](../app/README.md). Compose Multiplatform sample: `app/src/commonMain/kotlin/com/example/app/compose/SdpDemoScreen.kt` (interactive SDP/HDP/WDP demo + auto-resize) and `DemoCalcRouting.kt`. Entry points per platform: `jvmMain/main.kt` (desktop), `iosMain/MainViewController.kt`, `macosMain/main.kt`, `wasmJsMain/main.kt`.
+- **KMP demo (`app`)** — [`app/README.md`](../app/README.md). Compose Multiplatform sample: `app/src/commonMain/kotlin/com/example/app/compose/SdpDemoScreen.kt` (interactive SDP/HDP/WDP demo + auto-resize) and `DemoCalcRouting.kt`. Entry points per platform: `jvmMain/main.kt` (desktop), `iosMain/MainViewController.kt`, `macosMain/main.kt`, `jsMain`/`wasmJsMain/main.kt` (web).
 - **Android-only demo (`app-android`)** — release builds with R8 + `proguard-rules.pro`.
 - **BenchLab (`benchlab` / `benchlab-android`)** — competitor benchmark (Dynamic vs SDPS vs Lib #2) that runs on Android, JVM, iOS, macOS and the browser; results in [PERFORMANCE.md](../PERFORMANCE.md) / [PERFORMANCE-COMPARATIVE.md](../PERFORMANCE-COMPARATIVE.md).
 

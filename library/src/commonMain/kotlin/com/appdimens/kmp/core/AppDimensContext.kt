@@ -39,13 +39,42 @@ interface AppDimensContext {
     /**
      * EN Registers a listener invoked synchronously whenever this window's
      * configuration changes (rotation, resize, density, font scale…).
+     * Returns a [ConfigurationRegistration] that must be [dispose][ConfigurationRegistration.dispose]d
+     * when the window/context is no longer needed, to prevent retention.
      * Default is a no-op; Android overrides with `ComponentCallbacks2`.
      * PT Registra um listener chamado sincronamente em mudança de configuração.
+     * Retorna uma [ConfigurationRegistration] que deve ser descartada quando a
+     * janela/contexto não for mais necessária, para prevenir retenção.
      */
-    fun registerConfigurationListener(listener: () -> Unit) = Unit
+    fun registerConfigurationListener(listener: () -> Unit): ConfigurationRegistration =
+        ConfigurationRegistration.NoOp
 
     /** EN Convenience: builds the coherent [DimenMetrics] snapshot for this window. */
     fun toMetrics(): DimenMetrics = DimenMetrics.from(configuration, isInMultiWindowMode)
+}
+
+/**
+ * EN A handle returned by [AppDimensContext.registerConfigurationListener] that
+ * allows the caller to unregister the listener when the window/context is no
+ * longer needed, preventing retention of Activity/Context objects.
+ *
+ * PT Handle retornado por [AppDimensContext.registerConfigurationListener] que
+ * permite ao chamador cancelar o listener quando a janela/contexto não for mais
+ * necessária, prevenindo retenção de objetos Activity/Context.
+ */
+fun interface ConfigurationRegistration {
+    /**
+     * EN Removes this listener from the configuration watcher and releases any
+     *    strong references it held to the associated context.
+     * PT Remove este listener do watcher de configuração e libera quaisquer
+     *    referências fortes que mantinha ao contexto associado.
+     */
+    fun dispose()
+
+    companion object {
+        /** EN No-op registration for platforms that do not need disposal. */
+        val NoOp = ConfigurationRegistration {}
+    }
 }
 
 /**

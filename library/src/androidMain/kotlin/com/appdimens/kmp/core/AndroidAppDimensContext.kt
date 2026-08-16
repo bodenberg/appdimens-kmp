@@ -43,8 +43,8 @@ internal class AndroidAppDimensContext(
     override val uiModeType: UiModeType
         get() = UiModeTypeDetector.detect(androidContext, foldingFeature)
 
-    override fun registerConfigurationListener(listener: () -> Unit) {
-        AppConfigListenerRegistry.register(androidContext, listener)
+    override fun registerConfigurationListener(listener: () -> Unit): ConfigurationRegistration {
+        return AppConfigListenerRegistry.register(androidContext, listener)
     }
 
     internal fun updateFoldingFeature(feature: FoldingFeature?) {
@@ -76,12 +76,24 @@ internal object AppConfigListenerRegistry {
         override fun onTrimMemory(level: Int) = Unit
     }
 
-    fun register(context: Context, listener: () -> Unit) {
-        val app = context.applicationContext ?: return
+    fun register(context: Context, listener: () -> Unit): ConfigurationRegistration {
+        val app = context.applicationContext ?: return ConfigurationRegistration.NoOp
         synchronized(listenersByApp) {
             val set = listenersByApp.getOrPut(app) { mutableSetOf() }
             if (set.add(listener) && set.size == 1) {
                 app.registerComponentCallbacks(watcher)
+            }
+        }
+        return ConfigurationRegistration {
+            synchronized(listenersByApp) {
+                val listeners = listenersByApp[app]
+                if (listeners != null) {
+                    listeners.remove(listener)
+                    if (listeners.isEmpty()) {
+                        listenersByApp.remove(app)
+                        app.unregisterComponentCallbacks(watcher)
+                    }
+                }
             }
         }
     }
@@ -96,13 +108,19 @@ internal object AppConfigListenerRegistry {
  * identidade do handle seja estável — o Context bruto sobrevive às composições.
  */
 internal object AndroidAppDimensContextCache {
+    // CRITICAL FIX: Use WeakReference as value to break the key → value → key cycle.
+    // Without this, WeakHashMap<Context, AndroidAppDimensContext> never collects the
+    // key because the value holds a strong reference to the same Context, creating
+    // a retention chain: global cache → value → androidContext → same key Context.
     private val cache =
-        java.util.Collections.synchronizedMap(java.util.WeakHashMap<Context, AndroidAppDimensContext>())
+        java.util.Collections.synchronizedMap(java.util.WeakHashMap<Context, java.lang.ref.WeakReference<AndroidAppDimensContext>>())
 
     fun get(context: Context): AndroidAppDimensContext {
         synchronized(cache) {
-            cache[context]?.let { return it }
-            return AndroidAppDimensContext(context).also { cache[context] = it }
+            cache[context]?.get()?.let { return it }
+            return AndroidAppDimensContext(context).also {
+                cache[context] = java.lang.ref.WeakReference(it)
+            }
         }
     }
 }

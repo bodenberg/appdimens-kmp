@@ -42,6 +42,8 @@ internal class WeakIdentityHashMap<K : Any, V : Any> : WeakIdentityMap<K, V> {
     }
 
     override fun containsKey(key: K): Boolean = map.containsKey(WeakKey(key))
+
+    override fun remove(key: K): Boolean = map.remove(WeakKey(key)) != null
 }
 
 @PublishedApi

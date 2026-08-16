@@ -1,6 +1,6 @@
 # Technical Performance Report: AppDimens Dynamic KMP — Comparative
 
-This report documents the performance of the **AppDimens Dynamic KMP** library measured in **current test runs only** (2026-08-15) across the platforms the library targets. The benchmark harness is **BenchLab** (`benchlab` module) — a 3-way competitor comparison: **Dynamic 1.0.0** × **SDPS 3.1.6** × **Lib #2**.
+This report documents the performance of the **AppDimens Dynamic KMP** library measured in **current test runs only** (2026-08-15) across the platforms the library targets. The benchmark harness is **BenchLab** (`benchlab` module) — a 3-way competitor comparison: **Dynamic 1.0.1** × **SDPS 3.1.6** × **Lib #2**.
 
 > [!NOTE]
 > **How to read the numbers**
@@ -19,7 +19,7 @@ This report documents the performance of the **AppDimens Dynamic KMP** library m
 
 The `benchlab` module runs **two independent benchmarks plus the legacy tests**, headlessly via the `AUTO_START` flag (intent extra on Android, JVM property on desktop/web, same flag on iOS/macOS entries):
 
-- **Benchmark A — Compose API (main thread)**: Dynamic 1.0.0 × SDPS 3.1.6 × Lib #2 measured **together inside the same composition** — identical 20,000-iteration warm-up per library, **9 samples × 50,000 iterations** per sample, per-sample order rotation, anti-DCE checksums, two workloads (constant 1dp + mixed values), chunked at 5,000 ops per frame.
+- **Benchmark A — Compose API (main thread)**: Dynamic 1.0.1 × SDPS 3.1.6 × Lib #2 measured **together inside the same composition** — identical 20,000-iteration warm-up per library, **9 samples × 50,000 iterations** per sample, per-sample order rotation, anti-DCE checksums, two workloads (constant 1dp + mixed values), chunked at 5,000 ops per frame.
 - **Benchmark B — Engine (`Dispatchers.Default`)**: Dynamic × SDPS only, off the main thread (Lib #2 has no non-Compose API → N/A).
 - **Legacy T1/T2/T3**: original methodology (mean of 3 passes over 50,000-iteration timing cells), kept for continuity; px resolution values (1/10/100 dp, sdp + sdpa) are captured on every pass.
 
@@ -27,7 +27,7 @@ The `benchlab` module runs **two independent benchmarks plus the legacy tests**,
 
 | Library | Version | Notes |
 |---------|---------|-------|
-| **Dynamic** | **1.0.0 (KMP)** | This library — measured on each target |
+| **Dynamic** | **1.0.1 (KMP)** | This library — measured on each target |
 | SDPS | 3.1.6 | Legacy table-based Android artifact (Android-only) |
 | Lib #2 | (KMP-compatible) | Per-call `@Composable` scaling (Android, JVM, iOS, wasmJs — no macOS variant) |
 
@@ -43,14 +43,14 @@ Release APK + R8 · sw=393dp · density 2.75.
 
 **Benchmark B — Engine (off main thread), median per 1dp call:**
 
-| Workload | Dynamic 1.0.0 | SDPS 3.1.6 |
+| Workload | Dynamic 1.0.1 | SDPS 3.1.6 |
 | :--- | :---: | :---: |
 | Constant 1dp | **~9.9 ns** | ~3.26 µs |
 | Mixed (12 dims) | **~10 ns** | ~3.60 µs |
 
 **Benchmark A — Compose probe (main thread, chunked), median per 1dp call:**
 
-| Workload | Dynamic 1.0.0 | SDPS 3.1.6 | Lib #2 |
+| Workload | Dynamic 1.0.1 | SDPS 3.1.6 | Lib #2 |
 | :--- | :---: | :---: | :---: |
 | Constant 1dp | **~27.7–29.7 ns** | ~5.27 µs | ~1.99–2.0 µs |
 | Mixed (12 dims) | **~30.1 ns** | ~5.43 µs | ~1.93 µs |
@@ -59,7 +59,7 @@ Release APK + R8 · sw=393dp · density 2.75.
 
 | Library | T3 |
 | :--- | :---: |
-| **Dynamic 1.0.0** | **~7–10 ns** |
+| **Dynamic 1.0.1** | **~7–10 ns** |
 | SDPS 3.1.6 | ~3.28 µs |
 | Lib #2 | ~1.11 µs |
 
@@ -69,7 +69,7 @@ Release APK + R8 · sw=393dp · density 2.75.
 
 Release JVM run · window 790×570 dp · same harness.
 
-| Workload | Dynamic 1.0.0 | Lib #2 |
+| Workload | Dynamic 1.0.1 | Lib #2 |
 | :--- | :---: | :---: |
 | Engine (per 1dp call) | **~3.0–3.3 ns** | ~320–400 ns |
 
@@ -79,7 +79,7 @@ Release JVM run · window 790×570 dp · same harness.
 
 Headless Chromium · viewport 1280×900 (sw=900dp, density 1.0) · optimized wasm production build.
 
-| Workload | Dynamic 1.0.0 | Lib #2 |
+| Workload | Dynamic 1.0.1 | Lib #2 |
 | :--- | :---: | :---: |
 | Engine (per 1dp call) | **~12–16 ns** | ~2,000–2,034 ns |
 
@@ -93,7 +93,7 @@ The same harness compiles to Kotlin/Native. Lib #2 publishes Android, JVM, iOS a
 
 ## 3. Resolution Values (px) — deterministic, identical across tests
 
-| dp | Dynamic 1.0.0 (sdp) | SDPS 3.1.6 (sdp) | Lib #2 (sdp) | Dynamic (sdpa) |
+| dp | Dynamic 1.0.1 (sdp) | SDPS 3.1.6 (sdp) | Lib #2 (sdp) | Dynamic (sdpa) |
 | :--- | :---: | :---: | :---: | :---: |
 | **1dp** | 3.6025 | 3.6025 | 3.6025 | 3.7289135 |
 | **10dp** | 36.025 | 36.0249 | 36.025 | 37.289135 |
@@ -126,4 +126,4 @@ Every phase, probe/engine medians, legacy cells and device info are logged to th
 
 ---
 
-*Report Updated: 2026-08-15 · AppDimens Dynamic KMP 1.0.0 · BenchLab on Android (Xiaomi 2107113SG), JVM desktop and wasmJs browser · release builds · Dynamic is 70–330× faster than the competitors depending on platform and harness.*
+*Report Updated: 2026-08-15 · AppDimens Dynamic KMP 1.0.1 · BenchLab on Android (Xiaomi 2107113SG), JVM desktop and wasmJs browser · release builds · Dynamic is 70–330× faster than the competitors depending on platform and harness.*

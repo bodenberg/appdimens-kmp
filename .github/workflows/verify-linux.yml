@@ -1,0 +1,35 @@
+name: verify-linux
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # EN `check` covers JVM, Android host, Kotlin/JS (node), Wasm (Chrome is
+      #    preinstalled on ubuntu-latest), linuxX64 tests and mingwX64 compile.
+      # PT `check` cobre JVM, Android host, Kotlin/JS (node), Wasm (Chrome já vem
+      #    no ubuntu-latest), testes linuxX64 e compilação mingwX64.
+      - name: Build & Check (JVM + Android + Web + Linux + Windows)
+        run: ./gradlew check --no-daemon --stacktrace
+
+      # EN Targets whose klibs are not reached by `check` on an x64 Linux host
+      #    (linuxArm64 has no runnable test task here) still must compile.
+      # PT Targets cujos klibs não são alcançados pelo `check` num host x64 Linux
+      #    (linuxArm64 não tem task de teste executável aqui) ainda precisam compilar.
+      - name: Compile non-host native klibs (linuxArm64)
+        run: ./gradlew :library:compileKotlinLinuxArm64 --no-daemon --stacktrace

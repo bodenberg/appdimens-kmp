@@ -32,6 +32,7 @@ internal interface WeakIdentityMap<K : Any, V : Any> {
     operator fun get(key: K): V?
     operator fun set(key: K, value: V)
     fun containsKey(key: K): Boolean
+    fun remove(key: K): Boolean
 }
 
 @PublishedApi

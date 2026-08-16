@@ -41,4 +41,4 @@ For eligible `CalcType`s on the default path, `getOrPut` returns `compute()` wit
 
 ---
 
-*AppDimens Dynamic KMP 1.0.0 — library performance notes.*
+*AppDimens Dynamic KMP 1.0.1 — library performance notes.*
