@@ -38,5 +38,11 @@ jobs:
       - name: Compile macOS (ARM64)
         run: ./gradlew :library:compileKotlinMacosArm64 --no-daemon --stacktrace
 
-      - name: Link iOS framework (static)
-        run: ./gradlew :library:linkDebugFrameworkIosSimulatorArm64 --no-daemon --stacktrace
+      # EN This library publishes KMP Maven variants (klib), not Apple
+      #    frameworks: `binaries.framework` is deliberately NOT configured, so
+      #    `linkDebugFrameworkIosSimulatorArm64` does not exist. The compile
+      #    steps above are the correct Apple gates.
+      # PT Esta biblioteca publica variantes Maven KMP (klib), não frameworks
+      #    Apple: `binaries.framework` é propositalmente NÃO configurado, então
+      #    `linkDebugFrameworkIosSimulatorArm64` não existe. Os passos de compile
+      #    acima são os gates Apple corretos.

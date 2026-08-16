@@ -12,25 +12,50 @@ internal actual object MetricsScopeHolder {
 
 /**
  * Single-threaded web runtime: a plain map is safe; no weak references exist.
- * Keyed by identity-equality of the window handle (referentially stable).
+ * Keyed by identity (`===`) of the window handle, so two distinct but
+ * `equals()`-equal handles remain separate keys (a `LinkedHashMap` would
+ * collapse them — wrong for a map that promises identity behavior).
  */
 internal class WebIdentityMap<K : Any, V : Any>(
     private val maxSize: Int = 16,
 ) : WeakIdentityMap<K, V> {
-    private val map = LinkedHashMap<K, V>()
 
-    override fun get(key: K): V? = map[key]
+    private class Entry<K : Any, V : Any>(val key: K, var value: V)
 
-    override fun set(key: K, value: V) {
-        if (map.size >= maxSize && !map.containsKey(key)) {
-            map.remove(map.keys.first())
+    private val entries = ArrayList<Entry<K, V>>(maxSize)
+
+    private fun indexOf(key: K): Int {
+        for (i in entries.indices) {
+            if (entries[i].key === key) return i
         }
-        map[key] = value
+        return -1
     }
 
-    override fun containsKey(key: K): Boolean = map.containsKey(key)
+    override fun get(key: K): V? {
+        val i = indexOf(key)
+        return if (i < 0) null else entries[i].value
+    }
 
-    override fun remove(key: K): Boolean = map.remove(key) != null
+    override fun set(key: K, value: V) {
+        val i = indexOf(key)
+        if (i >= 0) {
+            entries[i].value = value
+            return
+        }
+        if (entries.size >= maxSize) {
+            entries.removeAt(0)
+        }
+        entries.add(Entry(key, value))
+    }
+
+    override fun containsKey(key: K): Boolean = indexOf(key) >= 0
+
+    override fun remove(key: K): Boolean {
+        val i = indexOf(key)
+        if (i < 0) return false
+        entries.removeAt(i)
+        return true
+    }
 }
 
 @PublishedApi

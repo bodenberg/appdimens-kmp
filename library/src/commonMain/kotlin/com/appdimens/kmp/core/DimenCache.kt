@@ -370,50 +370,113 @@ object DimenCache {
 
     /**
      * Weak so a test/isolated context does not leak; the real window lives for the process.
-     * The value is a [ConfigurationRegistration] so we can dispose it if needed.
+     *
+     * CRITICAL LIFECYCLE DESIGN: the value [WatcherEntry] holds the listener lambda
+     * AND the [ConfigurationRegistration]. The listener must **not** capture the
+     * [AppDimensContext] key — otherwise the weak entry can never be collected
+     * (value → key cycle: map → registration → listener → context). The callback
+     * only nulls the global fast slots (any configuration change invalidates every
+     * window's slot; the next [metricsFor] rebuilds from the live context), so it
+     * needs no context reference at all.
      */
-    private val watchedContexts = weakIdentityMap<AppDimensContext, ConfigurationRegistration>()
+    private class WatcherEntry(
+        val listener: () -> Unit,
+        val registration: ConfigurationRegistration,
+        var consumers: Int,
+    )
+
+    private val watchedContexts = weakIdentityMap<AppDimensContext, WatcherEntry>()
     private val watchedContextsLock = SynchronizedObject()
 
     /**
      * EN Registers the platform window listener exactly once per [AppDimensContext]
-     * instance and stores the [ConfigurationRegistration] so it can be disposed.
-     * Called only from [metricsFor] / [init] — never from the hot lane.
-     * PT Registra o listener de janela uma única vez por instância de [AppDimensContext]
-     * e armazena a [ConfigurationRegistration] para descarte quando necessário.
+     * instance. Called only from [metricsFor] / [init] — never from the hot lane.
+     * The code (non-Compose) path has no lifecycle owner, so this registers without
+     * a consumer count; the Compose provider pairs [acquireConfigWatcher] with
+     * [releaseConfigWatcher] so the registration is disposed when the composition ends.
+     * PT Registra o listener de janela uma única vez por instância de [AppDimensContext].
+     * O caminho code (não-Compose) não tem dono de lifecycle, então registra sem
+     * contador; o provider Compose emparelha [acquireConfigWatcher] com
+     * [releaseConfigWatcher] para descartar o registro ao fim da composição.
      */
     private fun ensureConfigWatcher(context: AppDimensContext) {
         locked(watchedContextsLock) {
             if (watchedContexts[context] == null) {
-                // CRITICAL FIX: The listener is registered via the platform (e.g. Android
-                // ComponentCallbacks2), and the registration is stored weakly. When the
-                // context is collected by GC, the weak entry is removed. We also store
-                // the registration so callers can explicitly dispose if needed.
-                val registration = context.registerConfigurationListener {
-                    onContextConfigChanged(context)
-                }
-                watchedContexts[context] = registration
+                val listener: () -> Unit = { onContextConfigChanged() }
+                val registration = context.registerConfigurationListener(listener)
+                watchedContexts[context] = WatcherEntry(listener, registration, 0)
             }
         }
     }
 
     /**
-     * EN Disposes the config watcher for [context], releasing the strong reference
-     *    chain that could otherwise keep an Activity/Context alive.
-     * PT Descarta o watcher de configuração para [context], liberando a cadeia de
-     *    referências fortes que poderia manter uma Activity/Context viva.
+     * EN Acquires the config watcher for [context] (reference-counted). The Compose
+     * provider calls this once per composition and pairs it with [releaseConfigWatcher]
+     * via `DisposableEffect`, so the platform registration is disposed as soon as the
+     * last composition using [context] leaves composition — no listener accumulation.
+     * PT Adquire o watcher de configuração de [context] (com contagem de referências).
+     * O provider Compose chama isto por composição e emparelha com
+     * [releaseConfigWatcher] via `DisposableEffect`.
      */
-    fun disposeConfigWatcher(context: AppDimensContext) {
-        locked<Unit>(watchedContextsLock) {
-            watchedContexts[context]?.dispose()
-            watchedContexts.remove(context)
+    fun acquireConfigWatcher(context: AppDimensContext) {
+        locked(watchedContextsLock) {
+            val entry = watchedContexts[context]
+            if (entry != null) {
+                entry.consumers++
+            } else {
+                val listener: () -> Unit = { onContextConfigChanged() }
+                val registration = context.registerConfigurationListener(listener)
+                watchedContexts[context] = WatcherEntry(listener, registration, 1)
+            }
         }
     }
 
-    private fun onContextConfigChanged(context: AppDimensContext) {
+    /**
+     * EN Releases one acquisition of the config watcher for [context]. When the last
+     * consumer leaves, the platform registration is [dispose][ConfigurationRegistration.dispose]d
+     * and the weak entry is removed — the Activity/Context becomes collectable.
+     * PT Libera uma aquisição do watcher de [context]. Quando o último consumidor sai,
+     * o registro é descartado e a entrada fraca é removida — Activity/Context coletável.
+     */
+    fun releaseConfigWatcher(context: AppDimensContext) {
+        locked<Unit>(watchedContextsLock) {
+            val entry = watchedContexts[context] ?: return
+            if (--entry.consumers <= 0) {
+                entry.registration.dispose()
+                watchedContexts.remove(context)
+            }
+        }
+    }
+
+    /**
+     * EN Disposes the config watcher for [context] unconditionally, releasing the
+     *    strong-reference chain that could otherwise keep an Activity/Context alive.
+     *    Use it when you own the lifecycle (code path without a composition).
+     * PT Descarta o watcher de configuração de [context] incondicionalmente, liberando
+     *    a cadeia de referências fortes que poderia manter uma Activity/Context viva.
+     */
+    fun disposeConfigWatcher(context: AppDimensContext) {
+        locked<Unit>(watchedContextsLock) {
+            val entry = watchedContexts[context]
+            if (entry != null) {
+                entry.registration.dispose()
+                watchedContexts.remove(context)
+            }
+        }
+    }
+
+    /**
+     * EN Global fast-slot invalidation: any real configuration change makes every
+     *    cached window snapshot potentially stale, so the slots are nulled; the next
+     *    [metricsFor] call rebuilds from the live context. No context reference is
+     *    captured, which keeps the weak watcher entry collectable.
+     * PT Invalidação global de fast slots: qualquer mudança real de configuração pode
+     *    deixar snapshots obsoletos; a próxima chamada de [metricsFor] reconstrói a
+     *    partir do context vivo. Nenhuma referência ao context é capturada.
+     */
+    private fun onContextConfigChanged() {
         fastWindowSlot.store(EMPTY_FAST_WINDOW_SLOT)
         fastMwSlot.store(EMPTY_MW_SLOT)
-        invalidateOnConfigChange(context.configuration)
     }
 
     private fun mwModeFor(context: AppDimensContext?): Boolean {

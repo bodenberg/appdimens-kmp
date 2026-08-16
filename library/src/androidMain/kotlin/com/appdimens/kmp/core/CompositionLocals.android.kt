@@ -7,6 +7,7 @@ package com.appdimens.kmp.core
 import android.app.Activity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalConfiguration
@@ -56,6 +57,21 @@ actual fun AppDimensProvider(content: @Composable () -> Unit) {
     // Cached per raw Context so the window-handle identity is stable across
     // recompositions; the folding feature is updated in place when it changes.
     val appContext = remember(context) { AndroidAppDimensContextCache.get(context) }
+
+    // EN Reference-counted config watcher tied to composition lifetime: acquire on
+    //    enter, release (which disposes the platform registration and makes the
+    //    Activity collectable) on leave. The listener never captures the context, so
+    //    even a lost release cannot pin the Activity.
+    // PT Watcher de configuração com contagem de referências atrelado à composição:
+    //    adquire ao entrar, libera (descarta o registro e torna a Activity coletável)
+    //    ao sair. O listener nunca captura o context.
+    DisposableEffect(appContext) {
+        DimenCache.acquireConfigWatcher(appContext)
+        onDispose {
+            DimenCache.releaseConfigWatcher(appContext)
+        }
+    }
+
     remember(
         foldingFeature?.state,
         foldingFeature?.orientation,

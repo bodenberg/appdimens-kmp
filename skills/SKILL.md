@@ -27,11 +27,14 @@ On release bumps, update version URLs in this file, `library-map.md`, and `refer
 **What's New in 1.0.1 (audit fixes + full target matrix):**
 - `fastPartition` race fixed — metrics + partition published as one atomic `FastPartitionSlot` (was two independent atomics that could serve another window's metrics)
 - Android context cache cycle fixed — `WeakHashMap<Context, WeakReference<AndroidAppDimensContext>>` (value no longer holds the key strongly)
-- Configuration listeners disposable — `registerConfigurationListener` returns `ConfigurationRegistration.dispose()`; the Android registry unregisters `ComponentCallbacks` when the last listener is removed
-- Strict race tests — `DimenCacheRaceTest` requires the exact expected value per key/snapshot
+- `WeakIdentityHashMap` structural defect fixed (JVM/Android) — strong `HashMap` of `IdentityWeakReference` wrappers + `ReferenceQueue` instead of `WeakHashMap<WeakKey<K>, V>` (the wrapper was the weak key and could be collected while the referent was alive; entries now live exactly as long as their referent)
+- Native `MetricsScopeHolder` is `@ThreadLocal` — each Kotlin/Native worker gets its own metrics slot (previously one shared mutable global could cross snapshots between workers)
+- Native/Web identity maps now compare with `===` — distinct-but-`equals()` window handles no longer collapse into one key (was `LinkedHashMap`)
+- Configuration listeners lifecycle — listener is context-free (no value→key cycle), watcher is reference-counted (`acquireConfigWatcher` / `releaseConfigWatcher`), the Android `AppDimensProvider` pairs them via `DisposableEffect`, and the Android registry holds listeners weakly — a destroyed Activity is collectable even without explicit `dispose()`
+- Strict race tests — `DimenCacheRaceTest` requires the exact expected value per key/snapshot; new GC / identity / lifecycle / native-worker tests
 - New targets: classic Kotlin/JS (`js`, IR), `linuxX64`, `linuxArm64`, `mingwX64` (all modules, via the shared `appdimens.kmp-library` convention plugin)
 - Encapsulated diagnostics — `DimenCache.isInitialized` is a plain `Boolean`, `cacheStats()` returns immutable `CacheStats`; experimental atomics are `internal`
-- CI restored — `verify-linux` + `verify-apple` gates; wrapper `distributionSha256Sum` pinned; Compose dev repo removed
+- CI restored — `verify-linux` + `verify-apple` gates (Apple gate no longer references the nonexistent `linkDebugFrameworkIosSimulatorArm64` task); wrapper `distributionSha256Sum` pinned; Compose dev repo removed
 
 **Authoritative docs (repo root, Git ref `1.0.1`):**
 - [README.md](../README.md) — install, `AppDimensProvider`, `DimenCache` (snapshot-partitioned; event-driven config watcher; specialized kernels), platform table

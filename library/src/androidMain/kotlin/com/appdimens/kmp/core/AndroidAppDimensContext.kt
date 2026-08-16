@@ -57,18 +57,36 @@ internal class AndroidAppDimensContext(
  * Application, dispatching to per-window listeners. On any real configuration change
  * the [DimenCache] fast slots are invalidated synchronously.
  *
+ * Listeners are held **weakly**: the owning window's strong reference lives in the
+ * [DimenCache] weak watcher map, which dies with the window context — so a destroyed
+ * Activity's listener becomes collectable even if `dispose()` was never called.
+ * Dead references are pruned on register and on dispatch.
+ *
  * PT Registry por Application de `ComponentCallbacks2` — um watcher por processo,
- * despachando para listeners por janela.
+ * despachando para listeners por janela. Listeners são guardados **fracamente**: a
+ * referência forte vive no mapa fraco do [DimenCache], que morre com o contexto da
+ * janela — um listener de Activity destruída é coletável mesmo sem `dispose()`.
  */
 internal object AppConfigListenerRegistry {
     private val listenersByApp =
-        java.util.Collections.synchronizedMap(java.util.WeakHashMap<Context, MutableSet<() -> Unit>>())
+        java.util.Collections.synchronizedMap(
+            java.util.WeakHashMap<Context, MutableSet<java.lang.ref.WeakReference<() -> Unit>>>()
+        )
 
     private val watcher = object : ComponentCallbacks2 {
         override fun onConfigurationChanged(newConfig: Configuration) {
+            // EN Mirrors the official Android library: the process watcher receives
+            //    the new Configuration directly (no window context captured), updates
+            //    the fallback metrics/factors and nulls the fast slots — exactly the
+            //    work [DimenCache.onContextConfigChanged] used to do per-context.
+            // PT Espelha a biblioteca oficial Android: o watcher recebe o novo
+            //    Configuration diretamente (sem capturar context de janela), atualiza
+            //    as métricas/fatores de fallback e anula os fast slots.
+            DimenCache.invalidateOnConfigChange(newConfig.toScreenConfiguration())
             val listeners = listenersByApp.values.toList()
             for (set in listeners) {
-                set.toList().forEach { it() }
+                pruneDead(set)
+                set.toList().forEach { it.get()?.invoke() }
             }
         }
 
@@ -76,11 +94,20 @@ internal object AppConfigListenerRegistry {
         override fun onTrimMemory(level: Int) = Unit
     }
 
+    private fun pruneDead(set: MutableSet<java.lang.ref.WeakReference<() -> Unit>>) {
+        val dead = set.filter { it.get() == null }
+        if (dead.isNotEmpty()) set.removeAll(dead)
+    }
+
     fun register(context: Context, listener: () -> Unit): ConfigurationRegistration {
         val app = context.applicationContext ?: return ConfigurationRegistration.NoOp
+        val weakListener = java.lang.ref.WeakReference(listener)
         synchronized(listenersByApp) {
             val set = listenersByApp.getOrPut(app) { mutableSetOf() }
-            if (set.add(listener) && set.size == 1) {
+            pruneDead(set)
+            val first = set.isEmpty()
+            set.add(weakListener)
+            if (first) {
                 app.registerComponentCallbacks(watcher)
             }
         }
@@ -88,7 +115,7 @@ internal object AppConfigListenerRegistry {
             synchronized(listenersByApp) {
                 val listeners = listenersByApp[app]
                 if (listeners != null) {
-                    listeners.remove(listener)
+                    listeners.remove(weakListener)
                     if (listeners.isEmpty()) {
                         listenersByApp.remove(app)
                         app.unregisterComponentCallbacks(watcher)

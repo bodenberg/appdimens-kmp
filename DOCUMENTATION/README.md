@@ -21,7 +21,11 @@ This folder goes deeper into each **scaling strategy** in [AppDimens Dynamic](..
 - **`fastPartition` race fixed**: the fast partition is now a single atomic `FastPartitionSlot(metrics, partition)` — before, two independent atomics could pair a snapshot partition with another window's metrics and return a wrong dimension under concurrency.
 - **Android context cache cycle fixed**: the `WeakHashMap<Context, …>` value no longer holds the key strongly (now a `WeakReference`), so Activities/Contexts are collectable.
 - **Configuration listeners disposable**: `registerConfigurationListener` returns `ConfigurationRegistration` with `dispose()`; the Android registry unregisters `ComponentCallbacks` when the last listener is removed.
-- **Strict race tests**: `DimenCacheRaceTest` requires the exact expected value per key/snapshot — no more false negatives.
+- **Config-watcher lifecycle hardened**: the registered listener is now **context-free** (no value→key cycle), the watcher is **reference-counted** (`acquireConfigWatcher` / `releaseConfigWatcher`), the Android `AppDimensProvider` pairs them via `DisposableEffect`, and the Android registry holds listeners **weakly** — a destroyed Activity is collectable even without an explicit `dispose()`.
+- **Weak identity map fixed (JVM/Android)**: `WeakHashMap<WeakKey<K>, V>` made the weak wrapper the map's weak key, so live entries could be dropped while the original key was strongly reachable. Replaced with a strong `HashMap` of `IdentityWeakReference` wrappers + `ReferenceQueue`.
+- **Native metrics scope is thread-local**: the Kotlin/Native `MetricsScopeHolder` is `@ThreadLocal` — each worker gets its own slot (was one shared mutable global).
+- **Native/Web identity maps use `===`**: `SynchronizedIdentityMap` / `WebIdentityMap` compare window handles by identity instead of `equals()`.
+- **Strict race tests**: `DimenCacheRaceTest` requires the exact expected value per key/snapshot — no more false negatives. New GC / identity / lifecycle / native-worker tests added.
 - **New targets**: classic Kotlin/JS (`js`, IR), `linuxX64`, `linuxArm64`, `mingwX64` on every module via the shared `appdimens.kmp-library` convention plugin. Linux/Windows expose the `code` API only.
 - **Encapsulated diagnostics**: `DimenCache.isInitialized` is a plain `Boolean` and `cacheStats()` returns immutable `CacheStats`; experimental atomics are `internal`.
 - **CI restored**: `verify-linux` + `verify-apple` gates; wrapper `distributionSha256Sum` pinned; Compose dev repository removed from the resolution path.

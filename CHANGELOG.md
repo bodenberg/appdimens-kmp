@@ -14,6 +14,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - **Android context cache cycle.** `WeakHashMap<Context, AndroidAppDimensContext>` was neutralized because the value held the key strongly, keeping Activities/Contexts alive indefinitely. The value is now a `WeakReference<AndroidAppDimensContext>`, so discarded Activities are collectable again.
 - **Configuration listeners never unregistered.** `registerConfigurationListener` now returns a `ConfigurationRegistration` with `dispose()`; the Android registry unregisters `ComponentCallbacks` and drops per-app listener sets when the last listener is removed — no more listener/context accumulation.
 - **Weak race-test assertions (false negatives).** `DimenCacheRaceTest` now requires the **exact expected value** per key/snapshot (it no longer accepts “any valid value” from another key), and a wrong transient read is counted even if a later `peek()` was corrected by another thread.
+- **`WeakIdentityHashMap` structural defect (JVM/Android).** The previous `WeakHashMap<WeakKey<K>, V>` made the weak *wrapper* the WeakHashMap's weak key: nothing strongly referenced the wrapper after insertion, so the GC could drop live entries while the original key was still strongly reachable (lost memoization, re-registered listeners, lost `dispose()` handles). Replaced with a **strong `HashMap` of `IdentityWeakReference` wrappers + `ReferenceQueue`** — entries now live exactly as long as their referent and are drained deterministically.
+- **Native `MetricsScopeHolder` not thread-local.** The Kotlin/Native actual was a single shared mutable `var` in a global object — two workers resolving concurrently could observe each other's `current` (same cross-snapshot contamination class the `FastPartitionSlot` fix eliminated on JVM). The holder is now **`@ThreadLocal`**: every worker gets its own instance.
+- **Native/Web “identity” maps used `equals()`.** `SynchronizedIdentityMap` and `WebIdentityMap` were backed by `LinkedHashMap`, which compares with `equals()` — two distinct but equal window handles collapsed into one key. Both now compare with **`===`** (identity), matching the JVM/Android semantics.
+- **Configuration-listener lifecycle still could retain an Activity.** The registered listener captured the window context (`{ onContextConfigChanged(context) }`), forming a value→key cycle in the weak watcher map; and `remember` in the Compose provider never disposed the registration. The listener is now **context-free** (a real config change invalidates the global fast slots; the next `metricsFor` rebuilds from the live context), the watcher is **reference-counted** (`acquireConfigWatcher` / `releaseConfigWatcher`), the Android `AppDimensProvider` acquires on composition and releases via `DisposableEffect`, and the Android registry holds listeners **weakly** (pruning dead references) — a destroyed Activity is collectable even without an explicit `dispose()`.
+- **Apple CI referenced a nonexistent task.** `verify-apple.yml` ran `:library:linkDebugFrameworkIosSimulatorArm64`, but this library publishes KMP Maven variants (no `binaries.framework` configured), so the task does not exist and the gate could never be green. The link step was removed — the compile steps remain the correct Apple gates.
 
 ### Added
 
@@ -27,11 +32,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - **wasmJs browser tests selectable.** `-Pappdimens.wasmTestBrowser=firefox|chrome|safari` (default `chrome`) on the convention plugin.
 - **BenchLab headless automation.** `AUTO_START` now auto-exports the report on completion and guards against overlapping runs.
 
+### Added
+
+- **GC / identity / lifecycle tests.** `WeakIdentityMapGcTest` (JVM: entry survives GC while the key is strongly reachable; entry disappears after the key dies), `WeakIdentityMapSemanticsTest` (all targets: `===` identity, bounded eviction), `ConfigWatcherLifecycleTest` (all targets: reference-counted acquire/release, dispose, re-register) and `MetricsScopeHolderNativeTest` (Kotlin/Native: two workers never cross `current`; nested `withMetrics` restores the outer value).
+
 ### Verified
 
 - `assemble` for all 19 modules on all configured targets — ✅
-- Tests: JVM (92), Kotlin/JS (90), linuxX64 (77), wasmJs/Firefox (90), Android host (84) — 0 failures
-- Compile: `mingwX64` (Windows) + `linuxArm64` — ✅
+- Tests: JVM (104), Kotlin/JS (99), linuxX64 (88), wasmJs/Firefox (99), Android host (93) — 0 failures
+- Compile: `mingwX64` (Windows) + `linuxArm64` + iOS (`iosArm64`/`iosSimulatorArm64`) + macOS (`macosArm64`) — ✅
 - BenchLab desktop (release, real window): **Dynamic 3.3 ns/op vs Lib #2 342 ns/op — ×95–104 faster**, anti-DCE checksums identical (bit-identical precision)
 - BenchLab on device (Xiaomi, release, R8): **Dynamic 23.9 ns/op vs Lib #2 1.3 µs/op — ×54 faster**, values 1:1
 - Formulas validated bit-identical against the official `appdimens-dynamic` Android library
