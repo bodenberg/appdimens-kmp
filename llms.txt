@@ -1,0 +1,50 @@
+# AppDimens Dynamic — KMP
+
+> Responsive `dp` / `sp` for Android · Desktop (JVM) · iOS · macOS · Web (JS + Wasm) · Linux · Windows — Kotlin Multiplatform library and Jetpack Compose Multiplatform API. Write values like `16.sdp` and the library scales them from the current window Configuration (size, density, optional flags) on every platform.
+
+## Key topics
+
+- [README — project overview, install, quick start](README.md)
+- [Beginner guide — step by step](GUIDE-FOR-BEGINNERS.md)
+- [API documentation — package index](DOCUMENTATION/index.md)
+- [Docs hub — scaling strategies and modules](DOCUMENTATION/README.md)
+- [Module graph — Maven artifacts](DOCUMENTATION/MODULES.md)
+- [Mathematics and calculus — formulas and kernels](DOCUMENTATION/MATHEMATICS-AND-CALCULUS.md)
+- [Compose API conventions — extension catalog](DOCUMENTATION/COMPOSE-API-CONVENTIONS.md)
+- [Performance report](PERFORMANCE.md)
+- [Performance comparative](PERFORMANCE-COMPARATIVE.md)
+- [R8 and ProGuard rules](R8-PROGUARD.md)
+- [Changelog](CHANGELOG.md)
+
+## Scaling strategies
+
+- [Scaled (default)](DOCUMENTATION/scaled.md)
+- [Auto](DOCUMENTATION/auto.md)
+- [Density](DOCUMENTATION/density.md)
+- [Diagonal](DOCUMENTATION/diagonal.md)
+- [Fill](DOCUMENTATION/fill.md)
+- [Fit](DOCUMENTATION/fit.md)
+- [Fluid](DOCUMENTATION/fluid.md)
+- [Interpolated](DOCUMENTATION/interpolated.md)
+- [Logarithmic](DOCUMENTATION/logarithmic.md)
+- [Percent](DOCUMENTATION/percent.md)
+- [Perimeter](DOCUMENTATION/perimeter.md)
+- [Power](DOCUMENTATION/power.md)
+- [Resize](DOCUMENTATION/resize.md)
+- [Physical units](DOCUMENTATION/physical-units.md)
+
+## Key packages
+
+- `com.appdimens.kmp.common` — shared types (`DpQualifier`, `Orientation`, `UiModeType`)
+- `com.appdimens.kmp.core` — `AppDimensProvider`, `DimenCache`, `MissingModule`
+- `com.appdimens.kmp.code` / `compose` — scaled APIs (principal artifact)
+- `com.appdimens.kmp.code.<strategy>` / `compose.<strategy>` — one artifact per strategy: `auto`, `density`, `diagonal`, `fill`, `fit`, `fluid`, `interpolated`, `logarithmic`, `percent`, `perimeter`, `power`, `resize`, `units`
+
+## Additional
+
+- [Product requirements (PRD)](DOCUMENTATION/PRD.md)
+- [Technical design (PDR)](DOCUMENTATION/PDR.md)
+- [Contributing](CONTRIBUTING.md)
+- [Code of conduct](CODE_OF_CONDUCT.md)
+- [Security](SECURITY.md)
+- [License — Apache 2.0](LICENSE)
