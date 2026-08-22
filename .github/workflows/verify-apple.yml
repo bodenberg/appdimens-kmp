@@ -6,43 +6,88 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+
+# EN Cancel superseded runs to save minutes and avoid overlapping uploads.
+# PT Cancela execuções obsoletas para economizar minutos e evitar uploads sobrepostos.
+concurrency:
+  group: verify-apple-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # EN macOS runners (macos-latest = arm64) ship more RAM, but the repo's 6 GB heap
+  #    is still larger than needed for compile-only Apple gates. Right-size it and
+  #    cap workers so the step cannot OOM/abort mid-log.
+  # PT Os runners macOS (macos-latest = arm64) têm mais RAM, mas o heap de 6 GB do
+  #    repo é maior do que o necessário para os gates Apple de compile-only. Ajusta
+  #    e limita workers para o passo não abortar no meio do log.
+  GRADLE_JVMARGS: "-Xmx3g -XX:MaxMetaspaceSize=384m -XX:+UseParallelGC -Dfile.encoding=UTF-8 --enable-native-access=ALL-UNNAMED"
+  GRADLE_WORKERS: "2"
+
 jobs:
   compile-apple:
     runs-on: macos-latest
+    timeout-minutes: 90
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
+
+      # EN The android target is still configured by the KMP convention plugin, so
+      #    AGP evaluates it even when only Apple klibs are compiled. Ensure the SDK
+      #    is present and its license accepted so configuration does not fail.
+      # PT O target android ainda é configurado pelo plugin de convenção KMP, então o
+      #    AGP o avalia mesmo compilando só klibs Apple. Garante o SDK e a licença.
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Accept Android SDK licenses
+        run: yes | sdkmanager --licenses > /dev/null || true
+
+      # EN Keep Kotlin/Native toolchains across runs (iosArm64/iosSimulatorArm64/
+      #    macosArm64). PT Mantém o toolchain Kotlin/Native entre execuções.
+      - name: Cache Kotlin/Native toolchain
+        uses: actions/cache@v4
+        with:
+          path: ~/.konan
+          key: konan-macos-${{ hashFiles('**/*.gradle.kts', '**/gradle.properties') }}
+          restore-keys: konan-macos-
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
       # EN Apple targets supported by Compose Multiplatform 1.11: iosArm64,
-      #    iosSimulatorArm64, macosArm64 (Intel Apple targets publish no Compose
-      #    `ui` artifacts, and tvOS/watchOS are not published either — the
-      #    Compose layer cannot compile there; the code API only works on targets
-      #    whose hierarchy excludes composeMain, which Intel Apple would not).
+      #    iosSimulatorArm64, macosArm64. This library publishes KMP Maven variants
+      #    (klib), not Apple frameworks, so these compile steps are the correct gates.
       # PT Targets Apple suportados pelo Compose Multiplatform 1.11: iosArm64,
-      #    iosSimulatorArm64, macosArm64 (Apple Intel não tem artefatos `ui` do
-      #    Compose, e tvOS/watchOS também não são publicados — a camada Compose
-      #    não compila nesses targets).
+      #    iosSimulatorArm64, macosArm64. A lib publica variantes Maven KMP (klib),
+      #    não frameworks, então estes compiles são os gates corretos.
       - name: Compile iOS (ARM64)
-        run: ./gradlew :library:compileKotlinIosArm64 --no-daemon --stacktrace
+        run: >
+          ./gradlew :library:compileKotlinIosArm64
+          --no-daemon --console=plain
+          -Dorg.gradle.jvmargs="$GRADLE_JVMARGS"
+          -Dorg.gradle.workers.max="$GRADLE_WORKERS"
+          -Dorg.gradle.configuration-cache=false
 
       - name: Compile iOS Simulator (ARM64)
-        run: ./gradlew :library:compileKotlinIosSimulatorArm64 --no-daemon --stacktrace
+        run: >
+          ./gradlew :library:compileKotlinIosSimulatorArm64
+          --no-daemon --console=plain
+          -Dorg.gradle.jvmargs="$GRADLE_JVMARGS"
+          -Dorg.gradle.workers.max="$GRADLE_WORKERS"
+          -Dorg.gradle.configuration-cache=false
 
       - name: Compile macOS (ARM64)
-        run: ./gradlew :library:compileKotlinMacosArm64 --no-daemon --stacktrace
-
-      # EN This library publishes KMP Maven variants (klib), not Apple
-      #    frameworks: `binaries.framework` is deliberately NOT configured, so
-      #    `linkDebugFrameworkIosSimulatorArm64` does not exist. The compile
-      #    steps above are the correct Apple gates.
-      # PT Esta biblioteca publica variantes Maven KMP (klib), não frameworks
-      #    Apple: `binaries.framework` é propositalmente NÃO configurado, então
-      #    `linkDebugFrameworkIosSimulatorArm64` não existe. Os passos de compile
-      #    acima são os gates Apple corretos.
+        run: >
+          ./gradlew :library:compileKotlinMacosArm64
+          --no-daemon --console=plain
+          -Dorg.gradle.jvmargs="$GRADLE_JVMARGS"
+          -Dorg.gradle.workers.max="$GRADLE_WORKERS"
+          -Dorg.gradle.configuration-cache=false

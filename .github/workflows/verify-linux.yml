@@ -6,30 +6,90 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+
+# EN Cancel superseded runs to save minutes and avoid overlapping uploads.
+# PT Cancela execuções obsoletas para economizar minutos e evitar uploads sobrepostos.
+concurrency:
+  group: verify-linux-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # EN Lower the memory/worker footprint for GitHub-hosted runners (ubuntu-latest:
+  #    ~7 GB RAM, 2 vCPU). The repo's gradle.properties asks for -Xmx6g + 4 workers,
+  #    which OOM-kills the step here and yields "log was not found". These overrides
+  #    keep the daemon inside the runner and shrink the log volume.
+  # PT Reduz a memória/nº de workers para runners hospedados (ubuntu-latest: ~7 GB
+  #    RAM, 2 vCPU). O gradle.properties pede -Xmx6g + 4 workers, o que mata o passo
+  #    por OOM e gera "log was not found". Estes overrides mantêm o daemon dentro do
+  #    runner e diminuem o volume de log.
+  GRADLE_JVMARGS: "-Xmx2g -XX:MaxMetaspaceSize=384m -XX:+UseParallelGC -Dfile.encoding=UTF-8 --enable-native-access=ALL-UNNAMED"
+  GRADLE_WORKERS: "2"
+
 jobs:
   check:
     runs-on: ubuntu-latest
+    timeout-minutes: 90
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
+
+      # EN The Android SDK is preinstalled on the runner, but the compileSdk (37)
+      #    platform is not, and its license is not accepted. Without this, AGP fails
+      #    the Android host tests at configuration/compile time.
+      # PT O Android SDK já vem no runner, mas a plataforma compileSdk (37) não está
+      #    instalada e a licença não está aceita. Sem isto, o AGP falha nos host tests.
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Accept Android SDK licenses
+        run: yes | sdkmanager --licenses > /dev/null || true
+
+      - name: Install compileSdk platform
+        run: sdkmanager "platforms;android-37" > /dev/null || true
+
+      # EN Keep Kotlin/Native toolchains across runs (linuxX64/linuxArm64/mingwX64).
+      # PT Mantém o toolchain Kotlin/Native entre execuções.
+      - name: Cache Kotlin/Native toolchain
+        uses: actions/cache@v4
+        with:
+          path: ~/.konan
+          key: konan-linux-${{ hashFiles('**/*.gradle.kts', '**/gradle.properties') }}
+          restore-keys: konan-linux-
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
       # EN `check` covers JVM, Android host, Kotlin/JS (node), Wasm (Chrome is
       #    preinstalled on ubuntu-latest), linuxX64 tests and mingwX64 compile.
-      # PT `check` cobre JVM, Android host, Kotlin/JS (node), Wasm (Chrome já vem
-      #    no ubuntu-latest), testes linuxX64 e compilação mingwX64.
+      #    --console=plain + no --stacktrace keeps the log small and avoids the
+      #    "log was not found" failure from an over-sized/aborted log.
+      # PT `check` cobre JVM, Android host, Kotlin/JS (node), Wasm (Chrome já vem no
+      #    ubuntu-latest), testes linuxX64 e compilação mingwX64. --console=plain e a
+      #    ausência de --stacktrace mantêm o log pequeno.
       - name: Build & Check (JVM + Android + Web + Linux + Windows)
-        run: ./gradlew check --no-daemon --stacktrace
+        run: >
+          ./gradlew check
+          --no-daemon --console=plain
+          -Dorg.gradle.jvmargs="$GRADLE_JVMARGS"
+          -Dorg.gradle.workers.max="$GRADLE_WORKERS"
+          -Dorg.gradle.configuration-cache=false
 
       # EN Targets whose klibs are not reached by `check` on an x64 Linux host
       #    (linuxArm64 has no runnable test task here) still must compile.
       # PT Targets cujos klibs não são alcançados pelo `check` num host x64 Linux
       #    (linuxArm64 não tem task de teste executável aqui) ainda precisam compilar.
       - name: Compile non-host native klibs (linuxArm64)
-        run: ./gradlew :library:compileKotlinLinuxArm64 --no-daemon --stacktrace
+        run: >
+          ./gradlew :library:compileKotlinLinuxArm64
+          --no-daemon --console=plain
+          -Dorg.gradle.jvmargs="$GRADLE_JVMARGS"
+          -Dorg.gradle.workers.max="$GRADLE_WORKERS"
+          -Dorg.gradle.configuration-cache=false
