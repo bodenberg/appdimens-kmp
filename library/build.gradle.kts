@@ -67,7 +67,7 @@ kotlin {
 //    foi desligado em junho/2025. Credenciais vêm de ~/.gradle/gradle.properties
 //    (nunca commitadas).
 val libraryVersion: String =
-    providers.gradleProperty("appdimens.version").orElse("1.0.1").get()
+    providers.gradleProperty("appdimens.version").orElse("1.0.2").get()
 
 mavenPublishing {
     coordinates("io.github.bodenberg", "appdimens-kmp", libraryVersion)

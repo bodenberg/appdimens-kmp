@@ -26,6 +26,30 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
     }
+    // EN Expose the shared version catalog (`gradle/libs.versions.toml`) to ALL
+    //    included builds so non-`build-logic` modules (library-bom and every
+    //    library-* module) can read versions like `libs.versions.composeMultiplatform`
+    //    without duplicating them as string literals. The `build-logic` included
+    //    build declares the same catalog independently in
+    //    `build-logic/settings.gradle.kts` — the two declarations are equivalent
+    //    (Gradle does not unify catalogs across included builds; declaring the
+    //    catalog twice keeps each build self-contained and avoids the
+    //    "accessors not generated" runtime error).
+    // PT Expõe o catálogo de versões compartilhado (`gradle/libs.versions.toml`)
+    //    a TODOS os builds incluídos para que módulos fora do `build-logic`
+    //    (library-bom e cada library-*) possam ler versões como
+    //    `libs.versions.composeMultiplatform` sem duplicar como string. O
+    //    `build-logic` declara o mesmo catálogo independentemente em
+    //    `build-logic/settings.gradle.kts` — as duas declarações são
+    //    equivalentes (o Gradle não unifica catálogos entre builds incluídos;
+    //    declarar duas vezes mantém cada build autossuficiente e evita o erro
+    //    "accessors not generated").
+    @Suppress("UnstableApiUsage")
+    versionCatalogs {
+        create("libs") {
+            from(files("gradle/libs.versions.toml"))
+        }
+    }
 }
 
 // EN npm-legal root name: the Kotlin wasmJs root aggregator derives the yarn

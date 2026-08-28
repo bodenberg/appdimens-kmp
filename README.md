@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="https://github.com/bodenberg/appdimens-kmp/releases" title="Releases">
-    <img src="https://img.shields.io/badge/version-1.0.1-blue.svg" alt="Version 1.0.1">
+    <img src="https://img.shields.io/badge/version-1.0.2-blue.svg" alt="Version 1.0.2">
   </a>
   &nbsp;
   <a href="LICENSE" title="Apache License 2.0">
@@ -91,15 +91,34 @@ Every platform shares the **same Kotlin API**, the same **cache** and the same *
 
 ---
 
-## Installation (v1.0.1)
+## Installation (v1.0.2)
 
-**1.0.1** keeps the modular packaging: the library ships as a **principal** artifact (`common` + `core` + **scaled** + **plain**) plus optional strategy modules. Kotlin packages and imports are unchanged.
+**1.0.2** keeps the modular packaging: the library ships as a **principal** artifact (`common` + `core` + **scaled** + **plain**) plus optional strategy modules. Kotlin packages and imports are unchanged.
+
+### Compose Multiplatform compatibility (1.0.2 fix)
+
+The library is compiled against **Compose Multiplatform 1.11.1** and **Compose Material3 1.9.0** (see `gradle/libs.versions.toml`). Starting with **1.0.2**:
+
+- All Compose artifacts in the library are declared as **`compileOnly`** — the library does **not** ship a second copy of Compose into your runtime classpath. Your app's own Compose stack is the single source of truth at runtime.
+- The library publishes **Gradle `constraints { ... require(...) }`** for `org.jetbrains.compose.runtime:runtime`, `ui`, `foundation` and `material3`. If your project does not pin a Compose version, Gradle resolves to the version the library was compiled against, so the runtime ABI matches the bytecode.
+- The **BOM** also includes those four `org.jetbrains.compose.*` artifacts in its `api(...)` constraint set, so importing the BOM aligns every Compose dependency in your project automatically.
+
+**Recommended (one-line fix, regardless of which Compose version your project was on before):**
+
+```kotlin
+// commonMain.dependencies
+implementation(platform("io.github.bodenberg:appdimens-kmp-bom:1.0.2"))
+implementation("io.github.bodenberg:appdimens-kmp")
+// ... strategy modules
+```
+
+If you must stay on a different Compose version (e.g. your entire app is on `1.9.0`), you can still pin Compose yourself in your version catalog — Gradle's conflict resolution lets your version win over the library's `require` constraint. You will then be using the library at your own risk: the bytecode was compiled against 1.11.1, so runtime calls into Compose internals may fail. Pin Compose to **exactly** `1.11.1` (runtime) and `1.9.0` (material3) for a guaranteed clean run. The BOM above is the simplest way to do that.
 
 ### With BOM (common to all platforms)
 
 ```kotlin
 // commonMain.dependencies (or the platform source set you target)
-implementation(platform("io.github.bodenberg:appdimens-kmp-bom:1.0.1"))
+implementation(platform("io.github.bodenberg:appdimens-kmp-bom:1.0.2"))
 
 implementation("io.github.bodenberg:appdimens-kmp")
 
@@ -123,7 +142,7 @@ implementation("io.github.bodenberg:appdimens-kmp-units")
 If you import `com.appdimens.kmp.compose.<strategy>` (or `code.<strategy>`) without adding the matching artifact, the Gradle check `checkAppDimensModules` fails with a line such as:
 
 ```text
-Missing AppDimens module for import …percent… — add: implementation("io.github.bodenberg:appdimens-kmp-percent:1.0.1")
+Missing AppDimens module for import …percent… — add: implementation("io.github.bodenberg:appdimens-kmp-percent:1.0.2")
 ```
 
 Runtime helper: `com.appdimens.kmp.core.MissingModule` (package → Maven coordinate). Version comes from the `appdimens.version` Gradle property.
@@ -131,9 +150,9 @@ Runtime helper: `com.appdimens.kmp.core.MissingModule` (package → Maven coordi
 ### Without BOM
 
 ```kotlin
-implementation("io.github.bodenberg:appdimens-kmp:1.0.1")
-implementation("io.github.bodenberg:appdimens-kmp-percent:1.0.1")
-// same satellites as above, each with :1.0.1
+implementation("io.github.bodenberg:appdimens-kmp:1.0.2")
+implementation("io.github.bodenberg:appdimens-kmp-percent:1.0.2")
+// same satellites as above, each with :1.0.2
 ```
 
 ### Artifact matrix
@@ -400,6 +419,16 @@ Other strategies (**percent**, **power**, **fluid**, **auto**, **diagonal**, **f
 | **DimenMetrics eager computation** | `normalizedAspectRatio` / `logNormalizedAspectRatio` are plain `val` — no hidden `synchronized` probe in the SDPA fast lane. |
 | **R8 pre-shrink for all AARs** | All 14 library modules ship R8-optimized bytecode (`optimization { minify = true }` + `-optimizationpasses 10` + `-allowaccessmodification`), mirroring the Android release builds. |
 | **BenchLab KMP** | Competitor benchmark (Dynamic vs SDPS vs Lib #2) that runs on Android, JVM, iOS, macOS and the browser. |
+
+### What's New in 1.0.2 (Compose version crash fix)
+
+| Change | Description |
+|--------|-------------|
+| **Compose artifacts are `compileOnly` now** | The convention plugin (`appdimens.kmp-library`) no longer ships a second copy of the Compose runtime into the consumer's runtime classpath. The consumer is the single source of truth for the Compose stack at runtime — eliminates the "module not found" / `NoClassDefFoundError` crash that happened in 1.0.0/1.0.1 when the consumer's Compose version differed from the library's compile-time Compose version. |
+| **Gradle `constraints { require(...) }` on every Compose artifact** | The library publishes four `require` constraints for `org.jetbrains.compose.runtime:runtime`, `ui`, `foundation` and `material3`. When a consumer's project does not pin a Compose version, Gradle resolves to the version the library was compiled against (Compose Multiplatform 1.11.1, Material3 1.9.0), so runtime ABI matches bytecode. |
+| **BOM aligns Compose automatically** | `io.github.bodenberg:appdimens-kmp-bom:1.0.2` now also constrains the four `org.jetbrains.compose.*` artifacts. A consumer that imports the BOM gets a one-line fix: `implementation(platform("io.github.bodenberg:appdimens-kmp-bom:1.0.2"))` aligns every Compose dependency in their project to the version the library was built against, regardless of what their own Compose would otherwise resolve to. |
+| **Single source of truth in `gradle/libs.versions.toml`** | The convention plugin now reads `composeMultiplatform`, `composeMaterial3`, `kotlinxCoroutines`, `kotlinxAtomicfu`, `kotlinxBrowser` and `androidx.annotation` via the `libs.versions.*` accessors generated from the shared catalog. The 1.0.0/1.0.1 release hardcoded these as string literals in the precompiled script plugin (`composeVersion = "1.11.1"` etc.) and could silently drift from the catalog after a maintainer update. The catalog is now the single source of truth and the build fails fast if it is malformed. |
+| **Test-time alignment** | The internal `composeTest` source set keeps Compose as `implementation` (test-classpath-only, does not flow to consumers) using the same catalog-pinned version, so module-level Compose tests always exercise the same API surface the bytecode targets. |
 
 ### What's New in 1.0.1 (audit fixes + full target matrix)
 

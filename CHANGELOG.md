@@ -6,6 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [1.0.2] — 2026-08-28
+
+### Fixed (Compose-version crash reported after 1.0.1)
+
+- **Consumer on a different Compose Multiplatform version crashes the app at startup ("module not found" / `NoClassDefFoundError`).** In 1.0.0 and 1.0.1 the convention plugin declared the Compose Multiplatform artifacts as `implementation` with the version hardcoded as a string literal in the precompiled script plugin (`composeVersion = "1.11.1"`). The library therefore shipped its own copy of the Compose runtime on the consumer's classpath. When a consumer's app was on a different Compose version (1.9.x, 1.10.x, a different 1.11.x patch, or a newer 1.12.x), Gradle resolved the highest version across the graph and the library's bytecode — compiled against 1.11.1 — referenced internal classes / methods that did not exist in the consumer's version → `NoClassDefFoundError`, `NoSuchMethodError`, "module not found" at app launch. The fix is two-layered:
+  1. All Compose artifacts in the convention plugin (`appdimens.kmp-library`) are now **`compileOnly`** instead of `implementation`. The library never ships a second copy of Compose into the consumer's runtime classpath; the consumer is the single source of truth for the Compose stack at runtime. The version is now also read from the shared `gradle/libs.versions.toml` (no more duplicated string literal that can drift from the catalog).
+  2. The convention plugin now publishes **Gradle `constraints { ... require(...) }`** blocks for `org.jetbrains.compose.runtime:runtime`, `ui`, `foundation` and `material3`. When a consumer does not pin a Compose version of their own, Gradle resolves exactly the version the library was compiled against, so the runtime ABI matches the bytecode. A consumer that deliberately wants a different Compose version can still override (Gradle conflict resolution lets the higher version win; the README documents the ABI-drift contract for that case).
+  3. The `library-bom` (BOM artifact `io.github.bodenberg:appdimens-kmp-bom`) now also includes the four `org.jetbrains.compose.*` artifacts in its `api(...)` constraint set. Consumers who import the BOM get a one-line fix: `implementation(platform("io.github.bodenberg:appdimens-kmp-bom:1.0.2"))` aligns every Compose Multiplatform dependency in the project to the version AppDimens was compiled against, regardless of what their own Compose would otherwise resolve to.
+  4. Internal test source set `composeTest` keeps Compose as `implementation` so module-level Compose tests still run on the producer's classpath; the test-time alignment uses the same catalog version, so tests always exercise the same Compose API the bytecode targets.
+- **Catalog drift between the precompiled script plugin and `libs.versions.toml` was possible in 1.0.0/1.0.1.** The hardcoded `composeVersion = "1.11.1"` / `material3Version = "1.9.0"` / `coroutinesVersion = "1.10.2"` etc. in `appdimens.kmp-library.gradle.kts` could silently fall behind the catalog after a maintainer update. The convention plugin now reads all of these via the `libs.versions.*` accessors generated from the shared catalog (`build-logic/settings.gradle.kts` declares the same catalog via `versionCatalogs { create("libs") { from(files("../gradle/libs.versions.toml")) } }`), so the catalog is the single source of truth and the build fails fast if the catalog is malformed.
+
+### Verified
+
+- `./gradlew :library:compileKotlinJvm :library:compileDebugKotlinAndroid` builds the core module against the catalog-pinned Compose 1.11.1 with no duplicated `compose.runtime:runtime` on the publication classpath.
+- `./gradlew :library-bom:dependencies --configuration api` shows the four `org.jetbrains.compose.*` constraints emitted by the BOM, so consumers that apply the BOM inherit the alignment.
+- `./gradlew :library:dependencies --configuration compileClasspath` (with the convention plugin applied) lists Compose as `compileOnly` (absent from the published classpath) and exposes the four `require` constraints on the consumer side.
+
+---
+
 ## [1.0.1] — 2026-08-15
 
 ### Fixed (audit findings from the 1.0.0 release)

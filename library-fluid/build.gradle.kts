@@ -36,7 +36,7 @@ kotlin {
 // PT ── Publicação no Maven Central (mesmo plugin do Android original) ────────
 //    Credenciais em ~/.gradle/gradle.properties (nunca commitadas).
 val libraryVersion: String =
-    providers.gradleProperty("appdimens.version").orElse("1.0.1").get()
+    providers.gradleProperty("appdimens.version").orElse("1.0.2").get()
 
 mavenPublishing {
     coordinates("io.github.bodenberg", "appdimens-kmp-fluid", libraryVersion)
