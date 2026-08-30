@@ -6,17 +6,17 @@ You write **once** and your code automatically adapts to any device — **phone,
 
 ---
 
-## Installation (v1.0.1)
+## Installation (v3.2.0)
 
 ```kotlin
 // commonMain.dependencies (or the platform source set you target)
-implementation(platform("io.github.bodenberg:appdimens-kmp-bom:1.0.1"))
+implementation(platform("io.github.bodenberg:appdimens-kmp-bom:3.2.0"))
 implementation("io.github.bodenberg:appdimens-kmp")
 implementation("io.github.bodenberg:appdimens-kmp-percent")
 implementation("io.github.bodenberg:appdimens-kmp-resize")
 ```
 
-Without the BOM, pin `:1.0.1` on each coordinate. Details: [README](./README.md) · [MODULES.md](./DOCUMENTATION/MODULES.md).
+Without the BOM, pin `:3.2.0` on each coordinate. Details: [README](./README.md) · [MODULES.md](./DOCUMENTATION/MODULES.md).
 
 | Strategy in this guide | Maven module |
 |------------------------|--------------|

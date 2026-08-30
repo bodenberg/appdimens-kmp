@@ -42,11 +42,11 @@ plugins {
 
 // EN Versions pinned to gradle/libs.versions.toml.
 // PT Versões fixadas conforme gradle/libs.versions.toml.
-private val coroutinesVersion = "1.10.2"
+private val coroutinesVersion = "1.11.0"
 private val atomicfuVersion = "0.28.0"
 private val composeVersion = "1.11.1"
 private val material3Version = "1.9.0"
-private val kotlinxBrowserVersion = "0.3.0"
+private val kotlinxBrowserVersion = "0.5.0"
 private val androidxAnnotationVersion = "1.9.1"
 
 kotlin {
@@ -144,24 +144,40 @@ kotlin {
             //    lives in commonMain: the Compose compiler plugin (applied to all
             //    compilations) requires it on the class path even for targets whose
             //    hierarchy excludes the ui/foundation-backed composeMain layer.
+            //    It is compileOnly: the library compiles against Compose Multiplatform
+            //    but NEVER ships or pins a version, so a Compose Multiplatform app
+            //    provides the single runtime (composables must share one Recomposer)
+            //    regardless of the version it chooses — no class/function-not-found
+            //    skew. Coroutines/atomicfu stay implementation (stable, runtime-needed).
             // PT O runtime do Compose publica para TODOS os targets (incl. linux/mingw),
-            //    então fica no commonMain: o plugin do compilador Compose (aplicado a
-            //    todas as compilações) exige o runtime no classpath mesmo para targets
-            //    cuja hierarquia exclui a camada composeMain (ui/foundation).
-            implementation("org.jetbrains.compose.runtime:runtime:$composeVersion")
+            //    então fica no commonMain. É compileOnly: a library compila contra o
+            //    Compose Multiplatform mas NUNCA embarca/pina versão, então um app
+            //    Compose Multiplatform fornece o único runtime (composables compartilham
+            //    um Recomposer) independente da versão — sem skew de classe/função.
+            compileOnly("org.jetbrains.compose.runtime:runtime:$composeVersion")
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
             implementation("org.jetbrains.kotlinx:atomicfu:$atomicfuVersion")
         }
         getByName("composeMain").dependencies {
-            implementation("org.jetbrains.compose.runtime:runtime:$composeVersion")
-            implementation("org.jetbrains.compose.ui:ui:$composeVersion")
-            implementation("org.jetbrains.compose.foundation:foundation:$composeVersion")
-            implementation("org.jetbrains.compose.material3:material3:$material3Version")
+            compileOnly("org.jetbrains.compose.runtime:runtime:$composeVersion")
+            compileOnly("org.jetbrains.compose.ui:ui:$composeVersion")
+            compileOnly("org.jetbrains.compose.foundation:foundation:$composeVersion")
+            compileOnly("org.jetbrains.compose.material3:material3:$material3Version")
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
             implementation("org.jetbrains.kotlinx:atomicfu:$atomicfuVersion")
         }
         commonTest.dependencies {
             implementation(kotlin("test"))
+            // EN Compose is `compileOnly` on main (no version pin, no conflict), but the
+            //    library's own Compose tests (composeTest) need a concrete Compose runtime
+            //    at test time. Provide it here, test-scoped and never shipped. Without it
+            //    tests fail with NoClassDefFoundError: androidx/compose/ui/unit/DensityKt
+            //    — the same "class not found" family as the consumer side.
+            // PT Compose é `compileOnly` no main (sem pin/sem conflito), mas os próprios
+            //    testes Compose da lib (composeTest) precisam de um runtime concreto em
+            //    tempo de teste. Fornecido aqui, escopo de teste e nunca embarcado.
+            implementation("org.jetbrains.compose.runtime:runtime:$composeVersion")
+            implementation("org.jetbrains.compose.ui:ui:$composeVersion")
         }
         androidMain.dependencies {
             implementation("androidx.annotation:annotation:$androidxAnnotationVersion")

@@ -1,8 +1,8 @@
 # AppDimens KMP — library map (concise)
 
-**Modules (1.0.1):** [DOCUMENTATION/MODULES.md](../DOCUMENTATION/MODULES.md)
+**Modules (3.2.0):** [DOCUMENTATION/MODULES.md](../DOCUMENTATION/MODULES.md)
 
-**Doc base (repo root, Git ref `1.0.1`):** this repository (`appdimens-kmp`)
+**Doc base (repo root, Git ref `3.2.0`):** this repository (`appdimens-kmp`)
 
 This file supplements [SKILL.md](SKILL.md). Read it when you need **package locations**, **symmetry between Compose and `code`**, or **core types**.
 

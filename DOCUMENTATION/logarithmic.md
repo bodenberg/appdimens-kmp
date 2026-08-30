@@ -1,6 +1,6 @@
 # Logarithmic strategy (`compose.logarithmic` / `code.logarithmic`)
 
-**Artifact:** `io.github.bodenberg:appdimens-kmp-logarithmic:1.0.1` (`:library-logarithmic`)
+**Artifact:** `io.github.bodenberg:appdimens-kmp-logarithmic:3.2.0` (`:library-logarithmic`)
 See [MODULES.md](MODULES.md) · [README installation](../README.md#installation-v101)
 
 **Same API surface as scaled** with prefixes `logsdp` / `loghdp` / `logwdp` / `logssp` / … — see [COMPOSE-API-CONVENTIONS.md §3](COMPOSE-API-CONVENTIONS.md#3-strategy-prefix-map-mirror-of-scaled).

@@ -2,7 +2,7 @@
 
 This folder goes deeper into each **scaling strategy** in [AppDimens Dynamic](../README.md): what it is, the formula, how to import it, and when to pick each mode. Each strategy’s code lives in `com.appdimens.kmp.compose.<strategy>` and `com.appdimens.kmp.code.<strategy>` with **no cross-imports** between strategies.
 
-**Modules (1.0.1):** principal `appdimens-kmp` (scaled + core/common/plain); strategy modules `appdimens-kmp-<strategy>`; BOM `appdimens-kmp-bom`. See [README — Installation](../README.md#installation-v101) · [MODULES.md](MODULES.md).
+**Modules (3.2.0):** principal `appdimens-kmp` (scaled + core/common/plain); strategy modules `appdimens-kmp-<strategy>`; BOM `appdimens-kmp-bom`. See [README — Installation](../README.md#installation-v101) · [MODULES.md](MODULES.md).
 
 ### 1.0.0 Changes (KMP port)
 
@@ -16,7 +16,7 @@ This folder goes deeper into each **scaling strategy** in [AppDimens Dynamic](..
 - **R8 pre-shrink for all AARs**: all 14 Android modules ship R8-optimized bytecode (`optimization { minify = true }`).
 - **BenchLab KMP**: competitor benchmark (Dynamic vs SDPS vs Lib #2) that runs on Android, JVM, iOS, macOS and the browser.
 
-### 1.0.1 Changes (audit fixes + full target matrix)
+### 3.2.0 Changes (audit fixes + full target matrix)
 
 - **`fastPartition` race fixed**: the fast partition is now a single atomic `FastPartitionSlot(metrics, partition)` — before, two independent atomics could pair a snapshot partition with another window's metrics and return a wrong dimension under concurrency.
 - **Android context cache cycle fixed**: the `WeakHashMap<Context, …>` value no longer holds the key strongly (now a `WeakReference`), so Activities/Contexts are collectable.
@@ -44,7 +44,7 @@ For **cache, bypass, and performance**, see also [library/PERFORMANCE.md](../lib
 
 ## Summary
 
-| Strategy | Maven artifact (1.0.1) | Document |
+| Strategy | Maven artifact (3.2.0) | Document |
 |----------|------------------------|----------|
 | **Unified math (all strategies)** | — | [MATHEMATICS-AND-CALCULUS.md](MATHEMATICS-AND-CALCULUS.md) |
 | **Module graph / packaging** | see [MODULES.md](MODULES.md) | [MODULES.md](MODULES.md) |
@@ -69,7 +69,7 @@ For **cache, bypass, and performance**, see also [library/PERFORMANCE.md](../lib
 - [PRD.md](PRD.md) · [PDR.md](PDR.md)
 
 0. [KDoc API — root index](index.md)  
-0a. [Modules — Maven/Gradle graph (1.0.1)](MODULES.md)  
+0a. [Modules — Maven/Gradle graph (3.2.0)](MODULES.md)  
 0b. [Mathematics & calculus — formal reference](MATHEMATICS-AND-CALCULUS.md)  
 1. [Compose API reference — conventions & scaled catalog](COMPOSE-API-CONVENTIONS.md)  
 2. [Scaled](scaled.md) — recommended starting point  

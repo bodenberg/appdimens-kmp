@@ -1,6 +1,6 @@
 # Auto strategy (`compose.auto` / `code.auto`)
 
-**Artifact:** `io.github.bodenberg:appdimens-kmp-auto:1.0.1` (`:library-auto`)
+**Artifact:** `io.github.bodenberg:appdimens-kmp-auto:3.2.0` (`:library-auto`)
 See [MODULES.md](MODULES.md) · [README installation](../README.md#installation-v101)
 
 **Same API surface as scaled** with prefixes `asdp` / `ahdp` / `awdp` / `assp` / … — see [COMPOSE-API-CONVENTIONS.md §3](COMPOSE-API-CONVENTIONS.md#3-strategy-prefix-map-mirror-of-scaled).

@@ -1,6 +1,6 @@
 # AppDimens KMP — library map
 
-**Doc base (repo root, Git ref `1.0.1`):** this repository (`appdimens-kmp`)
+**Doc base (repo root, Git ref `3.2.0`):** this repository (`appdimens-kmp`)
 
 Read this file when you need package locations, Compose↔`code` symmetry, or core types.
 
@@ -8,7 +8,7 @@ Read this file when you need package locations, Compose↔`code` symmetry, or co
 
 ---
 
-## Gradle / Maven modules (1.0.1)
+## Gradle / Maven modules (3.2.0)
 
 | Strategy | Gradle project | Maven artifact | Source roots (commonMain) |
 |---|---|---|---|

@@ -1,6 +1,6 @@
 # Perimeter strategy (`compose.perimeter` / `code.perimeter`)
 
-**Artifact:** `io.github.bodenberg:appdimens-kmp-perimeter:1.0.1` (`:library-perimeter`)
+**Artifact:** `io.github.bodenberg:appdimens-kmp-perimeter:3.2.0` (`:library-perimeter`)
 See [MODULES.md](MODULES.md) · [README installation](../README.md#installation-v101)
 
 **Same API surface as scaled** with prefixes `prsdp` / `prhdp` / `prwdp` / `prssp` / … — see [COMPOSE-API-CONVENTIONS.md §3](COMPOSE-API-CONVENTIONS.md#3-strategy-prefix-map-mirror-of-scaled).

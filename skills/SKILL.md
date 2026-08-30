@@ -5,11 +5,11 @@ description: Use this skill for any Kotlin Multiplatform responsive layout or sc
 
 # AppDimens KMP — project workflow
 
-**Library (1.0.1):** `appdimens-kmp` (scaled + core), `appdimens-kmp-<strategy>`, BOM `appdimens-kmp-bom`. Packages use the **`com.appdimens.kmp.*`** root (this is the Kotlin Multiplatform library — the Android-only predecessor used `com.appdimens.dynamic.*`; do not mix them). See [MODULES.md](../DOCUMENTATION/MODULES.md).
+**Library (3.2.0):** `appdimens-kmp` (scaled + core), `appdimens-kmp-<strategy>`, BOM `appdimens-kmp-bom`. Packages use the **`com.appdimens.kmp.*`** root (this is the Kotlin Multiplatform library — the Android-only predecessor used `com.appdimens.dynamic.*`; do not mix them). See [MODULES.md](../DOCUMENTATION/MODULES.md).
 
 **Platforms:** Android (min SDK 24) · JVM desktop · iOS (`iosArm64`/`iosSimulatorArm64`) · macOS (`macosArm64`) · Web (Kotlin/JS + wasmJs) · Linux (`linuxX64`/`linuxArm64`) · Windows (`mingwX64`). One API for all of them (Linux/Windows expose the `code` API only).
 
-**Install:** `platform("io.github.bodenberg:appdimens-kmp-bom:1.0.1")` then the modules you need. Kotlin imports are `com.appdimens.kmp.*`.
+**Install:** `platform("io.github.bodenberg:appdimens-kmp-bom:3.2.0")` then the modules you need. Kotlin imports are `com.appdimens.kmp.*`.
 
 On release bumps, update version URLs in this file, `library-map.md`, and `reference.md` together.
 
@@ -35,8 +35,9 @@ On release bumps, update version URLs in this file, `library-map.md`, and `refer
 - New targets: classic Kotlin/JS (`js`, IR), `linuxX64`, `linuxArm64`, `mingwX64` (all modules, via the shared `appdimens.kmp-library` convention plugin)
 - Encapsulated diagnostics — `DimenCache.isInitialized` is a plain `Boolean`, `cacheStats()` returns immutable `CacheStats`; experimental atomics are `internal`
 - CI restored — `verify-linux` + `verify-apple` gates (Apple gate no longer references the nonexistent `linkDebugFrameworkIosSimulatorArm64` task); wrapper `distributionSha256Sum` pinned; Compose dev repo removed
+- Compose Multiplatform version independence: `org.jetbrains.compose.*` (runtime, ui, foundation, material3) is declared `compileOnly` in the `appdimens.kmp-library` convention plugin. The library compiles against the pinned Compose Multiplatform version but never ships or pins it; the consumer's Compose Multiplatform is the single runtime on every target (Android, JVM, iOS, macOS, Web), so there is no version skew and no "class/function not found" regardless of the Compose Multiplatform version the app chooses.
 
-**Authoritative docs (repo root, Git ref `1.0.1`):**
+**Authoritative docs (repo root, Git ref `3.2.0`):**
 - [README.md](../README.md) — install, `AppDimensProvider`, `DimenCache` (snapshot-partitioned; event-driven config watcher; specialized kernels), platform table
 - [DOCUMENTATION/MODULES.md](../DOCUMENTATION/MODULES.md) — Maven/Gradle graph (principal vs satellites) + target table
 - [DOCUMENTATION/README.md](../DOCUMENTATION/README.md) — all strategies, decision flow

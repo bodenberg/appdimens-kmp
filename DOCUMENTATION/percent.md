@@ -1,6 +1,6 @@
 # Percent strategy (`compose.percent` / `code.percent`)
 
-**Artifact:** `io.github.bodenberg:appdimens-kmp-percent:1.0.1` (`:library-percent`)
+**Artifact:** `io.github.bodenberg:appdimens-kmp-percent:3.2.0` (`:library-percent`)
 See [MODULES.md](MODULES.md) · [README installation](../README.md#installation-v101)
 
 ## What it is

@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [3.2.0]
+
+### Fixed
+
+- **Compose version independence for consumers.** `library/consumer-rules.pro` now keeps `androidx.compose.*` packages. The library references Compose via `compileOnly` (no version pin), but a minifying consumer app using a different Compose BOM could have those classes stripped by R8, causing `NoClassDefFoundError` / "class not found" at runtime. The keep rules guarantee the consumer's single Compose runtime stays present and linkable, so the library works with any Compose version — no conflict.
+- **Library Compose tests.** Added `compose.runtime` + `compose.ui` as test-scoped dependencies in the `appdimens.kmp-library` convention plugin so the library's own Compose tests (`composeTest`) have a Compose runtime at test time (`NoClassDefFoundError: androidx/compose/ui/unit/DensityKt` fixed).
+
+---
+
 ## [1.0.1] — 2026-08-15
 
 ### Fixed (audit findings from the 1.0.0 release)
@@ -66,5 +75,6 @@ First stable Kotlin Multiplatform release.
 - **BenchLab KMP** — competitor benchmark (Dynamic vs SDPS vs Lib #2) that runs on Android, JVM, iOS, macOS and the browser.
 - **BOM** — `appdimens-kmp-bom` version alignment for multi-module consumers.
 
+[3.2.0]: https://github.com/bodenberg/appdimens-kmp/releases/tag/3.2.0
 [1.0.1]: https://github.com/bodenberg/appdimens-kmp/releases/tag/1.0.1
 [1.0.0]: https://github.com/bodenberg/appdimens-kmp/releases/tag/1.0.0

@@ -1,4 +1,4 @@
-# AppDimens Dynamic KMP — Gradle / Maven modules (1.0.1)
+# AppDimens Dynamic KMP — Gradle / Maven modules (3.2.0)
 
 ## Module graph
 
@@ -51,13 +51,13 @@ Every library module (`:library` and all satellites) compiles for:
 | `appdimens-kmp-<strategy>` | `code.<strategy>` + `compose.<strategy>` |
 | `appdimens-kmp-bom` | Version constraints for the set above (`java-platform`) |
 
-All published coordinates share `appdimens.version` in `gradle.properties` (**1.0.1**).
+All published coordinates share `appdimens.version` in `gradle.properties` (**3.2.0**).
 
 ## Installation
 
 ```kotlin
 // commonMain.dependencies (or the platform source set you target)
-implementation(platform("io.github.bodenberg:appdimens-kmp-bom:1.0.1"))
+implementation(platform("io.github.bodenberg:appdimens-kmp-bom:3.2.0"))
 implementation("io.github.bodenberg:appdimens-kmp")
 implementation("io.github.bodenberg:appdimens-kmp-percent")
 ```

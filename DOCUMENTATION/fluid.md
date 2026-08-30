@@ -1,6 +1,6 @@
 # Fluid strategy (`compose.fluid` / `code.fluid`)
 
-**Artifact:** `io.github.bodenberg:appdimens-kmp-fluid:1.0.1` (`:library-fluid`)
+**Artifact:** `io.github.bodenberg:appdimens-kmp-fluid:3.2.0` (`:library-fluid`)
 See [MODULES.md](MODULES.md) · [README installation](../README.md#installation-v101)
 
 **Same API surface as scaled** with prefixes `fsdp` / `fhdp` / `fwdp` / `fssp` / … — see [COMPOSE-API-CONVENTIONS.md §3](COMPOSE-API-CONVENTIONS.md#3-strategy-prefix-map-mirror-of-scaled).

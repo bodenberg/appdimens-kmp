@@ -84,3 +84,23 @@
 -dontnote kotlinx.**
 -dontwarn sun.misc.**
 -dontnote sun.misc.**
+
+
+################################################################################
+# 7. COMPOSE RUNTIME REFERENCES (compileOnly — NOT bundled by the library)
+#    The library references androidx.compose.* classes (LocalDensity, Density,
+#    Dp, TextUnit, rememberTextMeasurer, BoxWithConstraintsScope, LocalTextStyle,
+#    CompositionLocalProvider, …) but ships NONE of them: Compose is `compileOnly`,
+#    so the consuming app provides the single runtime. A minifying consumer using a
+#    DIFFERENT Compose version would otherwise let R8 strip the exact Compose
+#    classes the library needs when the app's own code does not touch them, causing
+#    NoClassDefFoundError / "class not found" at runtime. Keeping these packages
+#    guarantees the consumer's Compose runtime stays present and linkable — the
+#    library works with ANY Compose version the user picks, with no version pin
+#    and no conflict (the app still owns one Compose runtime).
+################################################################################
+
+-keep class androidx.compose.runtime.** { *; }
+-keep class androidx.compose.ui.** { *; }
+-keep class androidx.compose.foundation.** { *; }
+-keep class androidx.compose.material3.** { *; }

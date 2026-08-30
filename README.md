@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="https://github.com/bodenberg/appdimens-kmp/releases" title="Releases">
-    <img src="https://img.shields.io/badge/version-1.0.1-blue.svg" alt="Version 1.0.1">
+    <img src="https://img.shields.io/badge/version-3.2.0-blue.svg" alt="Version 3.2.0">
   </a>
   &nbsp;
   <a href="LICENSE" title="Apache License 2.0">
@@ -66,7 +66,7 @@ Write values like `16.sdp` and the library scales them from the current window *
 
 ---
 
-## Supported platforms (1.0.1)
+## Supported platforms (3.2.0)
 
 | Target | Compose API | `code` API | Notes |
 |--------|:---:|:---:|-------|
@@ -91,15 +91,15 @@ Every platform shares the **same Kotlin API**, the same **cache** and the same *
 
 ---
 
-## Installation (v1.0.1)
+## Installation (v3.2.0)
 
-**1.0.1** keeps the modular packaging: the library ships as a **principal** artifact (`common` + `core` + **scaled** + **plain**) plus optional strategy modules. Kotlin packages and imports are unchanged.
+**3.2.0** keeps the modular packaging: the library ships as a **principal** artifact (`common` + `core` + **scaled** + **plain**) plus optional strategy modules. Kotlin packages and imports are unchanged.
 
 ### With BOM (common to all platforms)
 
 ```kotlin
 // commonMain.dependencies (or the platform source set you target)
-implementation(platform("io.github.bodenberg:appdimens-kmp-bom:1.0.1"))
+implementation(platform("io.github.bodenberg:appdimens-kmp-bom:3.2.0"))
 
 implementation("io.github.bodenberg:appdimens-kmp")
 
@@ -123,7 +123,7 @@ implementation("io.github.bodenberg:appdimens-kmp-units")
 If you import `com.appdimens.kmp.compose.<strategy>` (or `code.<strategy>`) without adding the matching artifact, the Gradle check `checkAppDimensModules` fails with a line such as:
 
 ```text
-Missing AppDimens module for import …percent… — add: implementation("io.github.bodenberg:appdimens-kmp-percent:1.0.1")
+Missing AppDimens module for import …percent… — add: implementation("io.github.bodenberg:appdimens-kmp-percent:3.2.0")
 ```
 
 Runtime helper: `com.appdimens.kmp.core.MissingModule` (package → Maven coordinate). Version comes from the `appdimens.version` Gradle property.
@@ -131,9 +131,9 @@ Runtime helper: `com.appdimens.kmp.core.MissingModule` (package → Maven coordi
 ### Without BOM
 
 ```kotlin
-implementation("io.github.bodenberg:appdimens-kmp:1.0.1")
-implementation("io.github.bodenberg:appdimens-kmp-percent:1.0.1")
-// same satellites as above, each with :1.0.1
+implementation("io.github.bodenberg:appdimens-kmp:3.2.0")
+implementation("io.github.bodenberg:appdimens-kmp-percent:3.2.0")
+// same satellites as above, each with :3.2.0
 ```
 
 ### Artifact matrix
@@ -146,7 +146,7 @@ implementation("io.github.bodenberg:appdimens-kmp-percent:1.0.1")
 
 Module graph: [DOCUMENTATION/MODULES.md](DOCUMENTATION/MODULES.md).
 
-**Requirements:** Min SDK **24** (Android) · **Kotlin 2.x** & **Java 17** (JVM) · **Compose Multiplatform 1.x**
+**Requirements:** Min SDK **24** (Android) · **Kotlin 2.x** & **Java 17** (JVM) · **Compose Multiplatform 1.x** (consumer-provided — the library declares Compose Multiplatform as `compileOnly` and never pins a version, so any Compose Multiplatform version works without conflict)
 
 ---
 
@@ -349,7 +349,7 @@ Other strategies (**percent**, **power**, **fluid**, **auto**, **diagonal**, **f
 | Resource | Use for |
 |----------|---------|
 | [DOCUMENTATION/README.md](DOCUMENTATION/README.md) | Per-strategy explanations |
-| [DOCUMENTATION/MODULES.md](DOCUMENTATION/MODULES.md) | Gradle/Maven module graph (1.0.1) |
+| [DOCUMENTATION/MODULES.md](DOCUMENTATION/MODULES.md) | Gradle/Maven module graph (3.2.0) |
 | [COMPOSE-API-CONVENTIONS.md](DOCUMENTATION/COMPOSE-API-CONVENTIONS.md) | Every Compose property & facilitator (scaled catalog + prefix map) |
 | [DOCUMENTATION/index.md](DOCUMENTATION/index.md) | Package index |
 
@@ -377,7 +377,7 @@ Other strategies (**percent**, **power**, **fluid**, **auto**, **diagonal**, **f
 
 ---
 
-## Highlights (1.0.1)
+## Highlights (3.2.0)
 
 - Code-only scaling (no XML dimen grids) · **SDP / HDP / WDP** + **14** scaling modes  \
 - **Aspect ratio** & **multi-window** flags · **Inverters** & **facilitators** · **Foldable** awareness on Android via WindowManager  \
@@ -401,7 +401,7 @@ Other strategies (**percent**, **power**, **fluid**, **auto**, **diagonal**, **f
 | **R8 pre-shrink for all AARs** | All 14 library modules ship R8-optimized bytecode (`optimization { minify = true }` + `-optimizationpasses 10` + `-allowaccessmodification`), mirroring the Android release builds. |
 | **BenchLab KMP** | Competitor benchmark (Dynamic vs SDPS vs Lib #2) that runs on Android, JVM, iOS, macOS and the browser. |
 
-### What's New in 1.0.1 (audit fixes + full target matrix)
+### What's New in 3.2.0 (audit fixes + full target matrix)
 
 | Change | Description |
 |--------|-------------|

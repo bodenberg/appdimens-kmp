@@ -1,6 +1,6 @@
 # Scaled strategy (`compose` / mirrored `code` — sources under `compose/scaled/`)
 
-**Artifact:** `io.github.bodenberg:appdimens-kmp:1.0.1` (`:library`)
+**Artifact:** `io.github.bodenberg:appdimens-kmp:3.2.0` (`:library`)
 API catalog: [COMPOSE-API-CONVENTIONS.md](COMPOSE-API-CONVENTIONS.md) · modules: [MODULES.md](MODULES.md)
 
 ## What it is

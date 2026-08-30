@@ -1,6 +1,6 @@
 # Fit strategy (`compose.fit` / `code.fit`)
 
-**Artifact:** `io.github.bodenberg:appdimens-kmp-fit:1.0.1` (`:library-fit`)
+**Artifact:** `io.github.bodenberg:appdimens-kmp-fit:3.2.0` (`:library-fit`)
 See [MODULES.md](MODULES.md) · [README installation](../README.md#installation-v101)
 
 **Same API surface as scaled** with prefixes `ftsdp` / `fthdp` / `ftwdp` / `ftssp` / … — see [COMPOSE-API-CONVENTIONS.md §3](COMPOSE-API-CONVENTIONS.md#3-strategy-prefix-map-mirror-of-scaled).
