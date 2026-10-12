@@ -44,8 +44,14 @@ jobs:
       #    is present and its license accepted so configuration does not fail.
       # PT O target android ainda é configurado pelo plugin de convenção KMP, então o
       #    AGP o avalia mesmo compilando só klibs Apple. Garante o SDK e a licença.
+      # EN The action's default `packages` includes the legacy `tools` package, which
+      #    no longer exists in the SDK repository and fails the step. Install only
+      #    platform-tools. PT O `packages` padrão inclui o pacote legado `tools`, que
+      #    não existe mais no repositório do SDK e quebra o passo.
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
 
       - name: Accept Android SDK licenses
         run: yes | sdkmanager --licenses > /dev/null || true
