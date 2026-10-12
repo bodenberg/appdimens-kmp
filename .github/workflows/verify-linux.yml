@@ -46,8 +46,14 @@ jobs:
       #    the Android host tests at configuration/compile time.
       # PT O Android SDK já vem no runner, mas a plataforma compileSdk (37) não está
       #    instalada e a licença não está aceita. Sem isto, o AGP falha nos host tests.
+      # EN The action's default `packages` includes the legacy `tools` package, which
+      #    no longer exists in the SDK repository and fails the step.
+      # PT O `packages` padrão da action inclui o pacote legado `tools`, que não
+      #    existe mais no repositório do SDK e quebra o passo.
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
 
       - name: Accept Android SDK licenses
         run: yes | sdkmanager --licenses > /dev/null || true
