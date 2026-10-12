@@ -15,12 +15,18 @@ import kotlin.time.TimeSource
  *
  *    Results are printed to stdout for human inspection; this test asserts nothing
  *    about absolute timing (CI machines vary wildly).
+ *
+ *    Lives in jvmTest (not commonTest): ~84M ops per run exceed the Karma/Mocha
+ *    per-test timeout under wasmJs ChromeHeadless on CI runners, failing `check`.
  * PT Micro-benchmark ponta-a-ponta do fast lane (JVM/desktop, sem APIs Android).
  *    Mede a API `code` real (`DimenSdp.sdp/sdpa/hdp/wdp`) contra a linha de base
  *    crua de duas multiplicações (`base * scale * density`). O fast lane deve ficar
  *    dentro de um pequeno fator constante da matemática crua — um múltiplo grande
  *    indica que o port perdeu a memoização de métricas por janela (fast window slot /
  *    ThreadLocal) que o Android original usa.
+ *
+ *    Fica em jvmTest (não commonTest): ~84M ops por execução estouram o timeout
+ *    por teste do Karma/Mocha no wasmJs ChromeHeadless dos runners de CI.
  */
 @OptIn(ExperimentalAtomicApi::class)
 class DimenFastLaneEndToEndTest {
