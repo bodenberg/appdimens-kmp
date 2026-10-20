@@ -24,6 +24,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### CI
 
 - **`verify-full` replaces `verify-linux`.** The single `check` job (40+ min, OOM / "log was not found" on ubuntu-latest) became a matrix of parallel jobs covering every module: JVM tests, Android host tests plus the app build, JS (Node), Wasm (Chrome), Linux x64 tests plus Linux arm64 / Windows compiles, and Apple tests (iOS Simulator + macOS) plus the iOS device compile. Each job uploads its test reports when it fails.
+- **Linux/Windows test resolution fixed.** `org.jetbrains.compose.ui:ui` moved from `commonTest` to `composeTest`: Compose Multiplatform publishes no linux/mingw `ui`, so `linuxX64Test` could not resolve its dependencies.
 
 
 ## [3.2.0]
