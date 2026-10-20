@@ -12,7 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - **Custom scaling strategies — new module `appdimens-kmp-custom`** (`:library-custom`, pure `commonMain`).
   - Define your own strategy with a DSL (`scalingStrategy("brand") { … }`) or with JSON in the cross-platform format shared by every AppDimens library.
-  - Curves: linear, power, logarithmic, interpolated, constant, breakpoints, or a pure `custom { }` lambda.
+  - Curves: linear, power, logarithmic, interpolated, constant, breakpoints, a free-form text `expression("…")` (JSON-serializable, same result on every platform), or a pure `custom { }` lambda; plus a per-value `formula("…")`.
   - Configurable: reference frame, axis, factor and value bounds, aspect ratio, font-scale policy, and rules per device class / screen range / orientation / multi-window.
   - Strategies can extend built-ins and presets (`tabletFriendly`, `compactFirst`, `tvSafe`, `wearable`, `gameHud`, `readableText`).
   - APIs: `16.cdp(Brand)` / `14.csp(Brand)` / `cdpPx` / `cspPx`, `ProvideScalingStrategy`, `ScalingStrategies.default`, `Brand.dp(16)`, `explainCurrent()`, and `code.custom` (`16.cdp(appContext, Brand)` → px).

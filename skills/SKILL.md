@@ -16,6 +16,7 @@ On release bumps, update version URLs in this file, `library-map.md`, and `refer
 **Unreleased — custom strategies (`appdimens-kmp-custom`, on `main`):**
 - `scalingStrategy("brand") { reference(…); curve = power(0.8f); clamp(…); on(DeviceClass.TABLET) { … } }` registers a user-defined strategy. JSON (`ScalingStrategies.loadJson`) uses the cross-platform `custom-strategy.schema.json` format.
 - Compose: `16.cdp(Brand)`, `14.csp(Brand)`, `cdpPx` / `cspPx`, the no-arg `16.cdp` (scope via `ProvideScalingStrategy`, else `ScalingStrategies.default`), `Brand.dp(16)`, `Brand.explainCurrent()`. `code`: `16.cdp(appContext, Brand)` returns **px**; also `cdpDp`, `csp`, `cspUnits`. Pure `commonMain`, every target.
+- Free-form formulas: `curve = expression("pow(ratio, 0.8) * (tablet ? 0.9 : 1)")` (factor) and `formula("base * pow(sw / 360, 0.7) + 2")` (per value) — text that also works in JSON (`"type": "expression"`, `"formula"`) and gives identical results on every platform. Variables: `sw width height shortSide longSide diagonal perimeter aspectRatio density fontScale`, flags `landscape portrait multiWindow phone tablet desktop tv watch car vr`, curve context `ratio axis ref refWidth refHeight`, value context `base scaled factor`.
 - Presets `CustomPresets.{TABLET_FRIENDLY, COMPACT_FIRST, TV_SAFE, WEARABLE, GAME_HUD, READABLE_TEXT}`. Built-ins as parents: `BuiltInStrategies.{SCALED, POWER, LOGARITHMIC, INTERPOLATED, DIAGONAL, PERIMETER, FIXED}.extend(id) { … }`.
 - Core: `CalcType.CUSTOM` + `DimenCache.buildCustomKey` (the strategy id lives in the key, so strategies never alias). Factor-only strategies cost one multiply.
 
@@ -185,7 +186,7 @@ Use when the user asks for their own scaling or none of the rows above satisfies
 2. **Keep a single source.** Define strategies in one place (`object AppStrategies` or a `composeResources/files/appdimens-strategies.json` loaded with `ScalingStrategies.loadJson`). If the project has an `appdimens.config.json` listing `customStrategies`, reuse those ids and never invent new ones silently.
 3. **Rules over forks.** Express device or screen differences as `on(DeviceClass.X) { … }` / `onScreen(minSmallestWidth = …) { … }` inside **one** strategy, not as separate strategies chosen with `if` at call sites.
 4. **Use `cdp` / `csp`** at call sites. Put `ProvideScalingStrategy` at the screen root or set `ScalingStrategies.default` once when a whole area uses it. `code` APIs (`16.cdp(appContext, Brand)`) return px.
-5. **Value bounds only when required** (`clampValue`, e.g. minimum tap targets): they move the strategy to the cached lane. `custom { }` / `transform { }` lambdas must be pure.
+5. **Value bounds only when required** (`clampValue`, e.g. minimum tap targets): they move the strategy to the cached lane. `custom { }` / `transform { }` lambdas must be pure. When the growth law does not fit any curve, write it as an `expression("…")` / `formula("…")` instead of a lambda when it must live in JSON or be shared with other platforms.
 6. **Verify** with `Brand.explainCurrent()` (Compose) or `Brand.explain(appContext)` on a phone, a tablet and the smallest supported device. Cite the factor in your answer.
 
 ---

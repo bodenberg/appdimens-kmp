@@ -32,7 +32,7 @@
 - [Power](DOCUMENTATION/power.md)
 - [Resize](DOCUMENTATION/resize.md)
 - [Physical units](DOCUMENTATION/physical-units.md)
-- [Custom strategies](DOCUMENTATION/custom.md): your own scaling — `scalingStrategy("brand") { … }`, rules per device class / screen range / orientation, JSON shared with every AppDimens platform, presets; `16.cdp(Brand)`, `14.csp(Brand)`, `ProvideScalingStrategy`, `16.cdp(appContext, Brand)` (px)
+- [Custom strategies](DOCUMENTATION/custom.md): your own scaling — `scalingStrategy("brand") { … }`, rules per device class / screen range / orientation, JSON shared with every AppDimens platform, free-form text formulas (`expression("…")`, `formula("…")`), presets; `16.cdp(Brand)`, `14.csp(Brand)`, `ProvideScalingStrategy`, `16.cdp(appContext, Brand)` (px)
 
 ## Key packages
 
