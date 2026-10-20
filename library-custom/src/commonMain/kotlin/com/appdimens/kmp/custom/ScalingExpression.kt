@@ -18,6 +18,8 @@
  */
 package com.appdimens.kmp.custom
 
+import kotlin.jvm.JvmField
+import kotlin.jvm.JvmStatic
 import kotlin.math.E
 import kotlin.math.PI
 import kotlin.math.abs

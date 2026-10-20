@@ -254,7 +254,7 @@ object ScalingStrategyJson {
                 append(",\"set\":{")
                 val start = length
                 writePatchFields(rule.patch, defaults = false)
-                if (length > start && this[start] == ',') deleteCharAt(start)
+                if (length > start && this[start] == ',') deleteAt(start)
                 append("}}")
             }
             append(']')
