@@ -81,6 +81,7 @@ kotlin {
             implementation(project(":library-power"))
             implementation(project(":library-resize"))
             implementation(project(":library-units"))
+            implementation(project(":library-custom"))
             implementation(libs.compose.runtime)
             implementation(libs.compose.ui)
             implementation(libs.compose.foundation)

@@ -314,6 +314,8 @@ fun SdpDemoScreen() {
                     SectionTitle("5. Auto-resize (DimenResize)")
 
                     AutoResizeExamplesCard()
+
+                    CustomStrategyExampleCard()
                 }
             }
         }

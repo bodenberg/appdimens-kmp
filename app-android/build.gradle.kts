@@ -97,6 +97,7 @@ dependencies {
     implementation(project(":library-power"))
     implementation(project(":library-resize"))
     implementation(project(":library-units"))
+    implementation(project(":library-custom"))
 
     implementation(libs.androidx.activity.compose)
     implementation(libs.compose.runtime)

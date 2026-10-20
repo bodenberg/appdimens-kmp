@@ -618,6 +618,40 @@ val padding = 16.scaledDp()
 
 ---
 
+## 🧪 Custom strategies — **your own** scaling rule
+
+**Idea:** When none of the strategies above feels right, describe the scaling yourself: the design frame you drew on, how fast sizes grow and the limits. You can also say "on tablets, do this instead".
+
+Add `implementation("io.github.bodenberg:appdimens-kmp-custom")`, then:
+
+```kotlin
+import com.appdimens.kmp.custom.*
+import com.appdimens.kmp.compose.custom.*
+
+// 1. Describe it once (e.g. in Dimens.kt)
+val Brand = scalingStrategy("brand") {
+    reference(width = 360, height = 640)   // the frame your designer used
+    curve = power(0.8f)                     // grow a bit slower than the screen
+    clamp(min = 0.9f, max = 1.5f)           // never smaller than 90 % or bigger than 150 %
+    on(DeviceClass.TABLET) { curve = logarithmic(0.4f) }  // calmer growth on tablets
+}
+
+// 2. Use it like sdp / ssp
+Box(Modifier.padding(16.cdp(Brand)))
+Text("Hello", fontSize = 14.csp(Brand))
+
+// 3. Or make it the default for a whole screen
+ProvideScalingStrategy(Brand) {
+    Text("Hello", fontSize = 14.csp)   // no parameter needed
+}
+```
+
+**Not sure about the numbers?** Show `Text(Brand.explainCurrent())` on a phone and on a tablet: it prints the factor and which rules applied.
+
+**Ready-made options:** `CustomPresets.TABLET_FRIENDLY`, `TV_SAFE`, `WEARABLE`, `GAME_HUD`, `COMPACT_FIRST` and `READABLE_TEXT`. Full guide (JSON, `code` API, presets, device classes per target): [DOCUMENTATION/custom.md](DOCUMENTATION/custom.md).
+
+---
+
 ## ✅ Checklist — “Did I miss something?”
 
 | Topic              | Remember |
@@ -629,6 +663,7 @@ val padding = 16.scaledDp()
 | **Rotate / Mode / Qualifier / Screen** | One-liner conditional sizing |
 | **scaledDp / scaledSp** | Chain many rules, then `.sdp` / `.ssp` |
 | **mm / cm / inch** | Real-world units → dp on screen |
+| **cdp / csp** | Your own strategy (`scalingStrategy { … }` or JSON) |
 | **Multiplatform**  | Same API on Android, desktop, iOS, macOS, web, Linux and Windows |
 
 When in doubt, stay on **SCALED** (`sdp` / `hdp` / `wdp`) and add these tools only when a real layout problem appears.

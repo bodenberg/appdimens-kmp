@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- **Custom scaling strategies — new module `appdimens-kmp-custom`** (`:library-custom`, pure `commonMain`).
+  - Define your own strategy with a DSL (`scalingStrategy("brand") { … }`) or with JSON in the cross-platform format shared by every AppDimens library.
+  - Curves: linear, power, logarithmic, interpolated, constant, breakpoints, or a pure `custom { }` lambda.
+  - Configurable: reference frame, axis, factor and value bounds, aspect ratio, font-scale policy, and rules per device class / screen range / orientation / multi-window.
+  - Strategies can extend built-ins and presets (`tabletFriendly`, `compactFirst`, `tvSafe`, `wearable`, `gameHud`, `readableText`).
+  - APIs: `16.cdp(Brand)` / `14.csp(Brand)` / `cdpPx` / `cspPx`, `ProvideScalingStrategy`, `ScalingStrategies.default`, `Brand.dp(16)`, `explainCurrent()`, and `code.custom` (`16.cdp(appContext, Brand)` → px).
+  - The device class is chosen per target via `expect`/`actual`.
+- **Core:** `DimenCache.CalcType.CUSTOM` (ordinal 15) + `DimenCache.buildCustomKey`. The strategy id lives in the key's sensitivity bits, so strategies never alias. Factor-only strategies take the one-multiply bypass lane; value-dependent ones are cached per window snapshot.
+
+---
+
 ## [3.2.0]
 
 ### Fixed

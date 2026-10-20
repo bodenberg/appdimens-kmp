@@ -14,6 +14,7 @@ Full Gradle/Maven matrix: [MODULES.md](../DOCUMENTATION/MODULES.md) · [library-
 - **`com.appdimens.kmp.core`** — `DimenMetrics` (immutable per-window snapshot, eager AR computation), `DimenCache` (snapshot-partitioned; event-driven config watcher; specialized kernels: `resolveSdpPx`/`resolveSdpaPx`/`resolveHdpPx`/`resolveWdpPx` + DP variants; `fastMetricsForCode` for non-Compose fast lane; no persistence since 1.0.0), `StrategyFactorRegistry` / `SharedScreenMetrics` (compat only), `MissingModule` (Maven hint map → `appdimens-kmp` artifacts), `DimenCalculationPlumbing`, `DesignScaleConstants`, `AspectRatioLookup` (exact `ln`), `PercentSpaceMath` / `ResizeMath` / `ResizeBound`, platform-neutral `AppDimensContext` + `ScreenConfiguration`, Compose (`AppDimensProvider`, `LocalDimenMetrics`, `LocalAppDimensContext`, stamps, `rememberDimen*`).
 - **`com.appdimens.kmp.compose.<strategy>`** / **`code.<strategy>`** — sources under `library/` (scaled + plain) or `library-<strategy>/`. Scaled's Compose package is top-level `compose` (files under `compose/scaled/`); its `code` package is top-level `code` (files under `code/scaled/`).
 - **`compose.resize` / `code.resize`** — constraint resize (not `calculateRawScaling`).
+- **`custom` / `compose.custom` / `code.custom`** — user-defined strategies (`:library-custom`, unreleased, `commonMain`): `scalingStrategy { }`, JSON, presets, `cdp` / `csp`.
 
 Platform window-handle adapters (per `AppDimensContext`): `androidMain` wraps `android.content.Context` (auto-cached per raw Context); `jvmMain` wraps the AWT window; `iosMain` wraps `UIScreen`; `macosMain` wraps `NSScreen`; `jsMain`/`wasmJsMain` wrap the browser viewport; `linuxMain`/`mingwMain` have no windowing API (`defaultPlatformContext() = null` — build an `AppDimensContext` from a `ScreenConfiguration` or use the `DimenMetrics` overloads). Shared native code lives in `nativeMain`.
 
@@ -36,6 +37,7 @@ Build hint for missing satellites: `MissingModule` (`com.appdimens.kmp.core`) + 
 | perimeter | [DOCUMENTATION/perimeter.md](../DOCUMENTATION/perimeter.md) |
 | density | [DOCUMENTATION/density.md](../DOCUMENTATION/density.md) |
 | resize | [DOCUMENTATION/resize.md](../DOCUMENTATION/resize.md) |
+| custom | [DOCUMENTATION/custom.md](https://github.com/bodenberg/appdimens-kmp/blob/main/DOCUMENTATION/custom.md) (unreleased, `main`) |
 | units (physical) | [DOCUMENTATION/physical-units.md](../DOCUMENTATION/physical-units.md) |
 
 **Product / formal math:** [PRD.md](../DOCUMENTATION/PRD.md) · [PDR.md](../DOCUMENTATION/PDR.md) · [MATHEMATICS-AND-CALCULUS.md](../DOCUMENTATION/MATHEMATICS-AND-CALCULUS.md)
@@ -50,7 +52,7 @@ Upstream sample modules only (not shipped inside `io.github.bodenberg:appdimens-
 
 ## Internal `DimenCache.CalcType` (debug / cache tagging)
 
-Maps to package families: AUTO, DIAGONAL, FILL, FIT, FLUID, INTERPOLATED, LOGARITHMIC, PERCENT, PERIMETER, POWER, RESIZE, SCALED, UNITIES, ASPECT_RATIO, DENSITY — see `library/src/commonMain/kotlin/com/appdimens/kmp/core/DimenCache.kt`. End users think in **strategy names** and imports, not this enum.
+Maps to package families: AUTO, DIAGONAL, FILL, FIT, FLUID, INTERPOLATED, LOGARITHMIC, PERCENT, PERIMETER, POWER, RESIZE, SCALED, UNITIES, ASPECT_RATIO, DENSITY, CUSTOM (user-defined strategies; the strategy id is packed into the key by `DimenCache.buildCustomKey`) — see `library/src/commonMain/kotlin/com/appdimens/kmp/core/DimenCache.kt`. End users think in **strategy names** and imports, not this enum.
 
 ## What this reference intentionally skips
 

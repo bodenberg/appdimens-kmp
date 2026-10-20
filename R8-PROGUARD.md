@@ -13,6 +13,7 @@ Each published Android AAR ships its own `consumer-rules.pro`:
 
 - **`appdimens-kmp`** — `common`, scaled `code`/`compose`, plus the few proven-specific core rules (cache-key enums, `ResizeBound`, `ScreenFactors` padding, `kotlin.Metadata`)
 - **`appdimens-kmp-<strategy>`** — that strategy’s public `code` / `compose` API (core rules arrive transitively)
+- **`appdimens-kmp-custom`** — public `custom` (engine, DSL, JSON, presets), `code.custom` and `compose.custom` APIs. No reflection, so a JSON loaded at runtime needs no extra keep rules
 
 Gradle merges consumer rules from the modules you depend on.
 

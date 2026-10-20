@@ -63,6 +63,7 @@ For **cache, bypass, and performance**, see also [library/PERFORMANCE.md](../lib
 | Density | `appdimens-kmp-density` | [density.md](density.md) |
 | Resize (constraint-based auto-fit) | `appdimens-kmp-resize` | [resize.md](resize.md) |
 | Physical units (mm, cm, in) | `appdimens-kmp-units` | [physical-units.md](physical-units.md) |
+| **Custom (your own strategies: DSL / JSON / presets)** | `appdimens-kmp-custom` | [custom.md](custom.md) |
 
 ### Quick links
 
@@ -86,7 +87,8 @@ For **cache, bypass, and performance**, see also [library/PERFORMANCE.md](../lib
 13. [Density](density.md)  
 14. [Resize](resize.md)  
 15. [Physical units](physical-units.md)  
-16. [Mathematics & calculus](MATHEMATICS-AND-CALCULUS.md)  
+16. [Custom strategies](custom.md) — define your own scaling (rules per device / screen, JSON)  
+17. [Mathematics & calculus](MATHEMATICS-AND-CALCULUS.md)  
 
 ## Suggested decision flow
 

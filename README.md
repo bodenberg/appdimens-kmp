@@ -116,6 +116,7 @@ implementation("io.github.bodenberg:appdimens-kmp-logarithmic")
 implementation("io.github.bodenberg:appdimens-kmp-perimeter")
 implementation("io.github.bodenberg:appdimens-kmp-resize")
 implementation("io.github.bodenberg:appdimens-kmp-units")
+implementation("io.github.bodenberg:appdimens-kmp-custom")   // your own strategies (unreleased — see below)
 ```
 
 ### Missing strategy module
@@ -142,6 +143,7 @@ implementation("io.github.bodenberg:appdimens-kmp-percent:3.2.0")
 |----------------|----------|
 | `appdimens-kmp` | `common`, `core`, `code.plain`, `code` / `compose` **scaled** |
 | `appdimens-kmp-<strategy>` | `code.<strategy>` + `compose.<strategy>` |
+| `appdimens-kmp-custom` | `custom` (DSL, JSON, presets) + `code.custom` + `compose.custom` |
 | `appdimens-kmp-bom` | Version constraints (`java-platform`) |
 
 Module graph: [DOCUMENTATION/MODULES.md](DOCUMENTATION/MODULES.md).
@@ -332,6 +334,31 @@ Approximate **real-world** size on screen (density-based). Compose: use helpers 
 
 ---
 
+## Custom strategies (your own scaling)
+
+When none of the built-in curves fits, or one growth law must be shared by several apps and platforms, define your own strategy with `appdimens-kmp-custom`:
+
+```kotlin
+import com.appdimens.kmp.custom.*
+import com.appdimens.kmp.compose.custom.*
+
+val Brand = scalingStrategy("brand") {
+    reference(width = 360, height = 640)          // your design frame
+    curve = power(0.8f)                             // linear / power / logarithmic / interpolated / breakpoints / custom { }
+    clamp(min = 0.85f, max = 1.6f)
+    on(DeviceClass.TABLET, DeviceClass.DESKTOP) { curve = logarithmic(0.4f) }
+    on(DeviceClass.WATCH) { axis = ScalingAxis.MIN; reference(192, 192) }
+}
+
+Modifier.padding(16.cdp(Brand))
+Text("Hi", fontSize = 14.csp(Brand))
+ProvideScalingStrategy(Brand) { Text("Scoped", fontSize = 14.csp) }   // or ScalingStrategies.default = Brand
+```
+
+The module is pure `commonMain` code, so it runs on every KMP target. The same configuration loads from JSON on every AppDimens platform (`ScalingStrategies.loadJson(text)`). Ready-made presets include `CustomPresets.TABLET_FRIENDLY`, `TV_SAFE`, `WEARABLE` and `GAME_HUD`. Built-ins can be extended (`BuiltInStrategies.POWER.extend("soft") { … }`). The non-Compose API returns **px**: `16.cdp(appContext, Brand)`. Full guide: [DOCUMENTATION/custom.md](DOCUMENTATION/custom.md).
+
+---
+
 <p align="center">
   <img src="IMAGES/screenshot.jpg" alt="Layout example" width="200"/>
   &nbsp;
@@ -386,6 +413,14 @@ Other strategies (**percent**, **power**, **fluid**, **auto**, **diagonal**, **f
 - **Fast lane on every platform**: Compose reads one CompositionLocal + one multiply; `code` reads one volatile slot + identity compare + two multiplies  \
 - **Resize-aware on every platform**: desktop/web/iOS/macOS providers rebuild the snapshot from the live window configuration  \
 - **AARs pre-shrunk with R8** at build time (all 14 modules) — consumers get optimized bytecode even in debug  \
+
+### Unreleased — Custom scaling strategies
+
+| Change | Description |
+|--------|-------------|
+| **New module `appdimens-kmp-custom`** | Lets you define your own scaling strategies with a DSL (`scalingStrategy("brand") { … }`) or JSON (one format shared with every AppDimens platform). Curves: linear, power, logarithmic, interpolated, constant, breakpoints, or a pure `custom { }` lambda. Strategies support axes, reference frame, factor/value bounds, aspect ratio, font-scale policy, and rules per device class / screen range / orientation / multi-window. They can extend built-ins or presets. |
+| **APIs** | Compose: `16.cdp(Brand)` · `14.csp(Brand)` · `cdpPx` / `cspPx` · `ProvideScalingStrategy` · `Brand.dp(16)` · `explainCurrent()`. `code`: `16.cdp(appContext, Brand)` (px) · `cdpDp` · `csp` · `cspUnits`. Device class per target via `expect`/`actual` (desktop targets → `desktop`). |
+| **Core: `CalcType.CUSTOM`** | `DimenCache.buildCustomKey` puts the strategy id in the 16 sensitivity bits, so strategies never alias. Factor-only strategies take the one-multiply bypass lane; value-dependent ones are cached per window snapshot. |
 
 ### What's New in 1.0.0 (KMP port)
 
