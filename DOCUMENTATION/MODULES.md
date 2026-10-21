@@ -20,7 +20,8 @@ benchlab (KMP benchmark)                                     benchlab-android (A
  ├── library-perimeter            → …:appdimens-kmp-perimeter
  ├── library-power                → …:appdimens-kmp-power
  ├── library-resize               → …:appdimens-kmp-resize
- └── library-units                → …:appdimens-kmp-units
+ ├── library-units                → …:appdimens-kmp-units
+ └── library-custom               → …:appdimens-kmp-custom   (user-defined strategies)
 ```
 
 Satellites depend only on `:library` (`api(project(":library"))`). Android Gradle `namespace` values are unique per module (`com.appdimens.kmp` for the principal, `com.appdimens.kmp.<strategy>` for satellites). Kotlin packages remain `com.appdimens.kmp.*`.
@@ -49,6 +50,7 @@ Every library module (`:library` and all satellites) compiles for:
 |----------|----------|
 | `appdimens-kmp` | `common`, `core`, **scaled**, **plain** |
 | `appdimens-kmp-<strategy>` | `code.<strategy>` + `compose.<strategy>` |
+| `appdimens-kmp-custom` | `custom` (DSL, JSON, presets, engine — `commonMain`) + `code.custom` + `compose.custom` — see [custom.md](custom.md) |
 | `appdimens-kmp-bom` | Version constraints for the set above (`java-platform`) |
 
 All published coordinates share `appdimens.version` in `gradle.properties` (**3.2.0**).
@@ -74,6 +76,7 @@ Without the BOM, pin the same version on each coordinate. See [README — Instal
 - **DimenMetrics eager AR**: `normalizedAspectRatio` and `logNormalizedAspectRatio` are plain `val` — no hidden `synchronized` probe in the SDPA fast lane.
 - Strategy-specific scales (`diagonal`, `power`, `logarithmic`, `interpolated`, `perimeter`) are derived lazily from `DimenCache.currentMetrics` at resolution time — no process-global pre-computation. `StrategyFactorRegistry` remains as a source-compatibility hook.
 - `CalcType` ordinals live in core so cache keys stay stable across modules.
+- `CalcType.CUSTOM` (ordinal 15) fills the last slot of the 4-bit key field. `DimenCache.buildCustomKey` stores the custom strategy id in the 16 sensitivity bits, and bit 2 selects bypass (factor-only) or a stored value (value-dependent).
 - **R8 pre-shrink**: every Android AAR is R8-optimized at build time (`optimization { minify = true }` + `-optimizationpasses 10` + `-allowaccessmodification`, `-dontobfuscate`) — consumers get optimized bytecode even in debug. See [R8-PROGUARD.md](../R8-PROGUARD.md).
 
 ## See also

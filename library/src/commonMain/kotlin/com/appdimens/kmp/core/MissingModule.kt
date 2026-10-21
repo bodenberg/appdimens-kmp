@@ -36,6 +36,7 @@ object MissingModule {
         "power" to "appdimens-kmp-power",
         "resize" to "appdimens-kmp-resize",
         "units" to "appdimens-kmp-units",
+        "custom" to "appdimens-kmp-custom",
         // scaled / plain / common / core live in the principal artifact
         "scaled" to PRINCIPAL_ARTIFACT,
         "plain" to PRINCIPAL_ARTIFACT,

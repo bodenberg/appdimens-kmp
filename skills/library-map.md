@@ -27,6 +27,7 @@ Read this file when you need package locations, Compose↔`code` symmetry, or co
 | power | `:library-power` | `appdimens-kmp-power` | `library-power/.../power` |
 | resize | `:library-resize` | `appdimens-kmp-resize` | `library-resize/.../resize` |
 | units | `:library-units` | `appdimens-kmp-units` | `library-units/.../units` |
+| custom *(unreleased)* | `:library-custom` | `appdimens-kmp-custom` | `library-custom/src/{commonMain,composeMain}/.../{custom,code/custom,compose/custom}` |
 
 Full graph: [DOCUMENTATION/MODULES.md](../DOCUMENTATION/MODULES.md). Satellites depend only on `:library`. `:library-bom` publishes version constraints.
 
@@ -52,6 +53,7 @@ Full graph: [DOCUMENTATION/MODULES.md](../DOCUMENTATION/MODULES.md). Satellites 
 - **`com.appdimens.kmp.compose.<strategy>`** — one folder per scaling strategy for Compose UI (e.g. `compose/percent/DimenPercent.kt`, `DimenPercentDpExtensions.kt`, …). Scaled lives at `compose/scaled/` but the package is top-level `com.appdimens.kmp.compose`.
 - **`com.appdimens.kmp.code.<strategy>`** — mirror for non-Compose code: `DimenSdp`, `DimenSsp`, `*DpExtensions`, `*SpExtensions`, `DimenScaled`, `Dimen*PlainPx.kt`, `code/plain/DimenPlainBranch.kt`. All `code` entry points take an **`AppDimensContext`** window handle (not an Android `Context`).
 - **`com.appdimens.kmp.compose.resize`** / **`com.appdimens.kmp.code.resize`** — constraint-based resize (binary search over discrete px steps, "fits" predicate); distinct from `calculateRawScaling` curves.
+- **`com.appdimens.kmp.custom`** — user-defined strategies (`:library-custom`, `commonMain`): model (`ScalingConfig`, `ScalingAxis`, `ScalingCurve`, `ScreenCondition`, `ScalingRule`, `FontScalePolicy`, `ScreenSnapshot`, `DeviceClass`), `ScalingStrategy` (memoized per snapshot, `explain`, `extend`, `withAxis`, `toJson`), `ScalingStrategies` (registry + `default` + `loadJson`), DSL `scalingStrategy { }`, `ScalingStrategyJson`, `ScalingExpression` / `FormulaTransform` (free-form text formulas), `BuiltInStrategies`, `CustomPresets`, bridge `DimenMetrics.toScreenSnapshot()` (device class via `expect`/`actual`). `compose.custom`: `cdp`, `csp`, `cdpPx`, `cspPx`, `ProvideScalingStrategy`, `explainCurrent`. `code.custom`: `cdp` (px), `cdpDp`, `csp`, `cspUnits` on `AppDimensContext`.
 
 ---
 
@@ -72,6 +74,7 @@ Full graph: [DOCUMENTATION/MODULES.md](../DOCUMENTATION/MODULES.md). Satellites 
 | perimeter | [DOCUMENTATION/perimeter.md](../DOCUMENTATION/perimeter.md) |
 | density | [DOCUMENTATION/density.md](../DOCUMENTATION/density.md) |
 | resize | [DOCUMENTATION/resize.md](../DOCUMENTATION/resize.md) |
+| custom | [DOCUMENTATION/custom.md](https://github.com/bodenberg/appdimens-kmp/blob/main/DOCUMENTATION/custom.md) (unreleased, `main`) |
 | units (physical) | [DOCUMENTATION/physical-units.md](../DOCUMENTATION/physical-units.md) |
 
 **Formal docs:** [PRD.md](../DOCUMENTATION/PRD.md) · [PDR.md](../DOCUMENTATION/PDR.md) · [MATHEMATICS-AND-CALCULUS.md](../DOCUMENTATION/MATHEMATICS-AND-CALCULUS.md)  
@@ -93,7 +96,7 @@ Upstream sample modules only — not in the Maven artifacts. Use for pattern ref
 
 ## Internal `DimenCache.CalcType`
 
-Debug/cache tagging only — end users think in strategy names. Values: AUTO, DIAGONAL, FILL, FIT, FLUID, INTERPOLATED, LOGARITHMIC, PERCENT, PERIMETER, POWER, RESIZE, SCALED, UNITIES, ASPECT_RATIO, DENSITY.  
+Debug/cache tagging only — end users think in strategy names. Values: AUTO, DIAGONAL, FILL, FIT, FLUID, INTERPOLATED, LOGARITHMIC, PERCENT, PERIMETER, POWER, RESIZE, SCALED, UNITIES, ASPECT_RATIO, DENSITY, CUSTOM (ordinal 15, user-defined strategies; `buildCustomKey` packs the strategy id).  
 Source: `library/src/commonMain/kotlin/com/appdimens/kmp/core/DimenCache.kt`
 
 ---

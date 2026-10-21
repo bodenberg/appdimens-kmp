@@ -1,6 +1,6 @@
 ---
 name: appdimens-kmp-workflow
-description: Use this skill for any Kotlin Multiplatform responsive layout or scaling question — including making apps look right on tablets, foldables, desktop windows, iOS, macOS, or the browser — and whenever the user mentions appdimens-kmp, sdp, hdp, wdp, ssp, DimenCache, autoResize, responsive dp/sp, or scaling strategies. Also trigger when the user wants to add the AppDimens KMP dependency, choose between Compose Multiplatform vs the non-Compose `code` API, implement constraint-based resize, or convert plain dp/sp values to scaled equivalents. When in doubt, use this skill — it covers the full lifecycle: install, strategy selection, Compose/code implementation, and resize, on every KMP target.
+description: Use this skill for any Kotlin Multiplatform responsive layout or scaling question — including making apps look right on tablets, foldables, desktop windows, iOS, macOS, or the browser — and whenever the user mentions appdimens-kmp, sdp, hdp, wdp, ssp, DimenCache, autoResize, responsive dp/sp, or scaling strategies. Also trigger when the user wants to add the AppDimens KMP dependency, choose between Compose Multiplatform vs the non-Compose `code` API, implement constraint-based resize, or convert plain dp/sp values to scaled equivalents. Also trigger for custom scaling: the user wants their own scaling strategy/config, per-device-type scaling rules (tablet, TV, watch, car, desktop), cdp/csp, scalingStrategy { }, ScalingStrategies, CustomPresets, or a scaling JSON shared across platforms. When in doubt, use this skill — it covers the full lifecycle: install, strategy selection, Compose/code implementation, and resize, on every KMP target.
 ---
 
 # AppDimens KMP — project workflow
@@ -12,6 +12,13 @@ description: Use this skill for any Kotlin Multiplatform responsive layout or sc
 **Install:** `platform("io.github.bodenberg:appdimens-kmp-bom:3.2.0")` then the modules you need. Kotlin imports are `com.appdimens.kmp.*`.
 
 On release bumps, update version URLs in this file, `library-map.md`, and `reference.md` together.
+
+**Unreleased — custom strategies (`appdimens-kmp-custom`, on `main`):**
+- `scalingStrategy("brand") { reference(…); curve = power(0.8f); clamp(…); on(DeviceClass.TABLET) { … } }` registers a user-defined strategy. JSON (`ScalingStrategies.loadJson`) uses the cross-platform `custom-strategy.schema.json` format.
+- Compose: `16.cdp(Brand)`, `14.csp(Brand)`, `cdpPx` / `cspPx`, the no-arg `16.cdp` (scope via `ProvideScalingStrategy`, else `ScalingStrategies.default`), `Brand.dp(16)`, `Brand.explainCurrent()`. `code`: `16.cdp(appContext, Brand)` returns **px**; also `cdpDp`, `csp`, `cspUnits`. Pure `commonMain`, every target.
+- Free-form formulas: `curve = expression("pow(ratio, 0.8) * (tablet ? 0.9 : 1)")` (factor) and `formula("base * pow(sw / 360, 0.7) + 2")` (per value) — text that also works in JSON (`"type": "expression"`, `"formula"`) and gives identical results on every platform. Variables: `sw width height shortSide longSide diagonal perimeter aspectRatio density fontScale`, flags `landscape portrait multiWindow phone tablet desktop tv watch car vr`, curve context `ratio axis ref refWidth refHeight`, value context `base scaled factor`.
+- Presets `CustomPresets.{TABLET_FRIENDLY, COMPACT_FIRST, TV_SAFE, WEARABLE, GAME_HUD, READABLE_TEXT}`. Built-ins as parents: `BuiltInStrategies.{SCALED, POWER, LOGARITHMIC, INTERPOLATED, DIAGONAL, PERIMETER, FIXED}.extend(id) { … }`.
+- Core: `CalcType.CUSTOM` + `DimenCache.buildCustomKey` (the strategy id lives in the key, so strategies never alias). Factor-only strategies cost one multiply.
 
 **What's New in 1.0.0 (KMP port):**
 - Full Kotlin Multiplatform port — same packages/API/math on Android, JVM, iOS, macOS and wasmJs
@@ -44,6 +51,7 @@ On release bumps, update version URLs in this file, `library-map.md`, and `refer
 - [DOCUMENTATION/COMPOSE-API-CONVENTIONS.md](../DOCUMENTATION/COMPOSE-API-CONVENTIONS.md) — Compose naming, facilitators, Plain chains, `code` parity
 - [DOCUMENTATION/resize.md](../DOCUMENTATION/resize.md) — `compose.resize` / `code.resize`
 - [GUIDE-FOR-BEGINNERS.md](../GUIDE-FOR-BEGINNERS.md) — narrative walkthrough
+- [DOCUMENTATION/custom.md](https://github.com/bodenberg/appdimens-kmp/blob/main/DOCUMENTATION/custom.md) — custom strategies (DSL, JSON, rules, presets, device classes per target); unreleased, on `main`
 - [PERFORMANCE.md](../PERFORMANCE.md) / [PERFORMANCE-COMPARATIVE.md](../PERFORMANCE-COMPARATIVE.md) — measured numbers per platform
 - Examples: [`app`](../app/README.md) (KMP demo) · [`app-android`](../app-android) (Android-only demo)
 
@@ -166,6 +174,20 @@ Use only when requirements or QA justify leaving scaled. **Before recommending a
 | **Density** | Classic density-style scaling | Matching legacy dp-to-physical expectations | Want screen-shape-aware curves |
 | **Physical units** | mm / cm / in helpers | Real-world sizing (rulers, print-like UI) | Most Material layout — use scaled instead |
 | **Resize** | *(not a global curve)* Largest discrete step in [min,max] fitting constraints | Auto-fit text or boxes inside known max | Whole-screen proportional layout |
+| **Custom** (`appdimens-kmp-custom`) | Your own factor: reference frame, axis, curve, bounds, font-scale policy, rules per device class / screen range | No built-in fits after QA; one growth law shared by several apps/platforms; TV / watch / car-specific behavior; remote-config experiments | A built-in already passes QA — prefer it (less to maintain) |
+
+---
+
+### Custom strategy workflow
+
+Use when the user asks for their own scaling or none of the rows above satisfies the acceptance criteria. Read [custom.md](https://github.com/bodenberg/appdimens-kmp/blob/main/DOCUMENTATION/custom.md) first.
+
+1. **Start from the closest built-in or preset** (`BuiltInStrategies.POWER.extend("x") { … }`, `CustomPresets.TABLET_FRIENDLY`, JSON `"extends"`). Change only what the acceptance criteria need.
+2. **Keep a single source.** Define strategies in one place (`object AppStrategies` or a `composeResources/files/appdimens-strategies.json` loaded with `ScalingStrategies.loadJson`). If the project has an `appdimens.config.json` listing `customStrategies`, reuse those ids and never invent new ones silently.
+3. **Rules over forks.** Express device or screen differences as `on(DeviceClass.X) { … }` / `onScreen(minSmallestWidth = …) { … }` inside **one** strategy, not as separate strategies chosen with `if` at call sites.
+4. **Use `cdp` / `csp`** at call sites. Put `ProvideScalingStrategy` at the screen root or set `ScalingStrategies.default` once when a whole area uses it. `code` APIs (`16.cdp(appContext, Brand)`) return px.
+5. **Value bounds only when required** (`clampValue`, e.g. minimum tap targets): they move the strategy to the cached lane. `custom { }` / `transform { }` lambdas must be pure. When the growth law does not fit any curve, write it as an `expression("…")` / `formula("…")` instead of a lambda when it must live in JSON or be shared with other platforms.
+6. **Verify** with `Brand.explainCurrent()` (Compose) or `Brand.explain(appContext)` on a phone, a tablet and the smallest supported device. Cite the factor in your answer.
 
 ---
 
@@ -203,6 +225,7 @@ Reference: [DOCUMENTATION/resize.md](../DOCUMENTATION/resize.md)
 - [ ] Agent Preflight completed for touched symbols.
 - [ ] Phase 0 answered: stack, `DpQualifier` baseline, task type (strategy / resize / both), scope, acceptance criteria.
 - [ ] Scaled presented as default; other strategies have matching `DOCUMENTATION/*.md` opened and trade-offs cited.
+- [ ] Custom strategies: started from a built-in/preset, defined in one place, rules instead of call-site `if`s, factor verified with `explain`.
 - [ ] `ignoreMultiWindows` / `*i` / `*ia` not surfaced to user.
 - [ ] Docs read for anything beyond trivial one-liners.
 - [ ] Imports use `com.appdimens.kmp.*` (never `com.appdimens.dynamic.*`); Maven coordinates use `appdimens-kmp`.

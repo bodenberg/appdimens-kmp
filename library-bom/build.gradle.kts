@@ -34,6 +34,7 @@ dependencies {
         api("io.github.bodenberg:appdimens-kmp-power:$libraryVersion")
         api("io.github.bodenberg:appdimens-kmp-resize:$libraryVersion")
         api("io.github.bodenberg:appdimens-kmp-units:$libraryVersion")
+        api("io.github.bodenberg:appdimens-kmp-custom:$libraryVersion")
     }
 }
 

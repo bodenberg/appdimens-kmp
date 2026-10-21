@@ -6,6 +6,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- **Custom scaling strategies — new module `appdimens-kmp-custom`** (`:library-custom`, pure `commonMain`).
+  - Define your own strategy with a DSL (`scalingStrategy("brand") { … }`) or with JSON in the cross-platform format shared by every AppDimens library.
+  - Curves: linear, power, logarithmic, interpolated, constant, breakpoints, a free-form text `expression("…")` (JSON-serializable, same result on every platform), or a pure `custom { }` lambda; plus a per-value `formula("…")`.
+  - Configurable: reference frame, axis, factor and value bounds, aspect ratio, font-scale policy, and rules per device class / screen range / orientation / multi-window.
+  - Strategies can extend built-ins and presets (`tabletFriendly`, `compactFirst`, `tvSafe`, `wearable`, `gameHud`, `readableText`).
+  - APIs: `16.cdp(Brand)` / `14.csp(Brand)` / `cdpPx` / `cspPx`, `ProvideScalingStrategy`, `ScalingStrategies.default`, `Brand.dp(16)`, `explainCurrent()`, and `code.custom` (`16.cdp(appContext, Brand)` → px).
+  - The device class is chosen per target via `expect`/`actual`.
+- **Core:** `DimenCache.CalcType.CUSTOM` (ordinal 15) + `DimenCache.buildCustomKey`. The strategy id lives in the key's sensitivity bits, so strategies never alias. Factor-only strategies take the one-multiply bypass lane; value-dependent ones are cached per window snapshot.
+
+---
+
+### CI
+
+- **`verify-full` replaces `verify-linux`.** The single `check` job (40+ min, OOM / "log was not found" on ubuntu-latest) became a matrix of parallel jobs covering every module: JVM tests, Android host tests plus the app build, JS (Node), Wasm (Chrome), Linux x64 tests plus Linux arm64 / Windows compiles, and Apple tests (iOS Simulator + macOS) plus the iOS device compile. Each job uploads its test reports when it fails.
+- **Linux/Windows test resolution fixed.** `org.jetbrains.compose.ui:ui` moved from `commonTest` to `composeTest`: Compose Multiplatform publishes no linux/mingw `ui`, so `linuxX64Test` could not resolve its dependencies.
+
+
 ## [3.2.0]
 
 ### Fixed

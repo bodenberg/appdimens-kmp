@@ -176,7 +176,15 @@ kotlin {
             // PT Compose é `compileOnly` no main (sem pin/sem conflito), mas os próprios
             //    testes Compose da lib (composeTest) precisam de um runtime concreto em
             //    tempo de teste. Fornecido aqui, escopo de teste e nunca embarcado.
+            // EN Only the runtime here: it publishes for every target. `ui` lives in
+            //    composeTest below — Compose Multiplatform has no linux/mingw `ui`, so a
+            //    commonTest dependency on it breaks linuxX64Test resolution.
+            // PT Só o runtime aqui (publica para todos os targets). `ui` fica no
+            //    composeTest abaixo — não há `ui` para linux/mingw, e no commonTest ele
+            //    quebra a resolução do linuxX64Test.
             implementation("org.jetbrains.compose.runtime:runtime:$composeVersion")
+        }
+        getByName("composeTest").dependencies {
             implementation("org.jetbrains.compose.ui:ui:$composeVersion")
         }
         androidMain.dependencies {

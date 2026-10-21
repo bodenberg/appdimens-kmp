@@ -1,0 +1,123 @@
+name: verify-full
+
+# EN Full multiplatform gate: every module, every target, split into parallel jobs so
+#    no single runner has to hold the whole build (the former single `check` job on
+#    ubuntu-latest ran 40+ min and died with OOM / "log was not found").
+# PT Gate multiplataforma completo: todos os módulos e targets, divididos em jobs
+#    paralelos para nenhum runner carregar o build inteiro (o antigo job único `check`
+#    no ubuntu-latest passava de 40 min e morria por OOM / "log was not found").
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-full-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # EN Right-size the Gradle daemon for hosted runners (the repo's gradle.properties
+  #    asks for -Xmx6g + 4 workers, which OOM-kills ubuntu-latest).
+  # PT Ajusta o daemon do Gradle aos runners hospedados (o gradle.properties pede
+  #    -Xmx6g + 4 workers, o que mata o ubuntu-latest por OOM).
+  GRADLE_JVMARGS: "-Xmx3g -XX:MaxMetaspaceSize=512m -XX:+UseParallelGC -Dfile.encoding=UTF-8 --enable-native-access=ALL-UNNAMED"
+  GRADLE_WORKERS: "2"
+
+jobs:
+  verify:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 75
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: JVM tests
+            os: ubuntu-latest
+            konan: false
+            tasks: jvmTest
+          - name: Android host tests + app build
+            os: ubuntu-latest
+            konan: false
+            tasks: testAndroidHostTest :app-android:assembleDebug
+          - name: JS (Node) tests
+            os: ubuntu-latest
+            konan: false
+            tasks: jsTest
+          - name: Wasm (Chrome) tests
+            os: ubuntu-latest
+            konan: false
+            tasks: wasmJsBrowserTest
+          - name: Linux x64 tests + Linux arm64 / Windows compile
+            os: ubuntu-latest
+            konan: true
+            tasks: linuxX64Test compileKotlinLinuxArm64 compileKotlinMingwX64
+          - name: Apple tests (iOS Simulator + macOS) + iOS device compile
+            os: macos-latest
+            konan: true
+            tasks: iosSimulatorArm64Test macosArm64Test compileKotlinIosArm64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      # EN The android target is configured by the convention plugin in every job, so
+      #    AGP needs the SDK, its license and the compileSdk platform everywhere. The
+      #    action's default `packages` includes the legacy `tools` package (gone from
+      #    the SDK repository), so install platform-tools only.
+      # PT O target android é configurado pelo plugin de convenção em todo job, então o
+      #    AGP precisa do SDK, da licença e da plataforma compileSdk em todos. O
+      #    `packages` padrão inclui o pacote legado `tools` (removido), então só
+      #    platform-tools.
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+
+      - name: Accept Android SDK licenses and install compileSdk
+        run: |
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager "platforms;android-37" > /dev/null || true
+
+      - name: Cache Kotlin/Native toolchain
+        if: matrix.konan
+        uses: actions/cache@v4
+        with:
+          path: ~/.konan
+          key: konan-${{ runner.os }}-${{ hashFiles('**/*.gradle.kts', '**/gradle.properties', 'gradle/libs.versions.toml') }}
+          restore-keys: konan-${{ runner.os }}-
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # EN Unqualified task names run in every module that has them (core, every
+      #    strategy, custom, apps, benchlab). --continue reports all failures at once.
+      # PT Nomes de task sem prefixo rodam em todo módulo que os tem (core, estratégias,
+      #    custom, apps, benchlab). --continue mostra todas as falhas de uma vez.
+      - name: ${{ matrix.name }}
+        run: >
+          ./gradlew ${{ matrix.tasks }}
+          --continue --no-daemon --console=plain
+          -Dorg.gradle.jvmargs="$GRADLE_JVMARGS"
+          -Dorg.gradle.workers.max="$GRADLE_WORKERS"
+          -Dorg.gradle.configuration-cache=false
+
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports-${{ strategy.job-index }}
+          path: '**/build/reports/tests/'
+          if-no-files-found: ignore
+          retention-days: 7
