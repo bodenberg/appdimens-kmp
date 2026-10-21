@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - **Custom scaling strategies — new module `appdimens-kmp-custom`** (`:library-custom`, pure `commonMain`).
   - Define your own strategy with a DSL (`scalingStrategy("brand") { … }`) or with JSON in the cross-platform format shared by every AppDimens library.
+  - Simplest form: write the formula — `16.cdp("base * pow(sw / 360, 0.8)")`, `scalingFormula("…")` (shared per text, also `ScalingStrategies.formula("…")`) or `scalingFormula { base, screen -> … }` (code). Formulas shaped `base * (…)` with no `base` inside are screen-only: the `(…)` part is evaluated once per window, bit-identical to evaluating the formula per value. `explain()` shows the formula.
   - Curves: linear, power, logarithmic, interpolated, constant, breakpoints, a free-form text `expression("…")` (JSON-serializable, same result on every platform), or a pure `custom { }` lambda; plus a per-value `formula("…")`.
   - Configurable: reference frame, axis, factor and value bounds, aspect ratio, font-scale policy, and rules per device class / screen range / orientation / multi-window.
   - Strategies can extend built-ins and presets (`tabletFriendly`, `compactFirst`, `tvSafe`, `wearable`, `gameHud`, `readableText`).
