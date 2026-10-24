@@ -78,6 +78,20 @@ fun Number.cspUnits(context: AppDimensContext, strategy: ScalingStrategy = Scali
     }
 }
 
+// EN Inline formulas — the formula **is** the value. PT Fórmulas inline — a fórmula **é** o valor.
+
+/** EN `16.cdp(context, "base * pow(sw / 360, 0.8)")` → px. Shared per text. */
+fun Number.cdp(context: AppDimensContext, formula: String): Float = cdp(context, ScalingStrategies.formula(formula))
+
+/** EN `16.cdpDp(context, "…")` → dp. */
+fun Number.cdpDp(context: AppDimensContext, formula: String): Float = cdpDp(context, ScalingStrategies.formula(formula))
+
+/** EN `14.csp(context, "…")` → px for text. */
+fun Number.csp(context: AppDimensContext, formula: String): Float = csp(context, ScalingStrategies.formula(formula))
+
+/** EN `14.cspUnits(context, "…")` → sp units. */
+fun Number.cspUnits(context: AppDimensContext, formula: String): Float = cspUnits(context, ScalingStrategies.formula(formula))
+
 // EN Strategy-first facilitators. PT Facilitadores a partir da estratégia.
 
 /** EN `Brand.px(context, 16)` → px. */

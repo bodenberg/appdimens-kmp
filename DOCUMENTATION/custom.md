@@ -5,6 +5,63 @@ See [MODULES.md](MODULES.md) · [README installation](../README.md#installation-
 
 The 13 built-in strategies cover most products. When an app (or a design system shared by several apps) needs its **own** growth law, use this module to define your own strategy instead of forking a built-in one. The module is pure `commonMain` code (Android, JVM desktop, iOS, macOS, js/wasmJs, Linux, Windows). The configuration is identical on every AppDimens platform (Android, KMP, iOS, Flutter, React Native, Web, Games, .NET) and can be loaded from JSON.
 
+## Quick start: just write the formula
+
+The easiest way is to write the math yourself, as ordinary Kotlin on one line. Inside the braces, the IDE autocompletes everything you can use (`base`, `sw`, `width`, `tablet`, `pow`, `clamp`…), and a typo is a compile error. There is nothing to configure.
+
+```kotlin
+import com.appdimens.kmp.custom.*
+import com.appdimens.kmp.compose.custom.*
+
+// 1. Formula: the result is the final value (`base` = the value you pass, e.g. 16)
+val Hud = scalingFormula { base * pow(sw / 360f, 0.8f) }
+val Card = scalingFormula { if (tablet) base * 1.2f else base * ratio }
+
+// 2. Factor: the result multiplies every value
+val Product = CustomScaleStrategy { (width / 360f).coerceIn(0.85f, 1.80f) }
+val Living = CustomScaleStrategy { if (tv) height / 540f else ratio }
+
+Modifier.padding(16.cdp(Product))           // 16 × factor
+Text("Score", fontSize = 18.csp(Hud))       // text follows the user font scale
+```
+
+Declare each strategy once (for example as a top-level `val`), then use it anywhere. Without Compose (`code.custom`) you get **px**: `16.cdp(appContext, Product)`.
+
+### What you can use inside the braces
+
+| Name | Meaning |
+|---|---|
+| `base` | the value you pass (`16` in `16.cdp(Hud)`), only in `scalingFormula { }` |
+| `sw` · `width` · `height` | smallest width · window width · window height (dp) |
+| `shortSide` · `longSide` · `diagonal` · `perimeter` · `aspectRatio` | other window measures |
+| `ratio` | `sw / 300`, the ratio `sdp` uses (`base * ratio` is the same as `sdp`) |
+| `phone` `tablet` `desktop` `tv` `watch` `car` `vr` · `landscape` `portrait` `multiWindow` | `Boolean` |
+| `density` · `fontScale` · `device` · `screen` | screen density · user font scale · `DeviceClass` · the whole `ScreenSnapshot` |
+| `pow` `sqrt` `ln` `log10` `exp` `abs` `round` `min` `max` `clamp` `lerp` `smoothstep` | math, no import needed |
+
+Anything else from Kotlin or your own code also works (`coerceIn`, `when`, your helpers). Strategies must be pure: they must not read mutable state, because results are memoized per window.
+
+| Form | You return | Cost per value | JSON |
+|---|---|---|---|
+| `CustomScaleStrategy { … }` | the **factor** | one multiply (runs once per window) | no |
+| `scalingFormula { … }` | the final value | cached per value and window | no |
+| `scalingFormula("…")` / `16.cdp("…")` | the final value, as text | one multiply when shaped `base * (…)`, otherwise cached | yes |
+
+### Text formulas (for JSON and remote config)
+
+When the formula has to live outside the code, in a JSON file, a remote config or an A/B test, write the same thing as text. It uses the same names (flags are 1/0):
+
+```kotlin
+val Hud = scalingFormula("base * pow(sw / 360, 0.8)")
+Modifier.padding(16.cdp("base * (tablet ? 0.9 : 1) * clamp(sw / 360, 0.85, 1.6)"))   // inline
+```
+
+Text is checked when the strategy is created: an unknown name fails right away with its position and the list of valid names (e.g. `unknown variable 'sww' (allowed: aspectRatio, base, …)`). The same text works in the strategies JSON (`{"id": "hud", "formula": "base * pow(sw / 360, 0.8)"}`) and gives the same numbers on every AppDimens platform. Operators and functions are listed in [Free-form formulas](#free-form-formulas-no-limits-from-the-built-in-curves). Without Compose: `16.cdp(appContext, "…")` (px) · `ScalingStrategies.formula("…")`.
+
+**Fast path.** A text formula shaped `base * (…)`, where the `(…)` part does not read `base`, costs one multiply per value, because the `(…)` part is computed once per window. `base * sw / 360` is evaluated as written, `(base * sw) / 360`, so write `base * (sw / 360)` to get the fast path. In code, prefer `CustomScaleStrategy { … }` for the same effect.
+
+For rules per device, factor bounds or a font-scale policy, use the full configuration below.
+
 ## What it is
 
 A custom strategy is an immutable, named configuration that turns the window into one **factor**:
@@ -29,7 +86,7 @@ Rules can override any field per **device class** (phone, tablet, desktop, TV, w
 | Value bounds (dp) | `clampValue(min = 10, max = 32)` | `"valueClamp": {"min": 10, "max": 32}` | none |
 | Aspect ratio | `aspectRatio(sensitivity = 0.004f)` | `"aspectRatio": {"enabled": true, "sensitivity": 0.004}` | off, k = 0.08 / 30 |
 | Font scale (`csp`) | `followFontScale()` · `ignoreFontScale()` · `clampFontScale(1.3f)` | `"fontScale": "follow"` · `"ignore"` · `{"max": 1.3}` | `follow` |
-| Multi-window | `ignoreMultiWindow = true` | `"ignoreMultiWindow": true` | false |
+| Multi-window (value stays unscaled; formulas and transforms are skipped; value bounds still apply) | `ignoreMultiWindow = true` | `"ignoreMultiWindow": true` | false |
 | Per-value formula | `formula("max(scaled, base)")` | `"formula": "max(scaled, base)"` | none |
 | Per-value hook (code) | `transform { base, scaled, screen -> … }` | — (code only) | none |
 | Rules | `on(…) { … }`, `onScreen(…) { … }`, `landscape { … }` … | `"rules": [{"when": {…}, "set": {…}}]` | none |

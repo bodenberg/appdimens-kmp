@@ -44,8 +44,20 @@ class ResolvedScaling internal constructor(
     internal val referenceDp: Float,
     internal val curveFactor: Float,
     internal val aspectRatioMultiplier: Float,
+    /** EN `ignoreMultiWindow` in multi-window: the value stays unscaled (only value bounds apply). */
+    internal val multiWindowIgnored: Boolean = false,
 ) {
     private val ratio: Float get() = if (referenceDp > 0f) axisDp / referenceDp else 1f
+
+    /**
+     * EN `E` of a proportional formula (`base * E`), evaluated once for this window; NaN when the
+     * formula (if any) needs the value. `base * E` then costs one multiply, like a curve.
+     * PT `E` de uma fórmula proporcional, calculado uma vez por janela; NaN caso contrário.
+     */
+    private val formulaCoefficient: Double =
+        (config.transform as? FormulaTransform)?.expression?.baseCoefficient
+            ?.evaluate(ScalingExpression.variables(screen, ratio, axisDp, referenceDp, config.reference))
+            ?: Double.NaN
 
     /** EN Scales [base] (dp) → dp. PT Escala [base] (dp) → dp. */
     fun scale(base: Float): Float {
@@ -59,9 +71,10 @@ class ResolvedScaling internal constructor(
             if (max != null && magnitude > max) magnitude = max
             out = if (out < 0f) -magnitude else magnitude
         }
+        if (multiWindowIgnored) return out
         when (val t = config.transform) {
             null -> Unit
-            is FormulaTransform -> out = t.expression.evaluate(
+            is FormulaTransform -> out = if (t.isProportional) (base.toDouble() * formulaCoefficient).toFloat() else t.expression.evaluate(
                 ScalingExpression.variables(screen, ratio, axisDp, referenceDp, config.reference, base, out, factor),
             ).toFloat()
             else -> out = t.transform(base, out, screen)
@@ -97,6 +110,7 @@ class ResolvedScaling internal constructor(
                 .append(config.maxFactor?.let(::fmt) ?: "-").append(']')
         }
         append(" => factor ").append(fmt(factor))
+        config.transform?.let { append(" then ").append(if (it is FormulaTransform) it.toString() else "transform") }
         if (appliedRules.isNotEmpty()) append(" rules=").append(appliedRules)
     }
 
@@ -160,6 +174,8 @@ class ScalingStrategy internal constructor(
         return resolved
     }
 
+    private val axisVariants = arrayOfNulls<ScalingStrategy>(ScalingAxis.entries.size)
+
     /** EN Screen-only factor. PT Fator dependente só da tela. */
     fun factor(screen: ScreenSnapshot): Float = resolve(screen).factor
 
@@ -182,7 +198,12 @@ class ScalingStrategy internal constructor(
     fun withAxis(axis: ScalingAxis): ScalingStrategy {
         if (axis == config.axis) return this
         val derivedId = "$id@${axis.jsonName}"
-        return ScalingStrategies.derived(derivedId) { ScalingStrategy(derivedId, config.copy(axis = axis)) }
+        // EN Cached per source instance, so a re-registered id never returns another config's variant.
+        //    A race only builds an equivalent variant twice.
+        // PT Cache por instância de origem: um id re-registrado nunca devolve variante de outra config.
+        val slot = axis.ordinal
+        axisVariants[slot]?.let { return it }
+        return ScalingStrategy(derivedId, config.copy(axis = axis)).also { axisVariants[slot] = it }
     }
 
     /** EN JSON for this strategy (throws for lambda curves/transforms). */
@@ -212,7 +233,7 @@ internal object ScalingEngine {
         val axisDp = screen.read(cfg.axis)
         val refDp = cfg.reference.read(cfg.axis)
         if (cfg.ignoreMultiWindow && screen.isMultiWindow) {
-            return ResolvedScaling(screen, cfg, 1f, applied, axisDp, refDp, 1f, 1f)
+            return ResolvedScaling(screen, cfg, 1f, applied, axisDp, refDp, 1f, 1f, multiWindowIgnored = true)
         }
         val ratio = if (refDp > 0f) axisDp / refDp else 1f
         val curveFactor = curve(cfg.curve, ratio, axisDp, refDp, cfg.reference, screen)
@@ -266,7 +287,6 @@ internal object ScalingEngine {
 object ScalingStrategies {
     private val lock = SynchronizedObject()
     private val byId = HashMap<String, ScalingStrategy>()
-    private val derivedCache = HashMap<String, ScalingStrategy>()
     private val cacheIds = AtomicInt(0)
 
     /** EN Largest id that fits `DimenCache` custom keys. */
@@ -320,20 +340,27 @@ object ScalingStrategies {
      */
     fun loadJson(json: String): Map<String, ScalingStrategy> {
         val doc = ScalingStrategyJson.decode(json)
+        // EN Resolve the default first, so a bad document registers nothing. PT Resolve o default antes.
+        val defaultStrategy = doc.defaultId?.let { doc.strategies[it] ?: getOrThrow(it) }
         doc.strategies.values.forEach { register(it) }
-        doc.defaultId?.let { default = doc.strategies[it] ?: getOrThrow(it) }
+        defaultStrategy?.let { default = it }
         return doc.strategies
     }
 
-    internal fun derived(id: String, create: () -> ScalingStrategy): ScalingStrategy =
-        synchronized(lock) { derivedCache.getOrPut(id, create) }
+    /**
+     * EN Strategy whose value is the text [formula] (`"base * pow(sw / 360, 0.8)"`), shared per
+     * text. Registry form of [scalingFormula].
+     * PT Estratégia cujo valor é a [formula] em texto, compartilhada por texto.
+     */
+    fun formula(formula: String): ScalingStrategy = FormulaStrategies.get(formula)
+
 
     /** EN Test helper. */
     internal fun resetForTest() {
         synchronized(lock) {
             byId.clear()
-            derivedCache.clear()
         }
+        FormulaStrategies.clear()
         defaultStrategy = null
     }
 }
