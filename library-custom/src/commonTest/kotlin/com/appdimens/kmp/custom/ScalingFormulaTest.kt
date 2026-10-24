@@ -126,6 +126,28 @@ class ScalingFormulaTest {
     }
 
     @Test
+    fun reviewFixes_malformedJsonFailsLoudly_andLoadIsAtomic() {
+        assertTrue(assertFailsWith<IllegalArgumentException> { ScalingStrategies.loadJson("""{"strategies":[{"id":"x","rules":[{"when":"tablet","set":{"multiplier":2}}]}]}""") }.message!!.contains("when must be an object"))
+        assertTrue(assertFailsWith<IllegalArgumentException> { ScalingStrategies.loadJson("""{"strategies":[{"id":"x","ignoreMultiWindow":"true"}]}""") }.message!!.contains("must be a boolean"))
+        assertTrue(assertFailsWith<IllegalArgumentException> { ScalingStrategies.loadJson("""{"strategies":[{"id":"x","clamp":1.5}]}""") }.message!!.contains("clamp must be an object"))
+        assertTrue(assertFailsWith<IllegalArgumentException> { scalingStrategy("neg", register = false) { clampValue(max = -1) } }.message!!.contains("maxValue must be >= 0"))
+        assertTrue(assertFailsWith<IllegalArgumentException> { ScalingStrategies.loadJson("""{"default":"missing","strategies":[{"id":"atomic","multiplier":2}]}""") }.message!!.contains("missing"))
+        assertTrue(ScalingStrategies["atomic"] == null)   // nothing registered by the failed load
+        // withAxis is cached per source instance, not per id.
+        val a = scalingStrategy("same", register = false) { multiply(1f) }
+        val b = scalingStrategy("same", register = false) { multiply(2f) }
+        assertEquals(1f, a.withAxis(ScalingAxis.HEIGHT).config.multiplier, 0f)
+        assertEquals(2f, b.withAxis(ScalingAxis.HEIGHT).config.multiplier, 0f)
+        assertSame(b.withAxis(ScalingAxis.HEIGHT), b.withAxis(ScalingAxis.HEIGHT))
+        // A sensitivity-only rule patch survives export + import.
+        val s = ScalingStrategies.loadJson(
+            """{"strategies":[{"id":"sens","aspectRatio":true,"rules":[{"when":{"device":"tablet"},"set":{"sensitivity":0.01}}]}]}""",
+        ).getValue("sens")
+        val again = ScalingStrategies.loadJson("""{"strategies":[${s.toJson()}]}""").getValue("sens")
+        assertEquals(s.factor(tablet), again.factor(tablet), 0f)
+    }
+
+    @Test
     fun textFormula_errorsAreReportedEarly() {
         val e = assertFailsWith<IllegalArgumentException> { scalingFormula("base * sww") }
         assertTrue(e.message!!.contains("unknown variable 'sww'"), e.message)

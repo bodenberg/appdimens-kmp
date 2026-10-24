@@ -174,6 +174,8 @@ class ScalingStrategy internal constructor(
         return resolved
     }
 
+    private val axisVariants = arrayOfNulls<ScalingStrategy>(ScalingAxis.entries.size)
+
     /** EN Screen-only factor. PT Fator dependente só da tela. */
     fun factor(screen: ScreenSnapshot): Float = resolve(screen).factor
 
@@ -196,7 +198,12 @@ class ScalingStrategy internal constructor(
     fun withAxis(axis: ScalingAxis): ScalingStrategy {
         if (axis == config.axis) return this
         val derivedId = "$id@${axis.jsonName}"
-        return ScalingStrategies.derived(derivedId) { ScalingStrategy(derivedId, config.copy(axis = axis)) }
+        // EN Cached per source instance, so a re-registered id never returns another config's variant.
+        //    A race only builds an equivalent variant twice.
+        // PT Cache por instância de origem: um id re-registrado nunca devolve variante de outra config.
+        val slot = axis.ordinal
+        axisVariants[slot]?.let { return it }
+        return ScalingStrategy(derivedId, config.copy(axis = axis)).also { axisVariants[slot] = it }
     }
 
     /** EN JSON for this strategy (throws for lambda curves/transforms). */
@@ -280,7 +287,6 @@ internal object ScalingEngine {
 object ScalingStrategies {
     private val lock = SynchronizedObject()
     private val byId = HashMap<String, ScalingStrategy>()
-    private val derivedCache = HashMap<String, ScalingStrategy>()
     private val cacheIds = AtomicInt(0)
 
     /** EN Largest id that fits `DimenCache` custom keys. */
@@ -334,8 +340,10 @@ object ScalingStrategies {
      */
     fun loadJson(json: String): Map<String, ScalingStrategy> {
         val doc = ScalingStrategyJson.decode(json)
+        // EN Resolve the default first, so a bad document registers nothing. PT Resolve o default antes.
+        val defaultStrategy = doc.defaultId?.let { doc.strategies[it] ?: getOrThrow(it) }
         doc.strategies.values.forEach { register(it) }
-        doc.defaultId?.let { default = doc.strategies[it] ?: getOrThrow(it) }
+        defaultStrategy?.let { default = it }
         return doc.strategies
     }
 
@@ -346,14 +354,11 @@ object ScalingStrategies {
      */
     fun formula(formula: String): ScalingStrategy = FormulaStrategies.get(formula)
 
-    internal fun derived(id: String, create: () -> ScalingStrategy): ScalingStrategy =
-        synchronized(lock) { derivedCache.getOrPut(id, create) }
 
     /** EN Test helper. */
     internal fun resetForTest() {
         synchronized(lock) {
             byId.clear()
-            derivedCache.clear()
         }
         FormulaStrategies.clear()
         defaultStrategy = null
