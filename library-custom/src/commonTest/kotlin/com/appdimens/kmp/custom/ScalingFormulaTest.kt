@@ -115,6 +115,17 @@ class ScalingFormulaTest {
     }
 
     @Test
+    fun reviewFixes_rangeMustBeAnObject_andIgnoreMultiWindowSkipsTheFormula() {
+        val e = assertFailsWith<IllegalArgumentException> {
+            ScalingStrategies.loadJson("""{"strategies":[{"id":"x","rules":[{"when":{"width":600},"set":{"multiplier":2}}]}]}""")
+        }
+        assertTrue(e.message!!.contains("must be an object"), e.message)
+        val s = scalingStrategy("mw", register = false) { ignoreMultiWindow = true; formula("base * 3") }
+        assertEquals(16f, s.scale(16f, phone.copy(isMultiWindow = true)), 0f)
+        assertEquals(48f, s.scale(16f, phone), 0f)
+    }
+
+    @Test
     fun textFormula_errorsAreReportedEarly() {
         val e = assertFailsWith<IllegalArgumentException> { scalingFormula("base * sww") }
         assertTrue(e.message!!.contains("unknown variable 'sww'"), e.message)
