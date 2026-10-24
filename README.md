@@ -347,8 +347,8 @@ import com.appdimens.kmp.compose.custom.*
 Modifier.padding(16.cdp("base * pow(sw / 360, 0.8)"))               // inline
 val Hud = scalingFormula("base * (tablet ? 0.9 : 1) * clamp(sw / 360, 0.85, 1.6)")
 Text("Score", fontSize = 18.csp(Hud))
-val Fancy = scalingFormula { base, screen -> base * (screen.smallestWidthDp / 360f).pow(0.8f) }  // plain Kotlin
-val Product = CustomScaleStrategy { screen -> (screen.widthDp / 360f).coerceIn(0.85f, 1.80f) }   // programmable factor
+val Fancy = scalingFormula { base * pow(sw / 360f, 0.8f) }                       // typed Kotlin, autocompleted
+val Product = CustomScaleStrategy { (width / 360f).coerceIn(0.85f, 1.80f) }      // programmable factor
 ```
 
 For rules per device, factor bounds or a font-scale policy, use the full configuration:
@@ -430,7 +430,7 @@ Other strategies (**percent**, **power**, **fluid**, **auto**, **diagonal**, **f
 
 | Change | Description |
 |--------|-------------|
-| **New module `appdimens-kmp-custom`** | Lets you define your own scaling strategies. The simplest form is a formula you write yourself (`16.cdp("base * pow(sw / 360, 0.8)")`, `scalingFormula("…")` or `scalingFormula { base, screen -> … }`) or a programmable factor (`CustomScaleStrategy { screen -> … }`); `base * (…)` formulas stay on the one-multiply fast path. There is also a DSL (`scalingStrategy("brand") { … }`) or JSON (one format shared with every AppDimens platform). Curves: linear, power, logarithmic, interpolated, constant, breakpoints, a free-form text `expression("…")` (JSON-serializable, same result on every platform), or a pure `custom { }` lambda; plus a per-value `formula("…")`. Strategies support axes, reference frame, factor/value bounds, aspect ratio, font-scale policy, and rules per device class / screen range / orientation / multi-window. They can extend built-ins or presets. |
+| **New module `appdimens-kmp-custom`** | Lets you define your own scaling strategies. The simplest form is one line of typed Kotlin with autocomplete: a factor (`CustomScaleStrategy { (width / 360f).coerceIn(0.85f, 1.8f) }`) or a final-value formula (`scalingFormula { base * pow(sw / 360f, 0.8f) }`), or the same formula as text for JSON (`scalingFormula("base * pow(sw / 360, 0.8)")`, `16.cdp("…")`). There is also a DSL (`scalingStrategy("brand") { … }`) or JSON (one format shared with every AppDimens platform). Curves: linear, power, logarithmic, interpolated, constant, breakpoints, a free-form text `expression("…")` (JSON-serializable, same result on every platform), or a pure `custom { }` lambda; plus a per-value `formula("…")`. Strategies support axes, reference frame, factor/value bounds, aspect ratio, font-scale policy, and rules per device class / screen range / orientation / multi-window. They can extend built-ins or presets. |
 | **APIs** | Compose: `16.cdp(Brand)` · `14.csp(Brand)` · `cdpPx` / `cspPx` · `ProvideScalingStrategy` · `Brand.dp(16)` · `explainCurrent()`. `code`: `16.cdp(appContext, Brand)` (px) · `cdpDp` · `csp` · `cspUnits`. Device class per target via `expect`/`actual` (desktop targets → `desktop`). |
 | **Core: `CalcType.CUSTOM`** | `DimenCache.buildCustomKey` puts the strategy id in the 16 sensitivity bits, so strategies never alias. Factor-only strategies take the one-multiply bypass lane; value-dependent ones are cached per window snapshot. |
 
