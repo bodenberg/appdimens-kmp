@@ -82,6 +82,21 @@ class ScalingFormulaTest {
     }
 
     @Test
+    fun programmableFactor_isScreenOnly_andMultipliesEveryValue() {
+        val product = CustomScaleStrategy { screen -> (screen.widthDp / 360f).coerceIn(0.85f, 1.80f) }
+        assertFalse(product.isValueDependent)
+        assertEquals(411f / 360f, product.factor(phone), 1e-6f)
+        assertEquals(1.8f, product.factor(tablet), 0f)
+        assertEquals(16f * 411f / 360f, product.scale(16f, phone), 1e-5f)
+        assertTrue(product.id.startsWith("scale#"))
+        val named = CustomScaleStrategy(id = "product") { 1.25f }
+        assertSame(named, ScalingStrategies["product"])
+        assertEquals(20f, named.scale(16f, phone), 0f)
+        val e = assertFailsWith<IllegalArgumentException> { CustomScaleStrategy { Float.NaN }.factor(phone) }
+        assertTrue(e.message!!.contains("non-finite"), e.message)
+    }
+
+    @Test
     fun textFormula_errorsAreReportedEarly() {
         val e = assertFailsWith<IllegalArgumentException> { scalingFormula("base * sww") }
         assertTrue(e.message!!.contains("unknown variable 'sww'"), e.message)

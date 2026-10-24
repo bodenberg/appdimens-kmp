@@ -23,7 +23,22 @@ Modifier.size(48.cdp(Hud))
 
 // 3. In code, with no limits (not JSON-serializable)
 val Fancy = scalingFormula { base, screen -> base * (screen.smallestWidthDp / 360f).pow(0.8f) }
+
+// 4. Programmable factor: return the factor that multiplies every value
+val Product = CustomScaleStrategy { screen ->
+    val width = screen.widthDp
+    (width / 360f).coerceIn(0.85f, 1.80f)
+}
+Modifier.padding(16.cdp(Product))    // 16 × factor
 ```
+
+| Form | You return | Cost per value | JSON |
+|---|---|---|---|
+| `16.cdp("…")` / `scalingFormula("…")` | the final value (`base` = input) | one multiply when shaped `base * (…)`, otherwise cached | yes |
+| `scalingFormula { base, screen -> … }` | the final value | cached per value and window | no |
+| `CustomScaleStrategy { screen -> … }` | the **factor** (any Kotlin: `if`, `when`, helpers, `coerceIn`…) | one multiply (the lambda runs once per window) | no |
+
+In the lambdas, `screen` is a `ScreenSnapshot`: `widthDp`, `heightDp`, `smallestWidthDp`, `minDp`, `maxDp`, `aspectRatio`, `density`, `fontScale`, `isLandscape`, `isMultiWindow`, `device` (`DeviceClass.PHONE`, `TABLET`, `TV`…). Lambdas must be pure (they must not read mutable state), because results are memoized per window.
 
 Without Compose (`code.custom`) you get **px**: `16.cdp(appContext, "base * pow(sw / 360, 0.8)")` · also `cdpDp`, `csp`, `cspUnits`; `ScalingStrategies.formula("…")` returns the shared strategy for a text.
 

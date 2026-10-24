@@ -28,6 +28,7 @@ import com.appdimens.kmp.compose.custom.cdp
 import com.appdimens.kmp.compose.custom.csp
 import com.appdimens.kmp.compose.custom.explainCurrent
 import com.appdimens.kmp.custom.CustomPresets
+import com.appdimens.kmp.custom.CustomScaleStrategy
 import com.appdimens.kmp.custom.DeviceClass
 import com.appdimens.kmp.custom.ScalingStrategy
 import com.appdimens.kmp.custom.scalingFormula
@@ -52,6 +53,11 @@ val DemoBrand: ScalingStrategy = scalingStrategy("demoBrand") {
  */
 val DemoFormula: ScalingStrategy = scalingFormula("base * (tablet ? 0.9 : 1) * clamp(sw / 360, 0.85, 1.6)")
 
+/** EN Programmable factor in plain Kotlin. PT Fator programável em Kotlin puro. */
+val DemoProduct: ScalingStrategy = CustomScaleStrategy { screen ->
+    (screen.widthDp / 360f).coerceIn(0.85f, 1.80f)
+}
+
 @Composable
 fun CustomStrategyExampleCard() {
     Card(
@@ -72,6 +78,7 @@ fun CustomStrategyExampleCard() {
                 DemoBox("gameHud", 48.cdp(CustomPresets.GAME_HUD))
                 DemoBox("formula", 48.cdp(DemoFormula))
                 DemoBox("inline", 48.cdp("base * pow(sw / 360, 0.8)"))
+                DemoBox("factor", 48.cdp(DemoProduct))
             }
             // EN Every cdp/csp without an explicit strategy inside the scope uses DemoBrand.
             // PT Todo cdp/csp sem estratégia explícita dentro do escopo usa DemoBrand.
