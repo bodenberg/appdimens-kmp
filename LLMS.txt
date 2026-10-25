@@ -32,7 +32,7 @@
 - [Power](DOCUMENTATION/power.md)
 - [Resize](DOCUMENTATION/resize.md)
 - [Physical units](DOCUMENTATION/physical-units.md)
-- [Custom strategies](DOCUMENTATION/custom.md): simplest form: one line of typed Kotlin, e.g. `CustomScaleStrategy { (width / 360f).coerceIn(0.85f, 1.8f) }` (factor) or `scalingFormula { base * pow(sw / 360f, 0.8f) }` (final value); as text for JSON: `scalingFormula("base * pow(sw / 360, 0.8)")`, `16.cdp("…")`; full form: your own scaling — `scalingStrategy("brand") { … }`, rules per device class / screen range / orientation, JSON shared with every AppDimens platform, free-form text formulas (`expression("…")`, `formula("…")`), presets; `16.cdp(Brand)`, `14.csp(Brand)`, `ProvideScalingStrategy`, `16.cdp(appContext, Brand)` (px)
+- [Custom strategies](DOCUMENTATION/custom.md): simplest form: one line of typed Kotlin, e.g. `CustomScaleStrategy { (width / 360f).coerceIn(0.85f, 1.8f) }` (factor) or `scalingFormula { base * pow(sw / 360f, 0.8f) }` (final value); as text for JSON: `scalingFormula("base * pow(sw / 360, 0.8)")`, `16.cdp("…")`; full form: your own scaling — `scalingStrategy("brand") { … }`, rules per device class / screen range / orientation, JSON shared with every AppDimens platform, free-form text formulas (`expression("…")`, `formula("…")`), presets; `16.cdp(Brand)`, `14.csp(Brand)`, `ProvideScalingStrategy`, `16.cdp(appContext, Brand)` (px). Full guides: [DOCUMENTATION/custom/](DOCUMENTATION/custom/README.md) (quick start, code formulas, text formulas, configuration, JSON, API reference, performance, cookbook, troubleshooting); agent notes: [skills/custom.md](skills/custom.md)
 
 ## Key packages
 

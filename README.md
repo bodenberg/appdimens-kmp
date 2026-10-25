@@ -367,7 +367,7 @@ Text("Hi", fontSize = 14.csp(Brand))
 ProvideScalingStrategy(Brand) { Text("Scoped", fontSize = 14.csp) }   // or ScalingStrategies.default = Brand
 ```
 
-The module is pure `commonMain` code, so it runs on every KMP target. The same configuration loads from JSON on every AppDimens platform (`ScalingStrategies.loadJson(text)`). Ready-made presets include `CustomPresets.TABLET_FRIENDLY`, `TV_SAFE`, `WEARABLE` and `GAME_HUD`. Built-ins can be extended (`BuiltInStrategies.POWER.extend("soft") { … }`). The non-Compose API returns **px**: `16.cdp(appContext, Brand)`. Full guide: [DOCUMENTATION/custom.md](DOCUMENTATION/custom.md).
+The module is pure `commonMain` code, so it runs on every KMP target. The same configuration loads from JSON on every AppDimens platform (`ScalingStrategies.loadJson(text)`). Ready-made presets include `CustomPresets.TABLET_FRIENDLY`, `TV_SAFE`, `WEARABLE` and `GAME_HUD`. Built-ins can be extended (`BuiltInStrategies.POWER.extend("soft") { … }`). The non-Compose API returns **px**: `16.cdp(appContext, Brand)`. Overview: [DOCUMENTATION/custom.md](DOCUMENTATION/custom.md); full guides (quick start, code and text formulas, configuration, JSON, API, cookbook, troubleshooting): [DOCUMENTATION/custom/](DOCUMENTATION/custom/README.md).
 
 ---
 
