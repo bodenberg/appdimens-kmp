@@ -27,7 +27,7 @@ Read this file when you need package locations, Compose↔`code` symmetry, or co
 | power | `:library-power` | `appdimens-kmp-power` | `library-power/.../power` |
 | resize | `:library-resize` | `appdimens-kmp-resize` | `library-resize/.../resize` |
 | units | `:library-units` | `appdimens-kmp-units` | `library-units/.../units` |
-| custom *(unreleased)* | `:library-custom` | `appdimens-kmp-custom` | `library-custom/src/{commonMain,composeMain}/.../{custom,code/custom,compose/custom}` |
+| custom | `:library-custom` | `appdimens-kmp-custom` | `library-custom/src/{commonMain,composeMain}/.../{custom,code/custom,compose/custom}` |
 
 Full graph: [DOCUMENTATION/MODULES.md](../DOCUMENTATION/MODULES.md). Satellites depend only on `:library`. `:library-bom` publishes version constraints.
 
@@ -74,7 +74,7 @@ Full graph: [DOCUMENTATION/MODULES.md](../DOCUMENTATION/MODULES.md). Satellites 
 | perimeter | [DOCUMENTATION/perimeter.md](../DOCUMENTATION/perimeter.md) |
 | density | [DOCUMENTATION/density.md](../DOCUMENTATION/density.md) |
 | resize | [DOCUMENTATION/resize.md](../DOCUMENTATION/resize.md) |
-| custom | [DOCUMENTATION/custom.md](https://github.com/bodenberg/appdimens-kmp/blob/main/DOCUMENTATION/custom.md) + [custom/](https://github.com/bodenberg/appdimens-kmp/blob/main/DOCUMENTATION/custom/README.md) guides (unreleased, `main`); agent notes: [custom.md](custom.md) |
+| custom | [DOCUMENTATION/custom.md](https://github.com/bodenberg/appdimens-kmp/blob/main/DOCUMENTATION/custom.md) + [custom/](https://github.com/bodenberg/appdimens-kmp/blob/main/DOCUMENTATION/custom/README.md) guides; agent notes: [custom.md](custom.md) |
 | units (physical) | [DOCUMENTATION/physical-units.md](../DOCUMENTATION/physical-units.md) |
 
 **Formal docs:** [PRD.md](../DOCUMENTATION/PRD.md) · [PDR.md](../DOCUMENTATION/PDR.md) · [MATHEMATICS-AND-CALCULUS.md](../DOCUMENTATION/MATHEMATICS-AND-CALCULUS.md)  
