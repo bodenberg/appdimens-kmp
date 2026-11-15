@@ -16,6 +16,7 @@ On release bumps, update version URLs in this file, `library-map.md`, and `refer
 **Unreleased — custom strategies (`appdimens-kmp-custom`, on `main`):**
 - `scalingStrategy("brand") { reference(…); curve = power(0.8f); clamp(…); on(DeviceClass.TABLET) { … } }` registers a user-defined strategy. JSON (`ScalingStrategies.loadJson`) uses the cross-platform `custom-strategy.schema.json` format.
 - Compose: `16.cdp(Brand)`, `14.csp(Brand)`, `cdpPx` / `cspPx`, the no-arg `16.cdp` (scope via `ProvideScalingStrategy`, else `ScalingStrategies.default`), `Brand.dp(16)`, `Brand.explainCurrent()`. `code`: `16.cdp(appContext, Brand)` returns **px**; also `cdpDp`, `csp`, `cspUnits`. Pure `commonMain`, every target.
+- Simplest form, for when the user just wants to write the math: one line of typed Kotlin, autocompleted, with the same names as the text language: `CustomScaleStrategy { (width / 360f).coerceIn(0.85f, 1.8f) }` (factor, runs once per window, one multiply per value) or `scalingFormula { base * pow(sw / 360f, 0.8f) }` (final value; `base` = the value passed). Scope names: `base sw width height shortSide longSide diagonal perimeter aspectRatio ratio density fontScale`, Booleans `phone tablet desktop tv watch car vr landscape portrait multiWindow`, math `pow sqrt ln log10 exp abs round min max clamp lerp smoothstep`. Use text (`scalingFormula("base * pow(sw / 360, 0.8)")`, `16.cdp("…")`) only when the formula must live in JSON or remote config (`code`: `16.cdp(appContext, …)` returns px); text shaped `base * (…)` stays on the one-multiply fast path.
 - Free-form formulas: `curve = expression("pow(ratio, 0.8) * (tablet ? 0.9 : 1)")` (factor) and `formula("base * pow(sw / 360, 0.7) + 2")` (per value) — text that also works in JSON (`"type": "expression"`, `"formula"`) and gives identical results on every platform. Variables: `sw width height shortSide longSide diagonal perimeter aspectRatio density fontScale`, flags `landscape portrait multiWindow phone tablet desktop tv watch car vr`, curve context `ratio axis ref refWidth refHeight`, value context `base scaled factor`.
 - Presets `CustomPresets.{TABLET_FRIENDLY, COMPACT_FIRST, TV_SAFE, WEARABLE, GAME_HUD, READABLE_TEXT}`. Built-ins as parents: `BuiltInStrategies.{SCALED, POWER, LOGARITHMIC, INTERPOLATED, DIAGONAL, PERIMETER, FIXED}.extend(id) { … }`.
 - Core: `CalcType.CUSTOM` + `DimenCache.buildCustomKey` (the strategy id lives in the key, so strategies never alias). Factor-only strategies cost one multiply.
@@ -51,7 +52,8 @@ On release bumps, update version URLs in this file, `library-map.md`, and `refer
 - [DOCUMENTATION/COMPOSE-API-CONVENTIONS.md](../DOCUMENTATION/COMPOSE-API-CONVENTIONS.md) — Compose naming, facilitators, Plain chains, `code` parity
 - [DOCUMENTATION/resize.md](../DOCUMENTATION/resize.md) — `compose.resize` / `code.resize`
 - [GUIDE-FOR-BEGINNERS.md](../GUIDE-FOR-BEGINNERS.md) — narrative walkthrough
-- [DOCUMENTATION/custom.md](https://github.com/bodenberg/appdimens-kmp/blob/main/DOCUMENTATION/custom.md) — custom strategies (DSL, JSON, rules, presets, device classes per target); unreleased, on `main`
+- [DOCUMENTATION/custom.md](https://github.com/bodenberg/appdimens-kmp/blob/main/DOCUMENTATION/custom.md) and the [custom/](https://github.com/bodenberg/appdimens-kmp/blob/main/DOCUMENTATION/custom/README.md) guides — custom strategies (code and text formulas, DSL, JSON, rules, presets, device classes per target); unreleased, on `main`
+- [skills/custom.md](custom.md) — agent reference for custom strategies: which form to pick, cheat sheet, rules to follow, verification
 - [PERFORMANCE.md](../PERFORMANCE.md) / [PERFORMANCE-COMPARATIVE.md](../PERFORMANCE-COMPARATIVE.md) — measured numbers per platform
 - Examples: [`app`](../app/README.md) (KMP demo) · [`app-android`](../app-android) (Android-only demo)
 
@@ -180,7 +182,7 @@ Use only when requirements or QA justify leaving scaled. **Before recommending a
 
 ### Custom strategy workflow
 
-Use when the user asks for their own scaling or none of the rows above satisfies the acceptance criteria. Read [custom.md](https://github.com/bodenberg/appdimens-kmp/blob/main/DOCUMENTATION/custom.md) first.
+Use when the user asks for their own scaling or none of the rows above satisfies the acceptance criteria. Read [custom.md](https://github.com/bodenberg/appdimens-kmp/blob/main/DOCUMENTATION/custom.md) and the agent notes in [skills/custom.md](custom.md) first.
 
 1. **Start from the closest built-in or preset** (`BuiltInStrategies.POWER.extend("x") { … }`, `CustomPresets.TABLET_FRIENDLY`, JSON `"extends"`). Change only what the acceptance criteria need.
 2. **Keep a single source.** Define strategies in one place (`object AppStrategies` or a `composeResources/files/appdimens-strategies.json` loaded with `ScalingStrategies.loadJson`). If the project has an `appdimens.config.json` listing `customStrategies`, reuse those ids and never invent new ones silently.

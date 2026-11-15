@@ -336,12 +336,24 @@ Approximate **real-world** size on screen (density-based). Compose: use helpers 
 
 ## Custom strategies (your own scaling)
 
-When none of the built-in curves fits, or one growth law must be shared by several apps and platforms, define your own strategy with `appdimens-kmp-custom`:
+When none of the built-in curves fits, or one growth law must be shared by several apps and platforms, define your own strategy with `appdimens-kmp-custom`.
+
+The simplest way is to write the formula. `base` is the value you pass, and the result is the scaled value:
 
 ```kotlin
 import com.appdimens.kmp.custom.*
 import com.appdimens.kmp.compose.custom.*
 
+Modifier.padding(16.cdp("base * pow(sw / 360, 0.8)"))               // inline
+val Hud = scalingFormula("base * (tablet ? 0.9 : 1) * clamp(sw / 360, 0.85, 1.6)")
+Text("Score", fontSize = 18.csp(Hud))
+val Fancy = scalingFormula { base * pow(sw / 360f, 0.8f) }                       // typed Kotlin, autocompleted
+val Product = CustomScaleStrategy { (width / 360f).coerceIn(0.85f, 1.80f) }      // programmable factor
+```
+
+For rules per device, factor bounds or a font-scale policy, use the full configuration:
+
+```kotlin
 val Brand = scalingStrategy("brand") {
     reference(width = 360, height = 640)          // your design frame
     curve = power(0.8f)                             // linear / power / logarithmic / interpolated / breakpoints / expression("…") / custom { }
@@ -355,7 +367,7 @@ Text("Hi", fontSize = 14.csp(Brand))
 ProvideScalingStrategy(Brand) { Text("Scoped", fontSize = 14.csp) }   // or ScalingStrategies.default = Brand
 ```
 
-The module is pure `commonMain` code, so it runs on every KMP target. The same configuration loads from JSON on every AppDimens platform (`ScalingStrategies.loadJson(text)`). Ready-made presets include `CustomPresets.TABLET_FRIENDLY`, `TV_SAFE`, `WEARABLE` and `GAME_HUD`. Built-ins can be extended (`BuiltInStrategies.POWER.extend("soft") { … }`). The non-Compose API returns **px**: `16.cdp(appContext, Brand)`. Full guide: [DOCUMENTATION/custom.md](DOCUMENTATION/custom.md).
+The module is pure `commonMain` code, so it runs on every KMP target. The same configuration loads from JSON on every AppDimens platform (`ScalingStrategies.loadJson(text)`). Ready-made presets include `CustomPresets.TABLET_FRIENDLY`, `TV_SAFE`, `WEARABLE` and `GAME_HUD`. Built-ins can be extended (`BuiltInStrategies.POWER.extend("soft") { … }`). The non-Compose API returns **px**: `16.cdp(appContext, Brand)`. Overview: [DOCUMENTATION/custom.md](DOCUMENTATION/custom.md); full guides (quick start, code and text formulas, configuration, JSON, API, cookbook, troubleshooting): [DOCUMENTATION/custom/](DOCUMENTATION/custom/README.md).
 
 ---
 
@@ -418,7 +430,7 @@ Other strategies (**percent**, **power**, **fluid**, **auto**, **diagonal**, **f
 
 | Change | Description |
 |--------|-------------|
-| **New module `appdimens-kmp-custom`** | Lets you define your own scaling strategies with a DSL (`scalingStrategy("brand") { … }`) or JSON (one format shared with every AppDimens platform). Curves: linear, power, logarithmic, interpolated, constant, breakpoints, a free-form text `expression("…")` (JSON-serializable, same result on every platform), or a pure `custom { }` lambda; plus a per-value `formula("…")`. Strategies support axes, reference frame, factor/value bounds, aspect ratio, font-scale policy, and rules per device class / screen range / orientation / multi-window. They can extend built-ins or presets. |
+| **New module `appdimens-kmp-custom`** | Lets you define your own scaling strategies. The simplest form is one line of typed Kotlin with autocomplete: a factor (`CustomScaleStrategy { (width / 360f).coerceIn(0.85f, 1.8f) }`) or a final-value formula (`scalingFormula { base * pow(sw / 360f, 0.8f) }`), or the same formula as text for JSON (`scalingFormula("base * pow(sw / 360, 0.8)")`, `16.cdp("…")`). There is also a DSL (`scalingStrategy("brand") { … }`) or JSON (one format shared with every AppDimens platform). Curves: linear, power, logarithmic, interpolated, constant, breakpoints, a free-form text `expression("…")` (JSON-serializable, same result on every platform), or a pure `custom { }` lambda; plus a per-value `formula("…")`. Strategies support axes, reference frame, factor/value bounds, aspect ratio, font-scale policy, and rules per device class / screen range / orientation / multi-window. They can extend built-ins or presets. |
 | **APIs** | Compose: `16.cdp(Brand)` · `14.csp(Brand)` · `cdpPx` / `cspPx` · `ProvideScalingStrategy` · `Brand.dp(16)` · `explainCurrent()`. `code`: `16.cdp(appContext, Brand)` (px) · `cdpDp` · `csp` · `cspUnits`. Device class per target via `expect`/`actual` (desktop targets → `desktop`). |
 | **Core: `CalcType.CUSTOM`** | `DimenCache.buildCustomKey` puts the strategy id in the 16 sensitivity bits, so strategies never alias. Factor-only strategies take the one-multiply bypass lane; value-dependent ones are cached per window snapshot. |
 

@@ -50,7 +50,7 @@ Every library module (`:library` and all satellites) compiles for:
 |----------|----------|
 | `appdimens-kmp` | `common`, `core`, **scaled**, **plain** |
 | `appdimens-kmp-<strategy>` | `code.<strategy>` + `compose.<strategy>` |
-| `appdimens-kmp-custom` | `custom` (DSL, JSON, presets, engine — `commonMain`) + `code.custom` + `compose.custom` — see [custom.md](custom.md) |
+| `appdimens-kmp-custom` | `custom` (code and text formulas, DSL, JSON, presets, engine — `commonMain`) + `code.custom` + `compose.custom` — see [custom.md](custom.md) and [custom/](custom/README.md) |
 | `appdimens-kmp-bom` | Version constraints for the set above (`java-platform`) |
 
 All published coordinates share `appdimens.version` in `gradle.properties` (**3.2.0**).

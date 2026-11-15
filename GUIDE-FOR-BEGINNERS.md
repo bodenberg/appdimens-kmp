@@ -646,6 +646,8 @@ ProvideScalingStrategy(Brand) {
 }
 ```
 
+**Even simpler — just write the formula:** `Box(Modifier.padding(16.cdp("base * pow(sw / 360, 0.8)")))`. `base` is the number you pass (16) and `sw` is the screen's smallest width in dp.
+
 **Not sure about the numbers?** Show `Text(Brand.explainCurrent())` on a phone and on a tablet: it prints the factor and which rules applied.
 
 **Ready-made options:** `CustomPresets.TABLET_FRIENDLY`, `TV_SAFE`, `WEARABLE`, `GAME_HUD`, `COMPACT_FIRST` and `READABLE_TEXT`. Full guide (JSON, `code` API, presets, device classes per target): [DOCUMENTATION/custom.md](DOCUMENTATION/custom.md).
