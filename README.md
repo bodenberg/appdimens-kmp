@@ -116,7 +116,7 @@ implementation("io.github.bodenberg:appdimens-kmp-logarithmic")
 implementation("io.github.bodenberg:appdimens-kmp-perimeter")
 implementation("io.github.bodenberg:appdimens-kmp-resize")
 implementation("io.github.bodenberg:appdimens-kmp-units")
-implementation("io.github.bodenberg:appdimens-kmp-custom")   // your own strategies (unreleased — see below)
+implementation("io.github.bodenberg:appdimens-kmp-custom")   // your own strategies (see below)
 ```
 
 ### Missing strategy module
@@ -426,7 +426,7 @@ Other strategies (**percent**, **power**, **fluid**, **auto**, **diagonal**, **f
 - **Resize-aware on every platform**: desktop/web/iOS/macOS providers rebuild the snapshot from the live window configuration  \
 - **AARs pre-shrunk with R8** at build time (all 14 modules) — consumers get optimized bytecode even in debug  \
 
-### Unreleased — Custom scaling strategies
+### Custom scaling strategies
 
 | Change | Description |
 |--------|-------------|
@@ -489,7 +489,7 @@ Same token names and the same math on every platform — [hub](https://github.co
 | Qt 5/6 — QML, Widgets | [appdimens-qt](https://github.com/bodenberg/appdimens-qt) | `AppDimens.sdp(16)` · `16_sdp` |
 | GTK 3/4 and portable C99 | [appdimens-gtk](https://github.com/bodenberg/appdimens-gtk) | `16sdp` (CSS) · `ad_sdp(&m, 16)` |
 | LVGL 8/9 — MCUs, embedded Linux | [appdimens-lvgl](https://github.com/bodenberg/appdimens-lvgl) | `lv_ad_sdp(16)` |
-| Roku — BrightScript / SceneGraph | [appdimens-roku](https://github.com/bodenberg/appdimens-roku) | `ad.sdp(16)` |
+| Roku — BrightScript / SceneGraph | [appdimens-roku](https://github.com/bodenberg/appdimens-roku) | `sdp(16)` · `ad.sdp(16)` |
 | Python — Tkinter, Qt, Kivy, pygame, Blender | [appdimens-py](https://github.com/bodenberg/appdimens-py) | `ad.sdp(16)` |
 | Games — Unity, Unreal, Godot, C/C++, .NET, Android | [appdimens-games](https://github.com/bodenberg/appdimens-games) | `64f.ASdp()` · `AppDimens.asdp(64)` · `appdimens::asdp(64)` |
 
